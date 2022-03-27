@@ -1,7 +1,7 @@
 # main links
 main:
   - title: "블로그 방문하기"
-    url: https:kyeongchan92.github.io # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
+    url: https://kyeongchan92.github.io # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
   - title: "About"
     url: /about/ # https://mmistakes.github.io/minimal-mistakes/about/
   # - title: "Sample Posts"
