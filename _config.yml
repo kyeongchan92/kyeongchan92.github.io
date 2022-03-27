@@ -24,7 +24,7 @@ description              : "뭔지도 모르는 데이터 사이언티스트가 
 url                      : "https://kyeongchan92.github.io/" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
-teaser                   : "/assets/images/정신차려.jpg" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
+teaser                   : "/assets/images/방패.PNG" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
@@ -103,7 +103,7 @@ analytics:
 # Site Author
 author:
   name             : "리갱"
-  avatar           : "/assets/images/정신차려.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/assets/images/방패.PNG" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "뭔지 모르겠는 데이터 사이언티스트가 되려고"
   #location         : "한국어딘가"
   #email            : "nahcklee@gmail.com"
