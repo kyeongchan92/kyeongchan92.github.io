@@ -102,15 +102,15 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "복습을 위하여"
-  location         : "Somewhere"
+  name             : "리갱"
+  avatar           : "G:\내 드라이브\005Image\정신차려.jpg"# path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : "차곡차곡"
+  location         : "한국어딘가"
   email            :
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
+      url: "nahcklee@gmail.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
