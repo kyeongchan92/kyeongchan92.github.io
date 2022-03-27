@@ -104,7 +104,7 @@ analytics:
 author:
   name             : "리갱"
   avatar           : "/assets/images/정신차려.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "아직 뭔지 모르겠는 데이터 사이언티스트가 되려고"
+  bio              : "뭔지 모르겠는 데이터 사이언티스트가 되려고"
   #location         : "한국어딘가"
   #email            : "nahcklee@gmail.com"
   links:
