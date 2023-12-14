@@ -1,0 +1,826 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Hedvig Letters Serif:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Leegang's AI Note" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다. 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.">
+<meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS ECS task, container 메모리 제한">
+<meta property="og:url" content="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/">
+<meta property="og:site_name" content="Leegang&apos;s AI Note">
+<meta property="og:description" content="ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다. 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/images/ecs example.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS ECS task, container 메모리 제한">
+<meta name="twitter:description" content="ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다. 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.">
+<meta name="twitter:image" content="/assets/images/ecs example.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>AWS ECS task, container 메모리 제한 | Leegang's AI Note</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-129549627-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leegang's AI Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Recommendation system, NLP, Machine Learning, MLOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="assets/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            AWS ECS task, container 메모리 제한
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-11-16T00:00:00+09:00">
+                2023-11-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다.
+컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.</p>
+
+<p>도커 컨테이너를 사용하면 팀원들이 모두 일관된 개발 환경을 가질 수 있다. 소프트웨어, os, 하드웨어의 구성을 어느 컴퓨터에서나 동일하고 표준적인 블록으로 추상화할 수 있기 때문이다.</p>
+
+<h1 id="cluster">Cluster</h1>
+
+<p><img src="/assets/images/ecs example.png" alt="0" /></p>
+
+<p>cluster는 ECS 컨테이너 인스턴스의 그룹이다. ECS는 이러한 인스턴스에 대한 일정, 유지 및 확장 요청 처리 로직을 다룬다. 또한 CPU 및 메모리 요구 사항을 기반으로 각 태스크의 최적 위치를 찾아준다.</p>
+
+<h1 id="task에-메모리-할당하기">task에 메모리 할당하기</h1>
+
+<p>태스크 레벨과 컨테이너 레벨 모두에서 메모리를 정의할 수 있다.</p>
+
+<p>태스크 레벨에서 정의된 메모리는 그 태스크의 hard limit이라고 부른다.</p>
+
+<p>컨테이너 레벨에서는 태스크에 메모리를 할당하기 위한 두 가지 파라미터가 있다. momoryReservation(soft limit)과 memory(hard limit)이다.</p>
+
+<p>소프트 메모리 제한은 스케쥴러가 태스크를 인스턴스에서 실행하기 위해 메모리를 예약해두는 양이다. 소프트 제한은 짧은 시간동안 초과되기도 한다.</p>
+
+<p>한편 하드 메모리 제한은 엄격히 메모리를 제한하는 limit이며 초과될 수 없다. 하드 제한이 넘어가면 컨테이너는 종료된다.</p>
+
+<blockquote>
+  <p>Note! memory와 memoryReservation은 태스크 정의 &gt;  컨테이너 정의에서 설정한다.</p>
+</blockquote>
+
+<p>컨테이너 정의에서 momoryReservation(soft limit)나 memory(hard limit) 둘 중 하나에는 0이 아닌 Integer를 입력해야한다!
+만약 둘 다 적을 것이라면 하드는 소프트보다 커야한다.
+(<a href="https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/task_definition_parameters.html">AWS &gt; aws-documentation &gt; Amazon ECS &gt; 개발자 안내서 &gt; 파라미터 참조 및 리소스 템플릿 &gt; 태스크 정의 파라미터</a>)</p>
+
+<hr />
+<p>참고</p>
+
+<p><a href="https://www.freecodecamp.org/news/amazon-ecs-terms-and-architecture-807d8c4960fd/">A beginner’s guide to Amazon’s Elastic Container Service</a></p>
+
+<p><a href="https://repost.aws/knowledge-center/allocate-ecs-memory-tasks">How can I allocate memory to tasks in Amazon ECS?</a></p>
+
+<p><a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html">Task definition parameters</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/11/22/css-basic/" rel="next" title="CSS 기초">
+                <i class="fa fa-chevron-left"></i> CSS 기초
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/11/15/what-is-gunicorn-wsgi-cgi/" rel="prev" title="gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어">
+                gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/avatar.gif"
+               alt="Kyeongchan Lee" />
+          <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#cluster"> <span class="nav-number">1</span> <span class="nav-text">Cluster</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#task에-메모리-할당하기"> <span class="nav-number">2</span> <span class="nav-text">task에 메모리 할당하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kyeongchan Lee</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

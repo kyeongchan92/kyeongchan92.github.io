@@ -1,1 +1,3 @@
-# kyeongchan92.github.io
+```shell
+bundle exec jekyll serve
+```

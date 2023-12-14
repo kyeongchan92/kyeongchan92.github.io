@@ -1,0 +1,998 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Hedvig Letters Serif:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Leegang's AI Note" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.">
+<meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python cx_Oracle 모듈 사용하여 Oracle DB 연결 - cursor, connection, pool이란">
+<meta property="og:url" content="http://localhost:4000/2023/10/27/cx-oracle/">
+<meta property="og:site_name" content="Leegang&apos;s AI Note">
+<meta property="og:description" content="python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python cx_Oracle 모듈 사용하여 Oracle DB 연결 - cursor, connection, pool이란">
+<meta name="twitter:description" content="python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>Python cx_Oracle 모듈 사용하여 Oracle DB 연결 - cursor, connection, pool이란 | Leegang's AI Note</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-129549627-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leegang's AI Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Recommendation system, NLP, Machine Learning, MLOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/10/27/cx-oracle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="assets/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            Python cx_Oracle 모듈 사용하여 Oracle DB 연결 - cursor, connection, pool이란
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-10-27T00:00:00+09:00">
+                2023-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다.
+cx_Oracle 공식문서인 <a href="https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html#connection-pooling">Connecting to Oracle Database</a>를 번역했습니다.</p>
+
+<h1 id="시작-전-connection과-cursor-기본개념">시작 전 connection과 cursor 기본개념</h1>
+<p>Connection 객체로부터 cursor() 메서드를 호출하여 Cursor객체를 가져오게 된다. Cursor는 Fetch 동작, 즉 데이터를 데이터 조회 동작을 관리한다. Cursor의 execute() 메서드를 사용하여 SQL 문장을 DB 서버에 보낸다.(출처 : <a href="http://pythonstudy.xyz/python/article/202-MySQL-%EC%BF%BC%EB%A6%AC">예제로 배우는 파이썬 프로그래밍-MySQL쿼리</a>)</p>
+
+<p>sql문장의 리턴값은 cursor 객체에 들어있고 cursor.fetchone(), cursor.fetchmany(size), cursor.fetchall()이라는 친구들로 원하는 만큼만 꺼내올 수 있다.
+cursor객체에서 데이터를 가져오고 싶으면 fetch 메소드를 사용해서 가져와야 한다.(출처 : <a href="https://velog.io/@minho/Python-cursors-fetchall-fetchmany-fetchone-to-read-records-from-database-table">Min-Ho’s log</a></p>
+
+<p><strong>cursor.fetchall()</strong> 쿼리 결과의 모든 row을 튜플의 리스트 형태로 리턴한다. fetch할 것이 없으면 빈 리스트를 리턴한다.</p>
+
+<p><strong>cursor.fetchmany(size)</strong> size만큼의 row를 리턴한다. 반복해서 호출할 때마다 다음 셋을 튜플의 리스트 형태로 리턴한다. 더이상 row가 없다면 빈 리스트를 리턴한다.</p>
+
+<p><strong>cursor.fetchone()</strong>  하나만 리턴한다. row가 더이상 없다면 <code class="language-plaintext highlighter-rouge">None</code>을 리턴한다.</p>
+
+<p><a href="https://dongr0510.medium.com/how-to-use-python-cursors-fetchall-fetchmany-fetchone-to-read-records-from-sql-34a0ff456abf">출처</a></p>
+
+<h1 id="database-connection-생성설정">Database Connection 생성/설정</h1>
+<p>cx_Oracle을 이용해 Oracle 데이터베이스에 연결하는 방법은 두 가지가 있다.</p>
+
+<h2 id="1-standalone-connections"><strong>1. Standalone connections</strong></h2>
+
+<p>어플리케이션이 데이터베이스에 싱글 유저 세션을 유지할 때 유용함. <code class="language-plaintext highlighter-rouge">cx_Oracle.connect()</code> 또는 alias인 <code class="language-plaintext highlighter-rouge">cx_Oracle.Connection()</code>으로 생성.</p>
+
+<p>Example) Standalone Connection to Oracle Database</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import cx_Oracle
+userpwd <span class="o">=</span> <span class="s2">". . ."</span>  <span class="c"># 패스워드는 프롬프트로부터 받거나 환경변수로 받으면 된다</span>
+connection <span class="o">=</span> cx_Oracle.connect<span class="o">(</span><span class="nv">user</span><span class="o">=</span><span class="s2">"hr"</span>, 
+                               <span class="nv">password</span><span class="o">=</span>userpwd,
+                               <span class="nv">dsn</span><span class="o">=</span><span class="s2">"dbhost.example.com/orclpdb1"</span>,  <span class="c"># data source name</span>
+                               <span class="nv">encoding</span><span class="o">=</span><span class="s2">"UTF-8"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p><strong>Closing Connections</strong></p>
+
+<p>연결이 더 이상 필요하지 않을 때 <code class="language-plaintext highlighter-rouge">Connection.close()</code>를 호출하여 연결을 해제해야 한다. 또는 연결에 대한 참조가 범위를 벗어나면(references go out of scope라고 표현) 자동으로 정리되도록 해도 된다. 또는 <code class="language-plaintext highlighter-rouge">with</code> 블록을 사용해도 된다.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>with cx_Oracle.connect<span class="o">(</span><span class="nv">user</span><span class="o">=</span>user, 
+                       <span class="nv">password</span><span class="o">=</span>password,
+                       <span class="nv">dsn</span><span class="o">=</span><span class="s2">"dbhost.example.com/orclpdb1"</span>,
+                       <span class="nv">encoding</span><span class="o">=</span><span class="s2">"UTF-8"</span><span class="o">)</span> as connection:
+    cursor <span class="o">=</span> connection.cursor<span class="o">()</span>
+    cursor.execute<span class="o">(</span><span class="s2">"insert into SomeTable values (:1, :2)"</span>,
+                   <span class="o">(</span>1, <span class="s2">"Some string"</span><span class="o">))</span>
+    connection.commit<span class="o">()</span>
+</code></pre></div></div>
+<p>이런식으로 블록으로 짜면 블록이 끝날때 connection은 닫히게 된다. 물론 블록 밖에서 connection 변수는 사용할 수 없다. 커넥션을 즉시 닫는 것은 커넥션 풀을 사용할 때 매우 중요하다. 다른 pool 유저가 재사용 할 수 있도록.</p>
+
+<p><strong>Connection Strings</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">cx_Oracle.connect()</code> 과 <code class="language-plaintext highlighter-rouge">cx_Oracle.SessionPool()</code>에는 data source name을 나타내는 파라미터 <code class="language-plaintext highlighter-rouge">dsn</code>이 있다. 
+이는 Oracle Database connection string(string은 방법, 코드라고 보면 될 것 같다)이라고 해서 연결할 데이터베이스를 식별하는 역할을 한다. <code class="language-plaintext highlighter-rouge">dsn</code> string은 다음 중 하나로 만들 수 있다.</p>
+<ul>
+  <li>An Oracle Easy Connect string</li>
+  <li>An Oracle Net Connect Descriptor string</li>
+  <li>A Net Service Name mapping to a connect descriptor</li>
+</ul>
+
+<p>하나씩 알아보자.</p>
+
+<p><strong>Easy Connect Syntax for Connection Strings</strong></p>
+
+<p>가장 간단한 connection string이다. <code class="language-plaintext highlighter-rouge">tnsnames.ora</code>같은 configuration 파일이 필요없다.</p>
+
+<p>Example) 예를들어 서비스가 <code class="language-plaintext highlighter-rouge">orclpdb1</code>이고 host가 <code class="language-plaintext highlighter-rouge">dbhost.example.com</code>이면 다음과 같이 사용한다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">connection</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s">"hr"</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">userpwd</span><span class="p">,</span>
+                               <span class="n">dsn</span><span class="o">=</span><span class="s">"dbhost.example.com/orclpdb1"</span><span class="p">,</span>
+                               <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>디폴트 port가 없는 데이터 베이스라면 dsn은 <code class="language-plaintext highlighter-rouge">"dbhost.example.com:1984/orclpdb1"</code>처럼 써야한다.</p>
+
+<p>Easy Connect Syntax는 예전 sid를 사용할 수 없고 service name을 지원한다.</p>
+
+<p><strong>Oracle Net Connect Descriptor Strings</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">cx_Oracle.makedsn()</code> 함수는 <code class="language-plaintext highlighter-rouge">cx_Oracle.connect()</code> 과 <code class="language-plaintext highlighter-rouge">cx_Oracle.SessionPool()</code>의 dsn 파라미터, 즉 connect descriptor string을 만드는데 사용된다.
+<code class="language-plaintext highlighter-rouge">makedsn()</code>함수는 데이터베이스의 hostname, port 번호, service name을 인자로 받는다.</p>
+
+<p>Example) 예를들어 서비스가 <code class="language-plaintext highlighter-rouge">orclpdb1</code>이고 host가 <code class="language-plaintext highlighter-rouge">dbhost.example.com</code>이면 다음과 같이 사용한다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dsn</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">makedsn</span><span class="p">(</span><span class="s">"dbhost.example.com"</span><span class="p">,</span> <span class="mi">1521</span><span class="p">,</span> <span class="n">service_name</span><span class="o">=</span><span class="s">"orclpdb1"</span><span class="p">)</span>
+<span class="n">connection</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s">"hr"</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">userpwd</span><span class="p">,</span> <span class="n">dsn</span><span class="o">=</span><span class="n">dsn</span><span class="p">,</span>
+                               <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">)</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">service_name</code>을 명시하는 이유는 세 번째 파라미터가 service name이 아닌 sid(system identifier)이기 때문이다. 그러나 대부분의 데이터베이스들은 service name을 주로 사용한다.
+<code class="language-plaintext highlighter-rouge">dsn</code>으로 넘어가는 인자는 다음과 같아진다.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=dbhost.example.com)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))
+</code></pre></div></div>
+
+<p><strong>Net Service Names for Connection Strings</strong></p>
+
+<hr />
+
+<h2 id="2-pooled-connections"><strong>2. Pooled connections</strong></h2>
+
+<p>커넥션 풀링(Connection pooling)은 어플리케이션이 데이터베이스에 자주 연결/연결해제를 할때 성능에 있어 중요한 요소이다. 풀(Pools)은 오라클의 *고가용성(high availability) 특징을 지원하고 신뢰해야하는 어플리케이션에 추천한다.
+작은 풀(small pools) 또한 단지 몇 번의 연결만 원할 때 유용할 수 있다. Pool은 어플리케이션 초기화할 때 <code class="language-plaintext highlighter-rouge">cx_Oracle.SessionPool()</code>로 생성하면 되고, <code class="language-plaintext highlighter-rouge">SessionPool.acquire()</code>을 이용해 pool로부터 connection을 가져올 수 있다.</p>
+
+<p>*고가용성(High Availability) : 시스템이 연속적으로 가동되며 사용 가능한 상태를 유지하는 능력. 시스템 또는 데이터베이스가 장애, 오류, 혹은 다른 문제로부터 회복하고 사용자에게 끊김 없이 서비스를 제공할 수 있는 더 높은 신뢰성</p>
+
+<h1 id="connection-pooling">Connection Pooling</h1>
+
+<p>cx_Oracle의 connection pooling은 어플리케이션들이 데이터베이스로의 connection의 pool을 생성/관리할 수 있게 한다.
+하나의 connection pool은 <code class="language-plaintext highlighter-rouge">SessionPool()</code>로 생성할 수 있다. 일반적으로 어플리케이션 초기화중에 호출된다. Pool 생성시에 initial pool size와 maximum pool size를 넘겨준다.</p>
+
+<p>pool이 더 많은 연결을 필요로 할 때, 새로운 연결이 자동으로 생성된다. 연결이 더이상 필요하지 않을 때 pool은 <code class="language-plaintext highlighter-rouge">min</code>으로 취소될 수 있다.</p>
+
+<p>Pool이 만들어진 후, <code class="language-plaintext highlighter-rouge">acquire()</code>를 호출하면 connection을 얻을 수 있다. 이 connection들을 standalone connection 사용 방식과 동일하게 사용하면 된다.
+Pool에서 얻어진 connection은 사용하고 나면  <code class="language-plaintext highlighter-rouge">SessionPool.release()</code> 또는 <code class="language-plaintext highlighter-rouge">Connection.close()</code>를 사용하여 다시 pool로 회수할 수 있다. 그렇지 않으면 connection을 참조하는 모든 변수들이 scope를 벗어날 때 회수된다.
+session pool은 <code class="language-plaintext highlighter-rouge">SessionPool.close()</code>를 사용하면 완전히 닫을 수 있다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">SessionPool</code>에서 session이란 ‘데이터베이스와의 연결’을 나타낸다고 보면 될 것 같다(chatgpt).</p>
+
+<ul>
+  <li>min : 세션 풀이 생성될 때 사용된 세션의 수와 세션 풀에서 관리될 최소 세션 수</li>
+  <li>max : 세션 풀이 제어할 수 있는 세션의 최대 수</li>
+  <li>increment : 추가 세션이 생성되어야 할 때, 생성될 세션의 수.</li>
+</ul>
+
+<p>Example</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># session pool 생성
+</span><span class="n">pool</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">SessionPool</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s">"hr"</span><span class="p">,</span> 
+                             <span class="n">password</span><span class="o">=</span><span class="n">userpwd</span><span class="p">,</span>
+                             <span class="n">dsn</span><span class="o">=</span><span class="s">"dbhost.example.com/orclpdb1"</span><span class="p">,</span> 
+                             <span class="nb">min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                             <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">)</span>
+
+<span class="c1"># Acquire a connection from the pool
+</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">acquire</span><span class="p">()</span>
+
+<span class="c1"># Use the pooled connection
+</span><span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"select * from mytab"</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="c1"># Release the connection to the pool
+</span><span class="n">pool</span><span class="p">.</span><span class="n">release</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+
+<span class="c1"># Close the pool
+</span><span class="n">pool</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>SessionPool 생성할 때 getmode 옵션을 주면 <code class="language-plaintext highlighter-rouge">acquire()</code> 호출 시 모든 connection이 사용중이더라도 사용 가능한 상태가 될때까지 기다린다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create the session pool
+</span><span class="n">pool</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">SessionPool</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s">"hr"</span><span class="p">,</span> 
+                             <span class="n">password</span><span class="o">=</span><span class="n">userpwd</span><span class="p">,</span>
+                             <span class="n">dsn</span><span class="o">=</span><span class="s">"dbhost.example.com/orclpdb1"</span><span class="p">,</span>
+                             <span class="nb">min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">getmode</span><span class="o">=</span><span class="n">cx_Oracle</span><span class="p">.</span><span class="n">SPOOL_ATTRVAL_WAIT</span><span class="p">,</span>
+                             <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">SessionPool.acquire()</code>는 리턴하기 전에 cx_Oracle은 네트워크 전송이 open된 상태인지 가벼운 체크를 한다. 만약 open 상태가 아니라면 <code class="language-plaintext highlighter-rouge">acquire()</code>는 해당 connection을 폐기하고 다른 connection을 리턴한다.
+그치만 데이터베이스 세션이 DBA에 의해 죽었는지, 데이터베이스 리소스 매니저 quota limit에 도달했는지는 알지 못한다.
+이를 해결하기 위해 <code class="language-plaintext highlighter-rouge">acquire()</code>는 pool 안의 사용되지 않았던 connection을 반환할 때 full round-trip ping(왕복)을 데이터베이스에 <code class="language-plaintext highlighter-rouge">SessionPool.ping_interval</code> 초 만큼 수행한다.
+만약 ping이 실패하면 해당 connection은 버려지고 다른 connection이 얻어진다.
+full ping은 시간 기반이므로, 모든 실패를 잡아내지 못한다. 또한 타임아웃이나 세션 킬은 <code class="language-plaintext highlighter-rouge">acquire()</code>다음과  <code class="language-plaintext highlighter-rouge">cursor.execute()</code> 전 시간 안에 일어날 수도 있다.
+이를 해결하기 위해 어플리케이션은 각각의 <code class="language-plaintext highlighter-rouge">acquire()</code> 이후에 에러를 체크하고 어플리케이션만의 retry를 할 필요가 있다.</p>
+
+<h1 id="connection-pool-sizing">Connection Pool Sizing</h1>
+
+<p>오라클이 추천하는 방식은 고정된 size의 connection pool을 사용하는 것이다. 즉 <code class="language-plaintext highlighter-rouge">min</code>과 <code class="language-plaintext highlighter-rouge">max</code>를 같게 하고 <code class="language-plaintext highlighter-rouge">ìncrement</code>를 0으로 하는 것이다.
+이것이 <a href="https://yangbongsoo.tistory.com/117">Connection storm</a>, 즉 여러 client가 동시에 DB 연결을 시도하여 과도한 수의 connection이 설정되는 장애 상황을 예방할 수 있다.</p>
+
+<hr />
+
+<h1 id="배치문-실행-및-bulk-로딩">배치문 실행 및 Bulk 로딩</h1>
+
+<p>cursor.execute()는 sql 한 줄만 수행하지만, 값만 바꿔 여러번 실행할 때는 cursor.executemany()를 사용하면 된다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s">'Parent 10'</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s">'Parent 20'</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="s">'Parent 30'</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="s">'Parent 40'</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="s">'Parent 50'</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">cursor</span><span class="p">.</span><span class="n">executemany</span><span class="p">(</span><span class="s">"insert into ParentTable values (:1, :2)"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="https://cx-oracle.readthedocs.io/en/latest/user_guide/batch_statement.html">출처</a></p>
+
+<p>pool로부터 확인할 수 있는 정보는 다음과 같다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">pool.busy</code> :  현재 <code class="language-plaintext highlighter-rouge">acquire()</code>된 세션 수를 반환한다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">pool.opened</code> : 현재 session pool에 의해 열린 세션 수를 반환한다.</p>
+
+<p>opened와 busy의 차이 : opened는 pool에 의해 현재 열린, pool안에 있는 세션의 수를 나타낸다. pool이 현재 확보하고 있는 세션의 수.
+busy는 pool 속의 세션 중에서 현재 작업 중인 세션(=connection 인 것 같다), 즉 쿼리나 다른 작업을 처리 중인 세션의 수를 나타낸다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pool</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="p">.</span><span class="n">SessionPool</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">properties</span><span class="p">[</span><span class="s">'user'</span><span class="p">],</span> 
+                             <span class="n">password</span><span class="o">=</span><span class="n">properties</span><span class="p">[</span><span class="s">'passwd'</span><span class="p">],</span>
+                             <span class="n">dsn</span><span class="o">=</span><span class="n">dsn</span><span class="p">,</span> 
+                             <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                             <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">opened</span><span class="p">)</span>  <span class="c1"># 1
+</span><span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">busy</span><span class="p">)</span>  <span class="c1"># 0
+</span>
+<span class="n">connection</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">acquire</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">opened</span><span class="p">)</span>  <span class="c1"># 1
+</span><span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">busy</span><span class="p">)</span>  <span class="c1"># 1
+</span>
+<span class="n">connection2</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">acquire</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">opened</span><span class="p">)</span>  <span class="c1"># 2
+</span><span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">busy</span><span class="p">)</span>  <span class="c1"># 2
+</span>
+<span class="n">pool</span><span class="p">.</span><span class="n">release</span><span class="p">(</span><span class="n">connection2</span><span class="p">)</span>  <span class="c1"># pool로 반환
+</span><span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">opened</span><span class="p">)</span>  <span class="c1"># 2
+</span><span class="k">print</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">busy</span><span class="p">)</span>  <span class="c1"># 1
+</span>
+</code></pre></div></div>
+
+<p>만약 increment가 2였다면, 두 번째 세션을 얻는 <code class="language-plaintext highlighter-rouge">connection2 = pool.acquire()</code>를 할 때 <code class="language-plaintext highlighter-rouge">pool.opened</code>는 3이 된다. 2개를 여니까.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/11/15/docker-gunicorn-memory-usage-check/" rel="next" title="Docker 내 gunicorn 사용시 memory usage 확인">
+                <i class="fa fa-chevron-left"></i> Docker 내 gunicorn 사용시 memory usage 확인
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/09/19/Contrastive-Learning-for-Sequential-Recommendation/" rel="prev" title="논문리뷰 - Contrastive Learning for Sequential Recommendation">
+                논문리뷰 - Contrastive Learning for Sequential Recommendation <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/avatar.gif"
+               alt="Kyeongchan Lee" />
+          <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#시작-전-connection과-cursor-기본개념"> <span class="nav-number">1</span> <span class="nav-text">시작 전 connection과 cursor 기본개념</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#database-connection-생성설정"> <span class="nav-number">2</span> <span class="nav-text">Database Connection 생성/설정</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#1-standalone-connections"> <span class="nav-number">2.1</span> <span class="nav-text">1. Standalone connections</strong</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#2-pooled-connections"> <span class="nav-number">2.2</span> <span class="nav-text">2. Pooled connections</strong</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#connection-pooling"> <span class="nav-number">3</span> <span class="nav-text">Connection Pooling</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#connection-pool-sizing"> <span class="nav-number">4</span> <span class="nav-text">Connection Pool Sizing</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#배치문-실행-및-bulk-로딩"> <span class="nav-number">5</span> <span class="nav-text">배치문 실행 및 Bulk 로딩</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kyeongchan Lee</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
