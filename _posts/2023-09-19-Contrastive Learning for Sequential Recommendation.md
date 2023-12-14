@@ -19,7 +19,7 @@ self-supervised learning은 라벨없는 데이터에서 representation을 학�
 ![0](/assets/images/cl4rec_framework.png)
 
 
-1\. 증강 모듈(Data Augmentation Module)
+1. 증강 모듈(Data Augmentation Module)
 
 
 $$\mathcal{A}$$를 augmentation method들의 집합이라고 하자. 즉 $$\mathcal{A}$$에는 뒤에 나올 crop, mask, reorder가 들어있다. 
@@ -38,9 +38,9 @@ Augmentation 방법은 $$\mathcal{A}$$로부터 무작위로 2개를 뽑아 $$a_
 - 최소화 : 하나의 시퀀스로부터 변형된 두 개의 시퀀스간 차이
 - 최대화 : 다른 유저로부터 변형된 두 시퀀스간 차이
 
-$$\mathcal{L}_{cl}(s_u^{a_i}, s_u^{a_j})=-\log \frac{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))}{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))+\sum_{s^- \in S^-}\exp(\text{sim}(s_u^{a_i}, s_u^-))}$$
+$$\mathcal{L}_{\text{cl}}(s_u^{a_i}, s_u^{a_j})=-\log \frac{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))}{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))+\sum_{s^- \in S^-}\exp(\text{sim}(s_u^{a_i}, s_u^-))}$$
 
-$$sim(u, v)=u^Tv$$, 즉 내적이다. 손실을 작게 한다 = -를 뗀 log를 크게 한다 = $$s_u^{a_i}$$와 $$s_u^{a_j}$$를 유사하게 한다 + $$s_u^{a_i}$$와 $$S^-$$에 속한 것들과는 멀어지게 한다가 되겠다.
+$$\text{sim}(u, v)=u^Tv$$, 즉 내적이다. 손실을 작게 한다 = -를 뗀 log를 크게 한다 = $$s_u^{a_i}$$와 $$s_u^{a_j}$$를 유사하게 한다 + $$s_u^{a_i}$$와 $$S^-$$에 속한 것들과는 멀어지게 한다가 되겠다.
 
 # Data Augmentation Operators
 
