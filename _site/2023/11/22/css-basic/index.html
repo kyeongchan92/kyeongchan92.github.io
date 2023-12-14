@@ -1,0 +1,1953 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Bitter:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="" />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Leegang's AI Note" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터 정리해보려한다. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.">
+<meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS 기초">
+<meta property="og:url" content="http://localhost:4000/2023/11/22/css-basic/">
+<meta property="og:site_name" content="Leegang&apos;s AI Note">
+<meta property="og:description" content="추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터 정리해보려한다. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/images/css basic/toystory_weird_rating.png">
+<meta property="og:image" content="/assets/images/css basic/attribute_selector.png">
+<meta property="og:image" content="/assets/images/css basic/virtual_before.png">
+<meta property="og:image" content="/assets/images/css basic/virtual_after.png">
+<meta property="og:image" content="/assets/images/css basic/virtual_before_after.png">
+<meta property="og:image" content="/assets/images/css basic/inline_height_draw.png">
+<meta property="og:image" content="/assets/images/css basic/line_height_ex.png">
+<meta property="og:image" content="/assets/images/css basic/width_height1.png">
+<meta property="og:image" content="/assets/images/css basic/width_height2.png">
+<meta property="og:image" content="/assets/images/css basic/margin_body.png">
+<meta property="og:image" content="/assets/images/css basic/margin_box3.png">
+<meta property="og:image" content="/assets/images/css basic/padding_body.png">
+<meta property="og:image" content="/assets/images/css basic/padding_box1.png">
+<meta property="og:image" content="/assets/images/css basic/padding_box2.png">
+<meta property="og:image" content="/assets/images/css basic/padding_box_sizing.png">
+<meta property="og:image" content="/assets/images/css basic/block_inline.png">
+<meta property="og:image" content="/assets/images/css basic/block_inline_height.png">
+<meta property="og:image" content="/assets/images/css basic/block_inline_display.png">
+<meta property="og:image" content="/assets/images/css basic/block_inline_display_block.png">
+<meta property="og:image" content="/assets/images/css basic/background_color.png">
+<meta property="og:image" content="/assets/images/css basic/background_ex_full.png">
+<meta property="og:image" content="/assets/images/css basic/background_ex_small.png">
+<meta property="og:image" content="/assets/images/css basic/background_ex_overflow.png">
+<meta property="og:image" content="/assets/images/css basic/background_ex_fixed_full.png">
+<meta property="og:image" content="/assets/images/css basic/background_ex_fixed_small.png">
+<meta property="og:image" content="/assets/images/css basic/layout_before_init.png">
+<meta property="og:image" content="/assets/images/css basic/layout_after_init.png">
+<meta property="og:image" content="/assets/images/css basic/layout_before_float.png">
+<meta property="og:image" content="/assets/images/css basic/layout_after_float_left.png">
+<meta property="og:image" content="/assets/images/css basic/layout_float_virtual.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_absolute.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_absolute_p.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_absolute_relative.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_fixed1.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_fixed2.png">
+<meta property="og:image" content="/assets/images/css basic/layout_position_fixed3.png">
+<meta property="og:image" content="/assets/images/css basic/layout_zindex.png">
+<meta property="og:image" content="/assets/images/css basic/layout_zindex_2.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CSS 기초">
+<meta name="twitter:description" content="추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터 정리해보려한다. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.">
+<meta name="twitter:image" content="/assets/images/css basic/toystory_weird_rating.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>CSS 기초 | Leegang's AI Note</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-129549627-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leegang's AI Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Recommendation system, NLP, Machine Learning, MLOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/11/22/css-basic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="assets/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            CSS 기초
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-11-22T00:00:00+09:00">
+                2023-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터
+정리해보려한다. 이 글은 <a href="https://m.yes24.com/Goods/Detail/103401495">Do it! 인터랙티브 웹 페이지 만들기</a> 책을 읽고 공부한 내용입니다.</p>
+
+<p><img src="/assets/images/css basic/toystory_weird_rating.png" alt="0" /></p>
+
+<p>위 사진의 html코드는 다음과 같다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;main&gt;</span>
+    <span class="nt">&lt;section&gt;</span>
+        
+    <span class="nt">&lt;/section&gt;</span>
+<span class="nt">&lt;/main&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<p>배경이 되는 회색 별은 &lt;p&gt;태그 바로 아래의 별 다섯개이고, 노란색으로 채워지는 별은 span.rating_star태그이다.
+CSS 코드를 여기 적기엔 너무 길기 때문에 CSS를 공부하면서 왜 저렇게 되는지 알아보자..</p>
+
+<p>아참 위 html 코드의 출처는 <a href="https://stickode.tistory.com/639">[JavaScript] 별점 드래그 기능 만들기</a>이다. (감사합니다ㅠ)</p>
+
+<hr />
+
+<h3 id="전체-선택자">전체 선택자</h3>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">*</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>body 태그를 포함해 태그 전체를 선택할 수 있다.</p>
+
+<h3 id="태그-선택자">태그 선택자</h3>
+
+<p>특정 태그를 선택한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h2</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="자손-선택자">자손 선택자</h3>
+
+<p>자식과 하위요소를 포함해 그 하위에 있는 모든 요소를 선택한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">p</span> <span class="nt">strong</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="자식-선택자">자식 선택자</h3>
+
+<p>직계 자식요소만 선택한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">ul</span> <span class="o">&gt;</span> <span class="nt">li</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="속성-선택자">속성 선택자</h3>
+
+<p>아래와 같은 HTML이 있다고 하자.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;form&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"password"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<p>form 태그 안에 input 태그를 2개 작성하고 type 속성을 각각 지정하자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">input</span><span class="o">[</span><span class="nt">type</span><span class="o">=</span><span class="s1">"text"</span><span class="o">]</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">input</span><span class="o">[</span><span class="nt">type</span><span class="o">=</span><span class="s1">"password"</span><span class="o">]</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/attribute_selector.png" alt="0" /></p>
+
+<p>그럼 결과는 다음과 같다. input 태그의 type 속성마다 각각 적용된다.</p>
+
+<h3 id="가상-선택자">가상 선택자</h3>
+
+<p>가상 선택자(virtual selector)는 특정 조건이 충족될 때 실행되도록 한다. 예를 들어 다음과 같은 HTML과 CSS가 있다고 하자.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1&gt;</span>HELLO<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h1</span><span class="nd">:hover</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">2px</span> <span class="nb">dashed</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>두번째 요소에는 h1에 :hover라는 가상 선택자를 붙였다.</p>
+
+<p><img src="/assets/images/css basic/virtual_before.png" alt="0" /></p>
+
+<p>마우스를 올려놓기 전엔 파란색 solid 선이다.</p>
+
+<p><img src="/assets/images/css basic/virtual_after.png" alt="0" /></p>
+
+<p>마우스를 올려놓으면 빨간색 dashed 선으로 바뀐다.</p>
+
+<p>이번엔 가상선택자 :before와 :after에 대해 알아보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span><span class="nd">:before</span> <span class="p">{</span>
+    <span class="nl">content</span><span class="p">:</span> <span class="s1">"before content"</span><span class="p">;</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h1</span><span class="nd">:after</span> <span class="p">{</span>
+    <span class="nl">content</span><span class="p">:</span> <span class="s1">"after content"</span><span class="p">;</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/virtual_before_after.png" alt="0" /></p>
+
+<p>그림처럼 :before와 :after는 ‘content’에 입력한 글자가 HELLO 앞뒤에 나타난다. 개발자도구에서 확인해보면 ::before와 ::after라는 가상의 요소가 생성되었다. HTML 파일에 입력하지
+않아도 CSS파일에서 입력한 콘텐츠가 생기는 것이다.</p>
+
+<h3 id="클래스-선택자와-아이디-선택자">클래스 선택자와 아이디 선택자</h3>
+
+<p>는 각각 .과 #를 사용하면 되니 넘어가자.</p>
+
+<h3 id="폰트-굵기">폰트 굵기</h3>
+
+<p>normal과 bold 두 가지가 있다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">font-weight</span><span class="p">:</span> <span class="nb">normal</span><span class="p">;</span> <span class="c">/*h1의 기본 굵기를 제거하고 normal을 적용한다.*/</span>
+<span class="p">}</span>
+
+<span class="nt">p</span> <span class="nt">span</span> <span class="p">{</span>
+    <span class="nl">font-weight</span><span class="p">:</span> <span class="nb">bold</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="폰트-크기-바꾸기">폰트 크기 바꾸기</h3>
+
+<p>웹페이지는 보통 픽셀로 구성되기 때문에 px를 주로 쓰지만 가끔 rem이나 em을 쓴다.
+rem은 최상위 부모인 &lt;html&gt;태그를 기준으로 폰트 크기를 설정한다. em은 부모 요소를 기준으로 폰트 크기를 설정한다.</p>
+
+<p>픽셀은 다음과 같이 숫자로 설정한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">articel</span> <span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">60px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>rem 사용할 땐 다음과 같다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">html</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">16px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span> <span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">3rem</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>최상위 요소인 html의 폰트 크기를 16px로 설정하고 h1태그는 3rem으로 설정했다. 즉 html요소 기준으로 3배 키우라는 뜻이다.</p>
+
+<p>rem이 나온 후 em은 잘 쓰지 않는다고 한다. 부모태그 기준으로 설정된다.</p>
+
+<h3 id="폰트-모양-바꾸기">폰트 모양 바꾸기</h3>
+
+<p>font-family 속성을 사용한다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li&gt;</span>FONT FAMILY<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>Serif<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">ul</span> <span class="nt">li</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">40px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">ul</span> <span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"돋움"</span>
+<span class="p">}</span>
+
+<span class="nt">ul</span> <span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">font-family</span><span class="p">:</span> <span class="s1">"serif"</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>구글 웹 폰트를 사용하려면 <a href="fonts.google.com">fonts.google.com</a>으로 접속해서 원하는 폰트의 웹폰트 코드와 font-family를 가져와 사용하면 된다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"txt"</span><span class="nt">&gt;</span>LOREM IPSUM<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">@charset</span> <span class="s1">"utf-8"</span><span class="p">;</span>
+<span class="k">@import</span> <span class="nb">url</span><span class="p">(</span><span class="n">url을</span>
+
+<span class="n">넣는다</span>
+<span class="p">)</span>
+<span class="p">;</span>
+
+<span class="nt">p</span><span class="nf">#txt</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">font-family</span><span class="p">:</span> <span class="s2">'Monoton'</span><span class="p">,</span> <span class="s2">'cursive'</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="폰트-색상-바꾸기">폰트 색상 바꾸기</h3>
+
+<p>영문명, 또는 #000000같은 16진수, 또는 rgb(0, 0, 0)같은 RGB로 입력한다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li&gt;</span>색상명 표기법<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>16진수 표기법<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>RGB 표기법<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="m">#ff0000</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="nb">rgb</span><span class="p">(</span><span class="m">255</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>셋 다 빨간색을 의미한다.</p>
+
+<h3 id="텍스트-줄-간격-바꾸기">텍스트 줄 간격 바꾸기</h3>
+
+<p>font-size는 텍스트 자체의 높이를 의미한다. line-height는 줄 간격 전체 높잇값을 나타낸다. 실수 값으로 쓸 수도 있고, 픽셀값으로 쓸 수도 있다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"text1"</span><span class="nt">&gt;</span>
+    Hello. This is..
+<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"text2"</span><span class="nt">&gt;</span>
+    Hello. This is..
+<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.text1</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+    <span class="nl">line-height</span><span class="p">:</span> <span class="m">40px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.text2</span> <span class="p">{</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+    <span class="nl">line-height</span><span class="p">:</span> <span class="m">1.5</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/inline_height_draw.png" alt="0" /></p>
+
+<p><img src="/assets/images/css basic/line_height_ex.png" alt="0" /></p>
+
+<p>실수 1.5로 설정한 .text2의 경우 폰트 크기 20px을 기준으로 1.5배로 설정되었다.</p>
+
+<h3 id="텍스트-정렬-방향-지정하기">텍스트 정렬 방향 지정하기</h3>
+
+<p>text-align이라는 속성을 사용하며 left, right, center, justifiy(양쪽정렬)이 있다.</p>
+
+<h3 id="텍스트-자간-지정하기">텍스트 자간 지정하기</h3>
+
+<p>letter-spacing이란 속성을 사용하며 px로 설정한다.</p>
+
+<h3 id="너비와-높이-지정하기">너비와 높이 지정하기</h3>
+
+<p>태그 영역의 크기는 width, height 속성을 사용함으로써 정의되며, px, %(부모태그 기준), vw(웹브라우저 너비 기준 백분율), vh(웹브라우저 높이 기준 백분율)을 사용한다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    width, height 모두 100px로 했을 때
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    width, height 모두 20%로 했을 때
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    width, height 모두 10vw로 했을 때
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    width, height 모두 10vh로 했을 때
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">20%</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">20%</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">10vw</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">10vw</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">4</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">10vh</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">10vh</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>px로 지정하면 웹브라우저 크기가 달라져도 영역 넓이가 변하지 않는 한편, %로 지정하면 웹브라우저 크기가 달라졌을 때 부모 태그인 &lt;body&gt;태그 기준으로 너빗값이 변한다.</p>
+
+<p><img src="/assets/images/css basic/width_height1.png" alt="0" /></p>
+
+<p><img src="/assets/images/css basic/width_height2.png" alt="0" /></p>
+
+<p>그러나 body태그는 height가 변하지 않는다! 그래서 %를 사용한다면 높이는 변하지 않는다.</p>
+
+<h3 id="바깥쪽-여백-지정하기">바깥쪽 여백 지정하기</h3>
+
+<p>margin 속성을 사용해 지정한다. px, %(부모 태그 기준), vw(웹브라우저 너비 기준), vh(웹브라우저 높이 기준)을 사용한다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin: 20px (상하좌우)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin: 20px 50px (상하, 좌우)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin: 20px auto (상하, 좌우중앙)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin: 20px auto 40px (상, 좌우중앙, 하)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin: 0px 10px 20px 30px (상, 우, 하, 좌)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin-left: 20px (좌)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin-right: 20px (우)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin-top: 20px (상)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    margin-bottom: 20px (하)
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">150px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">40px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">20px</span> <span class="m">50px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">20px</span> <span class="nb">auto</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">4</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">20px</span> <span class="nb">auto</span> <span class="m">40px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">5</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">0px</span> <span class="m">10px</span> <span class="m">20px</span> <span class="m">30px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">6</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin-left</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">7</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin-right</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">8</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin-top</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">9</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">margin-bottom</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/margin_body.png" alt="0" /></p>
+
+<p>일단 body 영역부터 확인하고 들어가보자.</p>
+
+<p><img src="/assets/images/css basic/margin_box3.png" alt="0" /></p>
+
+<p>실제론 상하 여백만 지정하고 좌우 여백은 중앙에 배치하도록 하는 방법을 가장 많이 사용한다고 한다.</p>
+
+<h3 id="안쪽-여백-지정하기">안쪽 여백 지정하기</h3>
+
+<p>안쪽 여백은 padding 속성을 사용하며, 사용법은 px, %, vw, vh로 margin과 사용법이 같다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;article&gt;</span>
+      box1
+  <span class="nt">&lt;/article&gt;</span>
+  <span class="nt">&lt;article&gt;</span>
+      box2
+  <span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">0px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">30px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/padding_body.png" alt="0" /></p>
+
+<p>body 영역부터 확인해보자.</p>
+
+<p><img src="/assets/images/css basic/padding_box1.png" alt="0" /></p>
+
+<p>일단 box1과 box2는 동일하게 width 100, height 100이다.</p>
+
+<p>box1은 안쪽여백(padding)을 0으로 줬기 때문에 box1이라는 텍스트가 박스 가장자리에 붙어있다.</p>
+
+<p><img src="/assets/images/css basic/padding_box2.png" alt="0" /></p>
+
+<p>그런데 box2는 안쪽여백에 30px을 주었기 때문에 box2라는 텍스트가 여백 안쪽에 위치한다. 박스 크기가 커진 것이다. 이처럼 padding은 기존 요소 크기에 안쪽 여백을 추가해준다. 결과적으로 box2의
+너빗값과 높잇값은 160px이 된다.</p>
+
+<p>그럼 기존 박스 크기는 유지하고 안쪽 여백만 있게 하려면? width와 height를 새로 작게 지정해줘서 padding까지 더한 값이 100이 되게 만들수도 있다.
+하지만 box-sizing 속성을 이용하면 기존 너빗값과 높잇값을 자동으로 포함시킬 수 있다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">0px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">30px</span><span class="p">;</span>
+    <span class="nl">box-sizing</span><span class="p">:</span> <span class="n">border-box</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>box-sizing: border-box 속성만 추가하면 기존 박스 크기를 유지하면서 여백을 지정할 수 있다.</p>
+
+<p><img src="/assets/images/css basic/padding_box_sizing.png" alt="0" /></p>
+
+<p>100 x 100은 유지하면서 안쪽 여백인 padding 30px이 추가됐다.</p>
+
+<h3 id="블록-요소와-인라인-요소-태그">블록 요소와 인라인 요소 태그</h3>
+
+<p>태그의 크기 및 테두리 등을 지정할 때는 해당 태그가 블록 요소인지 인라인 요소인지에 따라 다르게 적용된다.</p>
+
+<p>블록 요소 : 웹페이지 영역을 구분하는 레이아웃과 관련된다. h1~h6, p, ol, ul, dl, div, header, footer, section, article, aside, nav 등. 줄을 자동으로
+바꾼다. 넓이와 높이를 지정할 수 있다. 너비를 지정하지 않을 시 부모의 너빗값을 100% 상속받는다. 블록요소와 인라인요소 모두 묶을 수 있다.</p>
+
+<p>인라인 요소 : 글의 서식과 관련된다. strong, em, a, span 등. 자동 줄바꿈 X, 옆으로 나열된다. 너비와 높이를 지정할 수 없다. 텍스트의 크기 자체가 해당 요소의 크기가 된다. 인라인 요소만 묶을
+수 있다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;p&gt;</span>
+    블록 요소 태그는 자동 줄 바꿈 됩니다. 현재 이 글은 p 태그입니다.
+<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;p&gt;</span>
+        <span class="nt">&lt;span&gt;</span>
+            <span class="nt">&lt;strong&gt;</span>인라인 요소 태그<span class="nt">&lt;/strong&gt;</span>들은 <span class="nt">&lt;em&gt;</span>좌우로<span class="nt">&lt;/em&gt;</span> 배치됩니다.
+        <span class="nt">&lt;/span&gt;</span>
+<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">p</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">strong</span><span class="o">,</span> <span class="nt">em</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/block_inline.png" alt="0" /></p>
+
+<p>블록 요소인 p태그에 width와 height를 설정하지 않아서 부모태그인 body태그의 width와 height를 상속받았다. 그리고 빨간색 테두리를 갖고있으며, 자기들 p태그끼리 자동 줄바꿈이 됐다. 반면 인라인
+요소인 strong과 em태그는 줄바꿈되지 않았다. 그리고 border를 보면 딱 텍스트만큼만 생긴걸 알 수 있다.</p>
+
+<p>블록요소와 인라인 요소의 크기를 지정해보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">p</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">strong</span><span class="o">,</span> <span class="nt">em</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>각각 height를 100px, 50px씩 지정해보았다.</p>
+
+<p><img src="/assets/images/css basic/block_inline_height.png" alt="0" /></p>
+
+<p>p태그는 height가 제대로 적용되어 빨간색 박스의 높이가 커졌다. 그런데 strong, em태그에는 적용되지 않았다.</p>
+
+<p>하지만 강제로 적용해야 할때는 display: inline-block이라는 속성을 추가하여 인라인, 블록 요소의 속성을 모두 사용하겠다고 하면 된다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">p</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">strong</span><span class="o">,</span> <span class="nt">em</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="n">inline-block</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/block_inline_display.png" alt="0" /></p>
+
+<p>strong, em태그에도 height가 적용되었다.</p>
+
+<p>인라인을 블록 요소로 강제 변환도 가능하다. display: block을 쓰면 된다. 만약 위의 strong, em태그에 이 display: block를 쓰면 어떻게 될까? 아마 height값이 적용될거고, 자동
+줄바꿈이 될거고, 크기는 텍스트 크기가 아니라 body의 width와 height를 상속받을 것이다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">p</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">strong</span><span class="o">,</span> <span class="nt">em</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="nb">block</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/block_inline_display_block.png" alt="0" /></p>
+
+<p>심지어 ‘좌우로’의 em태그 크기는 두 번째 p태그를 넘어버렸다.</p>
+
+<hr />
+
+<h3 id="배경색-지정하기">배경색 지정하기</h3>
+
+<p>backgound-color 속성을 사용한다. 영문명, rgb(0, 0, 0), #000000(16진수)같은 표현을 사용한다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#000<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#111<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#222<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#333<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#444<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>#555<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">li</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="m">#000</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#000</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#111</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#222</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">4</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#333</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">5</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#444</span>
+<span class="p">}</span>
+
+<span class="nt">li</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">6</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#555</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/background_color.png" alt="0" /></p>
+
+<h3 id="배경-이미지-삽입하기">배경 이미지 삽입하기</h3>
+
+<ul>
+  <li>background-image : 이미지의 url</li>
+  <li>background-repeat : repeat, repeat-x, repeat-y, no-repeat</li>
+  <li>background-position : 가로축, 세로축 위치 지정. ‘center, center’로 지정하면 좌우 중앙, 상하 중앙이므로 정중앙에 위치한다.</li>
+  <li>background-size : 배경이미지의 크기. contain으로 지정하면 이미지 비율은 유지시키면서 태그 안 영역을 비율에 맞게 가득 채운다. cover로 지정하면 이미지가 잘리더라도 영역을 꽉차게 가득
+채운다.</li>
+  <li>background-attachment : 배경이미지가 움직이지 않게 고정한다. fixed로 지정하면 어느 태그에 종속되어있든 상관없이 무조건 웹브라우저 기준으로 고정된다.</li>
+</ul>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;section&gt;</span>
+    <span class="nt">&lt;article&gt;&lt;/article&gt;</span>
+    <span class="nt">&lt;article&gt;&lt;/article&gt;</span>
+<span class="nt">&lt;/section&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">section</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">90vw</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">90vh</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">4vh</span> <span class="nb">auto</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="m">#000</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span> <span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">50%</span><span class="p">;</span>
+    <span class="nl">background-repeat</span><span class="p">:</span> <span class="nb">no-repeat</span><span class="p">;</span>
+    <span class="nl">background-position</span><span class="p">:</span> <span class="nb">center</span> <span class="nb">center</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span> <span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-image</span><span class="p">:</span> <span class="sx">url('../img/car1.jpg')</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span> <span class="nt">article</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-image</span><span class="p">:</span> <span class="sx">url('../img/car2.jpg')</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/background_ex_full.png" alt="0" /></p>
+
+<p><img src="/assets/images/css basic/background_ex_small.png" alt="0" /></p>
+
+<p>section 태그를 살펴볼까? width와 height를 vw, vh로 했기 때문에 웹브라우저의 크기가 변해도 비율을 유지한다. 각 이미지가 각 article 태그 안에 정중앙에 위치하고 있다. 만약
+article의 height를 80%로 하면 어떻게 될까? 이미지가 section 범위를 넘어버린다.</p>
+
+<p><img src="/assets/images/css basic/background_ex_overflow.png" alt="0" /></p>
+
+<p>article에 background-attachment: fixed 속성을 넣어볼까? 그럼 article 태그는 어느 태그에 종속되어있든 상관하지 않고, 무조건 웹브라우저 기준으로 고정된다.</p>
+
+<p><img src="/assets/images/css basic/background_ex_fixed_full.png" alt="0" /></p>
+
+<p><img src="/assets/images/css basic/background_ex_fixed_small.png" alt="0" /></p>
+
+<h3 id="레이아웃-구성하기">레이아웃 구성하기</h3>
+
+<p>블록 요소를 이용하여 집안을 거실, 주방, 서재 등으로 나누듯이 웹페이지의 레이아웃을 구성해보자.</p>
+
+<p>웹페이지의 레이아웃을 나누기 전에 css를 초기화해야 하는데, 그 이유는 모든 태그엔 기본 여백, 폰트가 설정돼있어서 원하는 값으로 조정하려면 불편하기 때문이다.
+그래서 여백 및 크기 등을 미리 초기화해야한다. 초기화하지 않으면 어떤 문제가 있는지 확인해보자.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;article&gt;</span>
+    <span class="nt">&lt;ul&gt;</span>
+        <span class="nt">&lt;li&gt;</span>list1<span class="nt">&lt;/li&gt;</span>
+        <span class="nt">&lt;li&gt;</span>list2<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;/ul&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#"</span><span class="nt">&gt;</span>link<span class="nt">&lt;/a&gt;</span>
+<span class="nt">&lt;/article&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">ul</span> <span class="nt">li</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_before_init.png" alt="0" /></p>
+
+<p>ul태그를 볼까? 상위 태그인 section에 이미 기본 여백 설정되어있고 li 태그엔 점(dot)이 기본적으로 설정되어 있어, li태그를 직접 조정하더라도 원하는대로 만들어지기 쉽지않다.
+link에는 기본적으로 밑줄이 들어가있다. 초기화를 해보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">*</span> <span class="p">{</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">0px</span><span class="p">;</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">0px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">ul</span><span class="o">,</span> <span class="nt">ol</span> <span class="p">{</span>
+    <span class="nl">list-style</span><span class="p">:</span> <span class="nb">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">a</span> <span class="p">{</span>
+    <span class="nl">text-decoration</span><span class="p">:</span> <span class="nb">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">ul</span> <span class="nt">li</span> <span class="p">{</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">blue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_after_init.png" alt="0" /></p>
+
+<p>전체 선택자 *를 이용해 모든 태그의 바깥쪽, 안쪽 여백을 0px로 만들고, ul, ol요소의 기본인 점을 없앤다. 그리고 a 태그의 밑줄을 제거한다.</p>
+
+<h3 id="float---블록-요소를-좌우로-배치하기">float - 블록 요소를 좌우로 배치하기</h3>
+
+<p>블록 요소의 특징은 뭐였을까? 레이아웃 배치때 사용되며 자동 줄바꿈이 적용되어 한줄에 한 태그만 사용된다. 한 줄에 2개 이상의 블록 요소를 배치하려면 float 속성을 사용해야한다.
+단어 그대로, 블록 요소를 그대로 띄워(?) 좌우로 배치한다. left, right 값을 사용하면 된다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"wrap"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;section</span> <span class="na">class=</span><span class="s">"left"</span><span class="nt">&gt;&lt;/section&gt;</span>
+    <span class="nt">&lt;section</span> <span class="na">class=</span><span class="s">"right"</span><span class="nt">&gt;&lt;/section&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">800px</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_before_float.png" alt="0" /></p>
+
+<p>일단 float를 적용하기 전을 볼까? div.wrap 태그를 800px의 넓이를 주고 중앙에 위치시킨다. 자식인 section.left와 section.right에는 너비를 300px, 400px로 준다.
+일반적으로, <strong>블록 요소 안에서 자식요소를 넣으면 부모의 블록에는 높이를 지정하지 않는다.</strong> 왜냐면 자식들의 높이를 인지하여 감싸기 때문이다.</p>
+
+<p>이제 section.left와 section.right에 float:left를 추가해보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">800px</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_after_float_left.png" alt="0" /></p>
+
+<p>.wrap이 자식 요소의 높잇값을 인식하지 못했다! 테두리를 감싸지 못했다. 블록 요소에 float를 적용시키면 부모 요소는 자식 요소의 높이를 인식하지 못한다.
+그렇다면 자식 요소에 float가 적용되어도 부모 요소가 자식 요소의 높잇값을 인식할 수 있도록 해보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">800px</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span><span class="nd">::after</span> <span class="p">{</span>
+    <span class="nl">content</span><span class="p">:</span> <span class="s2">''</span><span class="p">;</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="nb">block</span><span class="p">;</span>
+    <span class="nl">clear</span><span class="p">:</span> <span class="nb">both</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_float_virtual.png" alt="0" /></p>
+
+<p>가상선택자 ::after를 생성하고 content는 빈 문자를, div.wrap을 block 속성으로 강제로 변경해버립니다. div는 이미 블록이니까 div가 아니라 ::after를 블록으로 변경한다는것 같습니다.
+마지막으로 clear: both를 하면 float영향을 해제할 수 있다고 합니다.</p>
+
+<h3 id="position---요소를-자유롭게-배치하기">position - 요소를 자유롭게 배치하기</h3>
+
+<p>position은 특정 영역 안에서 위치 조절을 더욱 자유롭게, 순서와 상관없이 화면에 가로세로 좌푯값을 직접 설정하여 배치할 수 있다.</p>
+
+<p>값으로는 다음 값을 사용할 수 있다.</p>
+
+<ul>
+  <li>relative : 원래 위치를 기준으로 상대 위치를 지정</li>
+  <li>absolute : 부모 요소의 특정 구간을 기준으로 절대 위치를 지정</li>
+  <li>fixed : 웹브라우저를 기준으로 절대 위치를 지정</li>
+</ul>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;section&gt;&lt;/section&gt;</span>
+    <span class="nt">&lt;section&gt;&lt;/section&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">section</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">600px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">relative</span><span class="p">;</span>
+    <span class="nl">top</span><span class="p">:</span> <span class="m">-100px</span><span class="p">;</span>
+    <span class="nl">left</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_position.png" alt="0" /></p>
+
+<p>seection 중 두번째만 position: relative를 적용시키고 좌푯값을 입력했다. top은 -100을 입력했기 때문에 오히려 위로 올라가버렸다. 그리고 left는 해당 방향에서 바라보는 쪽으로, 즉
+오른쪽으로 100px만큼 이동해버렸다.
+left, right, top, bottom으로 지정할 수 있다. 이제 abolute를 적용해보자.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"wrap"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"left"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"right"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"box"</span><span class="nt">&gt;&lt;/p&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"bottom"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">800px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">5px</span> <span class="nb">solid</span> <span class="no">black</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">50px</span> <span class="nb">auto</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span><span class="nd">::after</span> <span class="p">{</span>
+    <span class="nl">content</span><span class="p">:</span> <span class="s2">''</span><span class="p">;</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="nb">block</span><span class="p">;</span>
+    <span class="nl">clear</span><span class="p">:</span> <span class="nb">both</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightgreen</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="nc">.box</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.bottom</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">800px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>일단 .left, .right, .bottom 요소를 배치했는데 각각 float 속성을 주어 가로로 배치했다. 이 때 wrap에는 ::after 가상 선택자를 줘서 float 영향을 해제한다.
+wrap은 자식 요소들의 높이를 인식할 수 있다.</p>
+
+<p><img src="/assets/images/css basic/layout_position_absolute.png" alt="0" /></p>
+
+<p>이 float가 살짝 어려운데… 부모 요소는 현재 float가 해제된 상태다. 이 때 자식 요소 중 하나라도 float가 있다면, 모든 형제가 float를 설정해야 해당 요소의 높잇값을 인식한다고 한다.
+지금은 bottom이 오른쪽에 공간이 없어서 자연스럽게 아래로 내려간 것이라고 한다.</p>
+
+<p>다시 bottom에 float를 적용하고 가자. 현재 .right 안에 p가 있고, 색깔은 빨간색이다.
+p 태그를 오른쪽으로 20px, 아래로 30px 이동시켜보자. 이 때 padding과 margin으로 설정하려면 매우 불편하다. absolute를 사용해보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="nc">.right</span> <span class="nc">.box</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+    <span class="nl">right</span><span class="p">:</span> <span class="m">100px</span><span class="p">;</span>
+    <span class="nl">bottom</span><span class="p">:</span> <span class="m">30px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_position_absolute_p.png" alt="0" /></p>
+
+<p>p는 이제 부모(또는 조상) 요소 중 position이 적용된 요소를 기준으로 설정된다. 즉, 현재는 부모인 div.wrap에 poision이 없이 때문에 최상위 태그인 body 기준으로 오른쪽에서 100px
+떨어진, 아래에서 30px 떨어진 곳에 위치한다.
+현재는 부모, 조상 전부 뒤져봐도 Position 값이 없는 경우인데, 이때는 (<a href="https://creamilk88.tistory.com/197">다른 웹사이트</a>에서 설명하기로는) viewport(현재 화면에
+보여지고 있는 사각형)를 기준으로 한다고 한다.</p>
+
+<p>이번에는 .box가 .right 영역을 기준으로 좌푯값이 설정되도록 position: relative를 넣어보자. 부모 태그인 .right에 넣는 것이다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">relative</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_position_absolute_relative.png" alt="0" /></p>
+
+<p>.box가 부모인 .right 기준으로 좌푯값이 설정되었다. 이처럼 position: relative는 자식의 좌푯값 기준을 설정할때 사용된다.</p>
+
+<p>이번엔 position: fixed를 해보자. fixed는 무조건 웹브라우저를 기준으로 좌푯값이 고정된다.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;section&gt;</span>
+    <span class="nt">&lt;article&gt;&lt;/article&gt;</span>
+<span class="nt">&lt;/section&gt;</span>
+
+<span class="nt">&lt;section&gt;</span>
+<span class="nt">&lt;/section&gt;</span>
+
+<span class="nt">&lt;section&gt;</span>
+<span class="nt">&lt;/section&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">section</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">100vh</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span> <span class="nt">article</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="m">#000</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">fixed</span><span class="p">;</span>
+    <span class="nl">bottom</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">right</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">orange</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">lightblue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">section</span><span class="nd">:nth-of-type</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">pink</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>모든 section을 브라우저의 크기와 똑같이 설정한다. 1번째 article에는</p>
+
+<p><img src="/assets/images/css basic/layout_position_fixed1.png" alt="0" />
+<img src="/assets/images/css basic/layout_position_fixed2.png" alt="0" />
+<img src="/assets/images/css basic/layout_position_fixed3.png" alt="0" /></p>
+
+<p>스크롤을 아무리 내려도 position: fixed가 적용된 section article은 그 자리에 계속 있다.</p>
+
+<h3 id="z-index-속성-사용하기">z-index 속성 사용하기</h3>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"wrap"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"left"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"right"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">400px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="m">#000</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">100px</span> <span class="nb">auto</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">relative</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+    <span class="nl">top</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">left</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+    <span class="nl">bottom</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">right</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/css basic/layout_zindex.png" alt="0" /></p>
+
+<p>이제 left를 강제로 위로 올려보자.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.wrap</span> <span class="nc">.left</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">blue</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+    <span class="nl">top</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">left</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">z-index</span><span class="p">:</span> <span class="m">2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.wrap</span> <span class="nc">.right</span> <span class="p">{</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">200px</span><span class="p">;</span>
+    <span class="nl">background-color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+    <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+    <span class="nl">bottom</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">right</span><span class="p">:</span> <span class="m">50px</span><span class="p">;</span>
+    <span class="nl">z-index</span><span class="p">:</span> <span class="m">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p><img src="/assets/images/css basic/layout_zindex_2.png" alt="0" /></p>
+
+<p>.left가 위로 올라왔다.</p>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/11/22/css-basic2/" rel="next" title="CSS 기초 - 인터랙티브">
+                <i class="fa fa-chevron-left"></i> CSS 기초 - 인터랙티브
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/11/16/aws-ecs-service-task-container/" rel="prev" title="AWS ECS task, container 메모리 제한">
+                AWS ECS task, container 메모리 제한 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/avatar.gif"
+               alt="Kyeongchan Lee" />
+          <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-3"> <a class="nav-link" href="#전체-선택자"> <span class="nav-number">1</span> <span class="nav-text">전체 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#태그-선택자"> <span class="nav-number">2</span> <span class="nav-text">태그 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#자손-선택자"> <span class="nav-number">3</span> <span class="nav-text">자손 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#자식-선택자"> <span class="nav-number">4</span> <span class="nav-text">자식 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#속성-선택자"> <span class="nav-number">5</span> <span class="nav-text">속성 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#가상-선택자"> <span class="nav-number">6</span> <span class="nav-text">가상 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#클래스-선택자와-아이디-선택자"> <span class="nav-number">7</span> <span class="nav-text">클래스 선택자와 아이디 선택자</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#폰트-굵기"> <span class="nav-number">8</span> <span class="nav-text">폰트 굵기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#폰트-크기-바꾸기"> <span class="nav-number">9</span> <span class="nav-text">폰트 크기 바꾸기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#폰트-모양-바꾸기"> <span class="nav-number">10</span> <span class="nav-text">폰트 모양 바꾸기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#폰트-색상-바꾸기"> <span class="nav-number">11</span> <span class="nav-text">폰트 색상 바꾸기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#텍스트-줄-간격-바꾸기"> <span class="nav-number">12</span> <span class="nav-text">텍스트 줄 간격 바꾸기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#텍스트-정렬-방향-지정하기"> <span class="nav-number">13</span> <span class="nav-text">텍스트 정렬 방향 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#텍스트-자간-지정하기"> <span class="nav-number">14</span> <span class="nav-text">텍스트 자간 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#너비와-높이-지정하기"> <span class="nav-number">15</span> <span class="nav-text">너비와 높이 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#바깥쪽-여백-지정하기"> <span class="nav-number">16</span> <span class="nav-text">바깥쪽 여백 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#안쪽-여백-지정하기"> <span class="nav-number">17</span> <span class="nav-text">안쪽 여백 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#블록-요소와-인라인-요소-태그"> <span class="nav-number">18</span> <span class="nav-text">블록 요소와 인라인 요소 태그</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#배경색-지정하기"> <span class="nav-number">19</span> <span class="nav-text">배경색 지정하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#배경-이미지-삽입하기"> <span class="nav-number">20</span> <span class="nav-text">배경 이미지 삽입하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#레이아웃-구성하기"> <span class="nav-number">21</span> <span class="nav-text">레이아웃 구성하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#float---블록-요소를-좌우로-배치하기"> <span class="nav-number">22</span> <span class="nav-text">float - 블록 요소를 좌우로 배치하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#position---요소를-자유롭게-배치하기"> <span class="nav-number">23</span> <span class="nav-text">position - 요소를 자유롭게 배치하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#z-index-속성-사용하기"> <span class="nav-number">24</span> <span class="nav-text">z-index 속성 사용하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kyeongchan Lee</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
