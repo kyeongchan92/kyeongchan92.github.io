@@ -19,7 +19,7 @@ self-supervised learning은 라벨없는 데이터에서 representation을 학�
 ![0](/assets/images/cl4rec_framework.png)
 
 
-1. 증강 모듈(Data Augmentation Module)
+1\. 증강 모듈(Data Augmentation Module)
 
 
 $$\mathcal{A}$$를 augmentation method들의 집합이라고 하자. 즉 $$\mathcal{A}$$에는 뒤에 나올 crop, mask, reorder가 들어있다. 
