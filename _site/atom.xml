@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-12-15T08:52:09+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-12-15T16:58:17+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
-한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : &lt;a href=&quot;https://docs.docker.com/config/containers/resource_constraints/&quot;&gt;Runtime options with Memory, CPUs, and GPUs&lt;/a&gt;&lt;/p&gt;
+한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
+번역했다 : &lt;a href=&quot;https://docs.docker.com/config/containers/resource_constraints/&quot; target=&quot;_blank&quot;&gt;Runtime options with Memory, CPUs, and GPUs&lt;/a&gt;&lt;/p&gt;
 
 &lt;hr /&gt;
 
@@ -12,9 +13,34 @@
 
 &lt;h2 id=&quot;메모리-부족의-위험성-이해하기&quot;&gt;메모리 부족의 위험성 이해하기&lt;/h2&gt;
 
+&lt;p&gt;컨테이너가 호스트의 메모리를 너무 많이 사용하게 하는걸 막아야한다.
+리눅스에서는 커널이 충분한 메모리가 없다고 판단하면 OOME(Out of Memory Exception)을 내뱉고, 메모리를 확보하기위해 프로세스를 죽이기 시작한다(이게 계속 gunicorn 프로세스가 죽었던
+이유구나..).
+도커나 다른 다른 어플리케이션을 포함해서 어느 프로세스든 죽을 수 있다. 만약 중요한 프로세스가 kill되면? 전체 시스템이 다운될 것이다.&lt;/p&gt;
+
+&lt;p&gt;도커는 이런 위험을 피하기 위해 노력한다. 도커 대몬에 &lt;span style=&quot;background-color:#fff5b1&quot;&gt;&lt;strong&gt;OOM 우선순위&lt;/strong&gt;&lt;/span&gt;를 적용시키는 것이다. 그렇게 해서 다른 시스템
+프로세스보다 죽을 가능성을 낮춘다.
+각 컨테이너에는 OOM 우선순위를 적용하지 않는다. 도커 대몬에 적용함으로써 개별 컨테이너를 종료할 가능성을 높이고, 도커 대몬이나 다른 시스템 프로세스가 죽을 확률을 낮춘다.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--oom-score-adj&lt;/code&gt;&lt;a href=&quot;https://docs.docker.com/compose/compose-file/05-services/#oom_score_adj&quot; target=&quot;_blank&quot;&gt;↗&lt;/a&gt;
+설정은 [-1000, 1000]사이의 숫자로 설정하여, 메모리 부족시 어떤 컨테이너를 먼저 죽일지 설정하게 해준다. 극단적으로 음수로 설정하면 안죽는 것이다.
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--oom-kill-disable&lt;/code&gt;&lt;a href=&quot;https://docs.docker.com/compose/compose-file/05-services/#oom_kill_disable&quot; target=&quot;_blank&quot;&gt;↗&lt;/a&gt; 설정은 메모리 부족시에도 해당 컨테이너를 죽지 않게 할수도 있다. &lt;strong&gt;하지만 이런 설정을 사용하는 것은 권장되지 않는다.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;oom-위험을-줄이려면&quot;&gt;OOM 위험을 줄이려면?&lt;/h2&gt;
+
+&lt;p&gt;다음과 같은 방법이 있다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;컨테이너가 사용할 수 있는 메모리 양을 아래 설명된 대로 설정한다.&lt;/li&gt;
+  &lt;li&gt;Docker 호스트에서 swap을 설정할 때 신중히… Swap은 메모리보단 느리지만, OOM 상황에 대한 버퍼 역할을 할 수 있다.&lt;/li&gt;
+  &lt;li&gt;컨테이너를 서비스로 변환한다. 즉 Kubernetes같은 오케스트레이션으로 컨테이너를 관리, 배포하는 것이다. 서비스는 여러 컨테이너 인스턴스를 실행하고 관리하는 개념이다. 서비스 수준의 조건 및 관리를 받게
+하는 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&quot;컨테이너의-메모리-엑세스를-제한하기&quot;&gt;컨테이너의 메모리 엑세스를 제한하기&lt;/h2&gt;
 
-&lt;p&gt;Docker는 하드 메모리 제한 또는 소프트 메모리 제한을 부여할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;Docker는 &lt;span style=&quot;background-color:#fff5b1&quot;&gt;하드 메모리 제한&lt;/span&gt; 또는 &lt;span style=&quot;background-color:#fff5b1&quot;&gt;소프트 메모리
+제한&lt;/span&gt;을 부여할 수 있습니다.&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -27,7 +53,30 @@
 
 &lt;p&gt;위 옵션 중 하나만 쓰일 때, 또는 한 개 이상 쓰일 때는 다른 효과가 나타난다.&lt;/p&gt;
 
-&lt;p&gt;대부분 양의 정수 + b, k, m, g처럼 바이트, 킬로바이트, 메가바이트, 기가바이트처럼 쓰인다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다. 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다. 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs</summary></entry><entry><title type="html">Coursera 강의 정리 - 추천시스템</title><link href="http://localhost:4000/2023/12/01/coursera-lecture/" rel="alternate" type="text/html" title="Coursera 강의 정리 - 추천시스템" /><published>2023-12-01T00:00:00+09:00</published><updated>2023-12-01T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/01/coursera-lecture</id><content type="html" xml:base="http://localhost:4000/2023/12/01/coursera-lecture/"></content><author><name>Kyeongchan Lee</name></author><summary type="html"></summary></entry><entry><title type="html">Huggingface 토크나이저 Padding and truncation</title><link href="http://localhost:4000/2023/11/28/huggingface-tokenizer-truncation/" rel="alternate" type="text/html" title="Huggingface 토크나이저 Padding and truncation" /><published>2023-11-28T00:00:00+09:00</published><updated>2023-11-28T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/28/huggingface%20tokenizer%20truncation</id><content type="html" xml:base="http://localhost:4000/2023/11/28/huggingface-tokenizer-truncation/">&lt;p&gt;huggingface에서 tokenizer를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.from_pretrained&lt;/code&gt; 메서드로 가져다 쓰는데, 갑자기 padding과 truncation, max_length 인자에 대해 헷갈렸다. 그래서 한 번 정리해보고자 한다.&lt;/p&gt;
+&lt;p&gt;대부분 양의 정수 + b, k, m, g처럼 바이트, 킬로바이트, 메가바이트, 기가바이트처럼 쓰인다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;옵션&lt;/th&gt;
+      &lt;th&gt;설명&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-m&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--memory=&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;컨테이너가 사용할 수 있는 메모리 최대량.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--memory-swap=&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;컨테이너가 disk로부터 사용할 수 있는 swap 메모리량. &lt;a href=&quot;https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details&quot; target=&quot;_blank&quot;&gt;자세히↗&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--memory-reservation&lt;/code&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--memory&lt;/code&gt;보다 작게 soft limit을 건다. 도커가 호스트로부터 메모리 경합이나 낮은 메모리를 감지할때 동작하는 수치다.&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다. 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다. 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs</summary></entry><entry><title type="html">Coursera 강의 정리 - 추천시스템</title><link href="http://localhost:4000/2023/12/01/coursera-lecture/" rel="alternate" type="text/html" title="Coursera 강의 정리 - 추천시스템" /><published>2023-12-01T00:00:00+09:00</published><updated>2023-12-01T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/01/coursera-lecture</id><content type="html" xml:base="http://localhost:4000/2023/12/01/coursera-lecture/"></content><author><name>Kyeongchan Lee</name></author><summary type="html"></summary></entry><entry><title type="html">Huggingface 토크나이저 Padding and truncation</title><link href="http://localhost:4000/2023/11/28/huggingface-tokenizer-truncation/" rel="alternate" type="text/html" title="Huggingface 토크나이저 Padding and truncation" /><published>2023-11-28T00:00:00+09:00</published><updated>2023-11-28T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/28/huggingface%20tokenizer%20truncation</id><content type="html" xml:base="http://localhost:4000/2023/11/28/huggingface-tokenizer-truncation/">&lt;p&gt;huggingface에서 tokenizer를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.from_pretrained&lt;/code&gt; 메서드로 가져다 쓰는데, 갑자기 padding과 truncation, max_length 인자에 대해 헷갈렸다. 그래서 한 번 정리해보고자 한다.&lt;/p&gt;
 
 &lt;p&gt;이 글은 다음을 번역하였습니다 : 
 &lt;a href=&quot;https://huggingface.co/&quot;&gt;Huggingface&lt;/a&gt; &amp;gt; &lt;a href=&quot;https://huggingface.co/docs&quot;&gt;Docs&lt;/a&gt; &amp;gt; &lt;a href=&quot;https://huggingface.co/docs/transformers/index&quot;&gt;Transformers&lt;/a&gt; &amp;gt; &lt;a href=&quot;https://huggingface.co/docs/transformers/pad_truncation&quot;&gt;Padding and truncation&lt;/a&gt;&lt;/p&gt;
@@ -616,308 +665,7 @@ wrap을 클릭하면 article의 background-color를 hotpink로 바꾼다.&lt;/p&
 
 &lt;hr /&gt;
 
-&lt;p&gt;함수를 활용하여 코드 패키징하기와 속성값 활용하기는 다음에 정리.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">별점도 반영하고 클릭 로그도 수집하려면 javascript를 알아야한다..! 감사하게도 Do it! 인터랙티브 웹 페이지 만들기 책에 javascript 기본 내용이 있어서 읽고 정리하게 되었다. 아직 장고와 css, html, js 사이의 데이터 이동을 시키기엔 어렵다.. 하여 또 다른 javascript 책을 파야하지 않을까 싶다!</summary></entry><entry><title type="html">CSS 기초 - 인터랙티브</title><link href="http://localhost:4000/2023/11/22/css-basic2/" rel="alternate" type="text/html" title="CSS 기초 - 인터랙티브" /><published>2023-11-22T00:00:00+09:00</published><updated>2023-11-22T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/22/css%20basic2</id><content type="html" xml:base="http://localhost:4000/2023/11/22/css-basic2/">&lt;p&gt;두 번째 시간…이번에는 trasform, transition 등으로 동적으로 움직이는 기능을 구현해보자. 또 flex라는 것을 이용해 자식 요소의 배치 방법을 지정해보자.
-이 글은 &lt;a href=&quot;https://m.yes24.com/Goods/Detail/103401495&quot;&gt;Do it! 인터랙티브 웹 페이지 만들기&lt;/a&gt; 책을 읽고 공부한 내용입니다.&lt;/p&gt;
-
-&lt;h3 id=&quot;transform을-배워보자&quot;&gt;transform을 배워보자&lt;/h3&gt;
-
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;section을 4개 만들고 자식태그로 article을 넣어보자.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;skewX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;20deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;45deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transform.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;딱 봐도 효과는 알 수 있다. 각각 확대 또는 축소, 기울기, 이동, 회전이 적용된다.&lt;/p&gt;
-
-&lt;p&gt;이젠 사용자 행동에 반응하도록 만들어보자!! transition을 사용하면 된다.&lt;/p&gt;
-
-&lt;h3 id=&quot;transition---가장-재미있단다&quot;&gt;transition - 가장 재미있단다&lt;/h3&gt;
-
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;perspective&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;800px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nc&quot;&gt;.section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;::after&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;clear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;both&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;시작&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;각도&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;(아무것도&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;안했을&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;때)&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transition-property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transition-duration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.3s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transition-delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transition-timing-function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cubic-bezier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;.8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;-0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.58&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1.39&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;60deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transition.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transition_hover.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;마우스를 올려놓으면 0.3초 안에, 딜레이 없이 바로, 10도에서 시작해 60도까지 Y축으로 회전하며, 가속도는 transition-timing-function에 입력한대로 회전한다.
-perspective를 설정하니 800px만큼 멀리서 보는 것처럼 약간 회전해있다.&lt;/p&gt;
-
-&lt;p&gt;cubic-bezier는 쉽게 만들어주는 사이트에서 참고하면 된다고 한다. –&amp;gt; &lt;a href=&quot;cubic-bezier.com&quot;&gt;cubic-bezier.com&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;화면-너비에-따라-웹페이지-디자인-변경하기&quot;&gt;화면 너비에 따라 웹페이지 디자인 변경하기&lt;/h3&gt;
-
-&lt;p&gt;미디어 쿼리를 이용하면 웹 브라우저의 너비를 인식하여 css를 다르게 설정할 수 있다. 예를 들어 너비가 1000px일 때 실행할 css는 다음과 같다.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;screen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1000px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;실행할&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;css&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;웹브라우저의 폭이 0~1000px일 때 실행할 css 구문을 우선 적용한다.&lt;/p&gt;
-
-&lt;p&gt;예시를 살펴보자.&lt;/p&gt;
-
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;pink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;auto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 상태에서는 다음과 같이 정가운데에 200 X 200의 핑크 사각형이 위치해있다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/media_before.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;이제 미디어 쿼리를 적용해보자. 웹브라우저 너비가 900px 이하일 때 article 요소의 배경색을 orange로 입력해보자.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;screen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;900px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이렇게 하면 이전 article이 핑크색이었더라도 미디어 쿼리의 최대 너비인 max-width값을 900px로 지정했으므로 이 구간에서는 핑크를 무시하고 orange를 우선 적용한다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/media_after.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;너비를 900 이하로 바꾸니 오랜지색으로 변경되었다. 400 이하일 땐 aqua로 바꿀 수도 있을 것이다.&lt;/p&gt;
-
-&lt;h2 id=&quot;flex&quot;&gt;flex&lt;/h2&gt;
-
-&lt;h3 id=&quot;display---자식-요소의-배치-방법-지정&quot;&gt;display - 자식 요소의 배치 방법 지정&lt;/h3&gt;
-
-&lt;p&gt;원래 float은 레이아웃이 아닌 텍스트와 이미지를 좌우로 배치하기 위해 사용한다. 과거에는 float을 많이 사용했지만 HTML5부터 flex 방식으로 편하게 레이아웃을 배치할 수 있다고 한다.&lt;/p&gt;
-
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;main&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/main&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100vh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;lightcyan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;aqua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;main은 body를 꽉 채우는 영역이 된다. section은 자식을 감싸고 있고, 각 article은 100 X 100의 사각형 영역이 된다. 이제 부모인 section에 flex를 적용해보자.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;display: flex는 자신의 블록 속성을 유지하면서 자식 요소에 flex 환경을 설정해준다. 자식들인 article이 가로로 배치되었다. 
-이 때 부모인 section도 그대로 블록 요소 특징을 유지하므로 너빗값이 100%로 유지된다.&lt;/p&gt;
-
-&lt;p&gt;이번에는 inline-flex로 바꿔보자.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_inline_flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;inline-flex는 자신을 인라인 속성으로 변경하면서 자식 요소에 flex 환경을 설정한다. 그래서 section이 인라인 속성으로 변경되어 자식 요소의 전체 너빗값만큼 크기가 달라진다.&lt;/p&gt;
-
-&lt;h3 id=&quot;flex-direction&quot;&gt;flex-direction&lt;/h3&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inline-flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;column&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_flex_direction.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;flex-direction으로 정렬 방향을 설정할 수 있다. 설정하지 않으면 기본 값은 row(가로)로 설정되고 column을 사용하면 세로로 정렬된다.&lt;/p&gt;
-
-&lt;h3 id=&quot;flex-wrap--자식에-줄바꿈-적용&quot;&gt;flex-wrap : 자식에 줄바꿈 적용&lt;/h3&gt;
-
-&lt;p&gt;float을 사용했을 때는 자식의 너빗값 합이 부모의 너빗값을 넘어가면 자동으로 줄바꿈 됐었다. 
-하지만 flex는 flex-wrap을 설정해야 줄바꿈을 할 수 있다.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_before_wrap.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;box-sizing: border-box는 안쪽여백(padding)에서 나왔었는데, 그냥 padding을 쓰면 전체 박스 크기가 커지지만 원래 크기로 유지하고 안쪽 여백을 추가할 때 썼었다.&lt;/p&gt;
-
-&lt;p&gt;암튼 이대로 브라우저 창을 줄이면 같은 비율로 줄어든다. flex-wrap을 추가해보자.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_after_wrap.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;자식요소인 article의 너빗값이 그대로 유지되면서 줄바꿈된다.&lt;/p&gt;
-
-&lt;h3 id=&quot;flex-flow--flex-direction-flex-wrap-한꺼번에-적용&quot;&gt;flex-flow : flex-direction, flex-wrap 한꺼번에 적용&lt;/h3&gt;
-
-&lt;p&gt;flex-flow를 사용하면 flex-direction, flex-wrap 속성을 한번에 적용할 수 있다.&lt;/p&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-flow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;자식요소-정렬하기&quot;&gt;자식요소 정렬하기&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;flex의 핵심 기능은 자식 요소를 어떻게 정렬하는가이다.&lt;/strong&gt; 자식요소는 justify-content나 align-content, align-items 속성을 사용해 정렬할 수 있다.&lt;/p&gt;
-
-&lt;h3 id=&quot;justify-content&quot;&gt;justify-content&lt;/h3&gt;
-
-&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;flex-flow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex-start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_flex_start.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;flex-start는 justify-content의 기본 값이다. 가장 위쪽 article 탭이 가장 왼쪽부터 시작한다.
-flex-end로 설정해보자.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_flex_end.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;종료 방향인 오른쪽으로 정렬된다. center로 해보자.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_center.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;가운데로 정렬된다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">두 번째 시간…이번에는 trasform, transition 등으로 동적으로 움직이는 기능을 구현해보자. 또 flex라는 것을 이용해 자식 요소의 배치 방법을 지정해보자. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.</summary></entry><entry><title type="html">CSS 기초</title><link href="http://localhost:4000/2023/11/22/css-basic/" rel="alternate" type="text/html" title="CSS 기초" /><published>2023-11-22T00:00:00+09:00</published><updated>2023-11-22T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/22/css%20basic</id><content type="html" xml:base="http://localhost:4000/2023/11/22/css-basic/">&lt;p&gt;추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터
+&lt;p&gt;함수를 활용하여 코드 패키징하기와 속성값 활용하기는 다음에 정리.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">별점도 반영하고 클릭 로그도 수집하려면 javascript를 알아야한다..! 감사하게도 Do it! 인터랙티브 웹 페이지 만들기 책에 javascript 기본 내용이 있어서 읽고 정리하게 되었다. 아직 장고와 css, html, js 사이의 데이터 이동을 시키기엔 어렵다.. 하여 또 다른 javascript 책을 파야하지 않을까 싶다!</summary></entry><entry><title type="html">CSS 기초</title><link href="http://localhost:4000/2023/11/22/css-basic/" rel="alternate" type="text/html" title="CSS 기초" /><published>2023-11-22T00:00:00+09:00</published><updated>2023-11-22T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/22/css%20basic</id><content type="html" xml:base="http://localhost:4000/2023/11/22/css-basic/">&lt;p&gt;추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터
 정리해보려한다. 이 글은 &lt;a href=&quot;https://m.yes24.com/Goods/Detail/103401495&quot;&gt;Do it! 인터랙티브 웹 페이지 만들기&lt;/a&gt; 책을 읽고 공부한 내용입니다.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/images/css basic/toystory_weird_rating.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
@@ -2043,7 +1791,308 @@ p 태그를 오른쪽으로 20px, 아래로 30px 이동시켜보자. 이 때 pad
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;&lt;img src=&quot;/assets/images/css basic/layout_zindex_2.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;.left가 위로 올라왔다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터 정리해보려한다. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.</summary></entry><entry><title type="html">AWS ECS task, container 메모리 제한</title><link href="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/" rel="alternate" type="text/html" title="AWS ECS task, container 메모리 제한" /><published>2023-11-16T00:00:00+09:00</published><updated>2023-11-16T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/16/aws%20ecs%20service%20task%20container</id><content type="html" xml:base="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/">&lt;p&gt;ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다.
+&lt;p&gt;.left가 위로 올라왔다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">추천시스템 페이지를 만드는 중 별점이 이상하게 표시되는 현상이 있었다… 책 Do it! 인터랙티브 웹 페이지 만들기에 나오는 템플릿 그대로 사용하다보니 이런 문제가 생겨도 해결하지 못하여 CSS 완전 쌩기초부터 정리해보려한다. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.</summary></entry><entry><title type="html">CSS 기초 - 인터랙티브</title><link href="http://localhost:4000/2023/11/22/css-basic2/" rel="alternate" type="text/html" title="CSS 기초 - 인터랙티브" /><published>2023-11-22T00:00:00+09:00</published><updated>2023-11-22T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/22/css%20basic2</id><content type="html" xml:base="http://localhost:4000/2023/11/22/css-basic2/">&lt;p&gt;두 번째 시간…이번에는 trasform, transition 등으로 동적으로 움직이는 기능을 구현해보자. 또 flex라는 것을 이용해 자식 요소의 배치 방법을 지정해보자.
+이 글은 &lt;a href=&quot;https://m.yes24.com/Goods/Detail/103401495&quot;&gt;Do it! 인터랙티브 웹 페이지 만들기&lt;/a&gt; 책을 읽고 공부한 내용입니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;transform을-배워보자&quot;&gt;transform을 배워보자&lt;/h3&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;section을 4개 만들고 자식태그로 article을 넣어보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scale&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;skewX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;20deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;translateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:nth-of-type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;45deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transform.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;딱 봐도 효과는 알 수 있다. 각각 확대 또는 축소, 기울기, 이동, 회전이 적용된다.&lt;/p&gt;
+
+&lt;p&gt;이젠 사용자 행동에 반응하도록 만들어보자!! transition을 사용하면 된다.&lt;/p&gt;
+
+&lt;h3 id=&quot;transition---가장-재미있단다&quot;&gt;transition - 가장 재미있단다&lt;/h3&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;50px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;perspective&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;800px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.section&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;::after&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;clear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;both&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;시작&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;각도&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;(아무것도&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;안했을&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;때)&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transition-property&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transform&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transition-duration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.3s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transition-delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transition-timing-function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cubic-bezier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;.8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;-0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.58&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1.39&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;transform&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rotateY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;60deg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;red&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transition.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/interactive_transition_hover.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;마우스를 올려놓으면 0.3초 안에, 딜레이 없이 바로, 10도에서 시작해 60도까지 Y축으로 회전하며, 가속도는 transition-timing-function에 입력한대로 회전한다.
+perspective를 설정하니 800px만큼 멀리서 보는 것처럼 약간 회전해있다.&lt;/p&gt;
+
+&lt;p&gt;cubic-bezier는 쉽게 만들어주는 사이트에서 참고하면 된다고 한다. –&amp;gt; &lt;a href=&quot;cubic-bezier.com&quot;&gt;cubic-bezier.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;화면-너비에-따라-웹페이지-디자인-변경하기&quot;&gt;화면 너비에 따라 웹페이지 디자인 변경하기&lt;/h3&gt;
+
+&lt;p&gt;미디어 쿼리를 이용하면 웹 브라우저의 너비를 인식하여 css를 다르게 설정할 수 있다. 예를 들어 너비가 1000px일 때 실행할 css는 다음과 같다.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;screen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1000px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;실행할&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;css&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;웹브라우저의 폭이 0~1000px일 때 실행할 css 구문을 우선 적용한다.&lt;/p&gt;
+
+&lt;p&gt;예시를 살펴보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;pink&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;auto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 상태에서는 다음과 같이 정가운데에 200 X 200의 핑크 사각형이 위치해있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/media_before.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;이제 미디어 쿼리를 적용해보자. 웹브라우저 너비가 900px 이하일 때 article 요소의 배경색을 orange로 입력해보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;@media&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;screen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;900px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;orange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이렇게 하면 이전 article이 핑크색이었더라도 미디어 쿼리의 최대 너비인 max-width값을 900px로 지정했으므로 이 구간에서는 핑크를 무시하고 orange를 우선 적용한다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/media_after.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;너비를 900 이하로 바꾸니 오랜지색으로 변경되었다. 400 이하일 땐 aqua로 바꿀 수도 있을 것이다.&lt;/p&gt;
+
+&lt;h2 id=&quot;flex&quot;&gt;flex&lt;/h2&gt;
+
+&lt;h3 id=&quot;display---자식-요소의-배치-방법-지정&quot;&gt;display - 자식 요소의 배치 방법 지정&lt;/h3&gt;
+
+&lt;p&gt;원래 float은 레이아웃이 아닌 텍스트와 이미지를 좌우로 배치하기 위해 사용한다. 과거에는 float을 많이 사용했지만 HTML5부터 flex 방식으로 편하게 레이아웃을 배치할 수 있다고 한다.&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;main&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;section&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;article&amp;gt;&amp;lt;/article&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/section&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/main&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100vh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;lightcyan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;aqua&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;main은 body를 꽉 채우는 영역이 된다. section은 자식을 감싸고 있고, 각 article은 100 X 100의 사각형 영역이 된다. 이제 부모인 section에 flex를 적용해보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;display: flex는 자신의 블록 속성을 유지하면서 자식 요소에 flex 환경을 설정해준다. 자식들인 article이 가로로 배치되었다. 
+이 때 부모인 section도 그대로 블록 요소 특징을 유지하므로 너빗값이 100%로 유지된다.&lt;/p&gt;
+
+&lt;p&gt;이번에는 inline-flex로 바꿔보자.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_inline_flex.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;inline-flex는 자신을 인라인 속성으로 변경하면서 자식 요소에 flex 환경을 설정한다. 그래서 section이 인라인 속성으로 변경되어 자식 요소의 전체 너빗값만큼 크기가 달라진다.&lt;/p&gt;
+
+&lt;h3 id=&quot;flex-direction&quot;&gt;flex-direction&lt;/h3&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inline-flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;column&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_flex_direction.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;flex-direction으로 정렬 방향을 설정할 수 있다. 설정하지 않으면 기본 값은 row(가로)로 설정되고 column을 사용하면 세로로 정렬된다.&lt;/p&gt;
+
+&lt;h3 id=&quot;flex-wrap--자식에-줄바꿈-적용&quot;&gt;flex-wrap : 자식에 줄바꿈 적용&lt;/h3&gt;
+
+&lt;p&gt;float을 사용했을 때는 자식의 너빗값 합이 부모의 너빗값을 넘어가면 자동으로 줄바꿈 됐었다. 
+하지만 flex는 flex-wrap을 설정해야 줄바꿈을 할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_before_wrap.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;box-sizing: border-box는 안쪽여백(padding)에서 나왔었는데, 그냥 padding을 쓰면 전체 박스 크기가 커지지만 원래 크기로 유지하고 안쪽 여백을 추가할 때 썼었다.&lt;/p&gt;
+
+&lt;p&gt;암튼 이대로 브라우저 창을 줄이면 같은 비율로 줄어든다. flex-wrap을 추가해보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_after_wrap.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;자식요소인 article의 너빗값이 그대로 유지되면서 줄바꿈된다.&lt;/p&gt;
+
+&lt;h3 id=&quot;flex-flow--flex-direction-flex-wrap-한꺼번에-적용&quot;&gt;flex-flow : flex-direction, flex-wrap 한꺼번에 적용&lt;/h3&gt;
+
+&lt;p&gt;flex-flow를 사용하면 flex-direction, flex-wrap 속성을 한번에 적용할 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-flow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;자식요소-정렬하기&quot;&gt;자식요소 정렬하기&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;flex의 핵심 기능은 자식 요소를 어떻게 정렬하는가이다.&lt;/strong&gt; 자식요소는 justify-content나 align-content, align-items 속성을 사용해 정렬할 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;justify-content&quot;&gt;justify-content&lt;/h3&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;section&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;blue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;box-sizing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;border-box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;flex-flow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;justify-content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex-start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_flex_start.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;flex-start는 justify-content의 기본 값이다. 가장 위쪽 article 탭이 가장 왼쪽부터 시작한다.
+flex-end로 설정해보자.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_flex_end.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;종료 방향인 오른쪽으로 정렬된다. center로 해보자.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/css basic/flex_justify_center.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;가운데로 정렬된다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">두 번째 시간…이번에는 trasform, transition 등으로 동적으로 움직이는 기능을 구현해보자. 또 flex라는 것을 이용해 자식 요소의 배치 방법을 지정해보자. 이 글은 Do it! 인터랙티브 웹 페이지 만들기 책을 읽고 공부한 내용입니다.</summary></entry><entry><title type="html">AWS ECS task, container 메모리 제한</title><link href="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/" rel="alternate" type="text/html" title="AWS ECS task, container 메모리 제한" /><published>2023-11-16T00:00:00+09:00</published><updated>2023-11-16T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/16/aws%20ecs%20service%20task%20container</id><content type="html" xml:base="http://localhost:4000/2023/11/16/aws-ecs-service-task-container/">&lt;p&gt;ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다.
 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.&lt;/p&gt;
 
 &lt;p&gt;도커 컨테이너를 사용하면 팀원들이 모두 일관된 개발 환경을 가질 수 있다. 소프트웨어, os, 하드웨어의 구성을 어느 컴퓨터에서나 동일하고 표준적인 블록으로 추상화할 수 있기 때문이다.&lt;/p&gt;
@@ -2081,7 +2130,114 @@ p 태그를 오른쪽으로 20px, 아래로 30px 이동시켜보자. 이 때 pad
 
 &lt;p&gt;&lt;a href=&quot;https://repost.aws/knowledge-center/allocate-ecs-memory-tasks&quot;&gt;How can I allocate memory to tasks in Amazon ECS?&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html&quot;&gt;Task definition parameters&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다. 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.</summary></entry><entry><title type="html">javascript + django click 이벤트</title><link href="http://localhost:4000/2023/11/15/javascript-django-click/" rel="alternate" type="text/html" title="javascript + django click 이벤트" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/javascript%20django%20click</id><content type="html" xml:base="http://localhost:4000/2023/11/15/javascript-django-click/">&lt;p&gt;참고 : &lt;a href=&quot;https://product.kyobobook.co.kr/detail/S000001818033&quot;&gt;Do it! 인터랙티브 웹 페이지 만들기&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">참고 : Do it! 인터랙티브 웹 페이지 만들기</summary></entry><entry><title type="html">gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어</title><link href="http://localhost:4000/2023/11/15/what-is-gunicorn-wsgi-cgi/" rel="alternate" type="text/html" title="gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/what%20is%20gunicorn%20wsgi%20cgi</id><content type="html" xml:base="http://localhost:4000/2023/11/15/what-is-gunicorn-wsgi-cgi/">&lt;p&gt;웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Apache&lt;/code&gt;), 엔진엑스(&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Nginx&lt;/code&gt;) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다.
+&lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html&quot;&gt;Task definition parameters&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">ECS를 사용하기 위해서는 도커 먼저 이해해야한다. 도커는 client-server 어플리케이션이다. 리눅스, 윈도우, 맥OS 어느곳에나 설치되어 도커 컨테이너를 실행할 수 있게 해준다. 컨테이너란 앱 또는 앱의 일부를 실행할 가벼운 환경이다. 하나의 컴퓨터에 Docker 소프트웨어가 설치되어 있다면, 여러 가지 다른 컨테이너를 동시에 여러개 실행할 수 있다.</summary></entry><entry><title type="html">Docker 내 gunicorn 사용시 memory usage 확인</title><link href="http://localhost:4000/2023/11/15/docker-gunicorn-memory-usage-check/" rel="alternate" type="text/html" title="Docker 내 gunicorn 사용시 memory usage 확인" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/docker%20gunicorn%20memory%20usage%20check</id><content type="html" xml:base="http://localhost:4000/2023/11/15/docker-gunicorn-memory-usage-check/">&lt;p&gt;도커 컨테이너에서 Gunicorn을 실행 중일 때, 메모리 사용량을 확인하는 방법&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;도커 CLI를 통한 메모리 통계 확인:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;다음 명령을 사용하여 도커 컨테이너의 메모리 사용량을 확인할 수 있습니다.
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker stats &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;options] &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
+          &lt;li&gt;이 명령은 실시간으로 CPU, 메모리, 네트워크 등의 통계를 표시합니다.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Column name&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;CONTAINER ID and Name&lt;/td&gt;
+      &lt;td&gt;the ID and name of the container&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;CPU % and MEM %&lt;/td&gt;
+      &lt;td&gt;the percentage of the host’s CPU and memory the container is using&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;MEM USAGE / LIMIT&lt;/td&gt;
+      &lt;td&gt;the total memory the container is using, and the total amount of memory it is allowed to use&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;NET I/O&lt;/td&gt;
+      &lt;td&gt;The amount of data the container has received and sent over its network interface&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;BLOCK I/O&lt;/td&gt;
+      &lt;td&gt;The amount of data the container has written to and read from block devices on the host&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;PIDs&lt;/td&gt;
+      &lt;td&gt;The number of processes or threads the container has created&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;도커 컨테이너 내부에서 Gunicorn 프로세스의 메모리 사용량 확인:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;컨테이너 내부에서 직접 Gunicorn 프로세스의 메모리 사용량을 확인할 수 있습니다.&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ps&lt;/code&gt;나 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;top&lt;/code&gt; 명령을 사용할 수 있습니다. 예를 들어:
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name] ps aux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+        &lt;p&gt;또는&lt;/p&gt;
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name] top
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
+          &lt;li&gt;이 명령은 컨테이너 내부에서 실행 중인 모든 프로세스의 목록과 자원 사용량을 표시합니다.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;도커 컨테이너의 로그 확인:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Gunicorn은 로그에 메모리 사용에 관한 정보를 기록할 수 있습니다. Gunicorn 로그를 확인하여 메모리 사용량을 파악할 수 있습니다.&lt;/li&gt;
+      &lt;li&gt;Gunicorn 로그는 일반적으로 STDOUT 또는 특정 로그 파일에 출력됩니다.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;도커 컨테이너의 메모리 리소스 사용 확인:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;도커는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker stats&lt;/code&gt; 명령 외에도 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker inspect&lt;/code&gt;를 사용하여 컨테이너의 자세한 정보를 얻을 수 있습니다.
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      
+docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.Config.Memory}}&apos;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name]
+      
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
+          &lt;li&gt;이 명령은 컨테이너가 할당된 메모리 양을 표시합니다.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;컨테이너의 메모리 한도 확인
+    &lt;ul&gt;
+      &lt;li&gt;컨테이너 메모리 구성을 확인하는 명령어
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      
+ docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.Config.Memory}}&apos;&lt;/span&gt; &amp;lt;container_id_or_name&amp;gt;
+ &lt;span class=&quot;c&quot;&gt;# 이게 안되면 Docker inspect 결과에서 &quot;Memory&quot; 필드가 존재하지 않는다는 의미이므로 아래와같이&lt;/span&gt;
+ docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.HostConfig.Memory}}&apos;&lt;/span&gt; &amp;lt;container_id_or_name&amp;gt;
+      
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+
+        &lt;p&gt;모든 설정을 보고 싶다면 다음과 같이!&lt;/p&gt;
+        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; docker inspect 962ec674f2c5
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이러한 방법 중 하나를 선택하여 Gunicorn이 실행 중인 도커 컨테이너의 메모리 사용량을 확인할 수 있다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">도커 컨테이너에서 Gunicorn을 실행 중일 때, 메모리 사용량을 확인하는 방법</summary></entry><entry><title type="html">gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어</title><link href="http://localhost:4000/2023/11/15/what-is-gunicorn-wsgi-cgi/" rel="alternate" type="text/html" title="gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/what%20is%20gunicorn%20wsgi%20cgi</id><content type="html" xml:base="http://localhost:4000/2023/11/15/what-is-gunicorn-wsgi-cgi/">&lt;p&gt;웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Apache&lt;/code&gt;), 엔진엑스(&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Nginx&lt;/code&gt;) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다.
 웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다.&lt;/p&gt;
 
 &lt;p&gt;gunicorn은 wsgi의 일종이다. wsgi는 cgi에서 파생된 개념이다.&lt;/p&gt;
@@ -2205,111 +2361,4 @@ Gunicorn에서 worker와 thread의 설정은 다음과 같습니다:&lt;/p&gt;
 &lt;h2 id=&quot;출처&quot;&gt;출처&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&quot;https://wikidocs.net/75556&quot;&gt;점프 투 장고 - 4-09 WSGI&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://this-programmer.tistory.com/345&quot;&gt;gunicorn은 대체 뭐하는 놈일까 (부제: CGI, WSGI는 대체 뭐냐)&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(Apache), 엔진엑스(Nginx) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다. 웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다.</summary></entry><entry><title type="html">Docker 내 gunicorn 사용시 memory usage 확인</title><link href="http://localhost:4000/2023/11/15/docker-gunicorn-memory-usage-check/" rel="alternate" type="text/html" title="Docker 내 gunicorn 사용시 memory usage 확인" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/docker%20gunicorn%20memory%20usage%20check</id><content type="html" xml:base="http://localhost:4000/2023/11/15/docker-gunicorn-memory-usage-check/">&lt;p&gt;도커 컨테이너에서 Gunicorn을 실행 중일 때, 메모리 사용량을 확인하는 방법&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;도커 CLI를 통한 메모리 통계 확인:&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;다음 명령을 사용하여 도커 컨테이너의 메모리 사용량을 확인할 수 있습니다.
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker stats &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;options] &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name]
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-        &lt;ul&gt;
-          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
-          &lt;li&gt;이 명령은 실시간으로 CPU, 메모리, 네트워크 등의 통계를 표시합니다.&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;Column name&lt;/th&gt;
-      &lt;th&gt;Description&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;CONTAINER ID and Name&lt;/td&gt;
-      &lt;td&gt;the ID and name of the container&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;CPU % and MEM %&lt;/td&gt;
-      &lt;td&gt;the percentage of the host’s CPU and memory the container is using&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;MEM USAGE / LIMIT&lt;/td&gt;
-      &lt;td&gt;the total memory the container is using, and the total amount of memory it is allowed to use&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;NET I/O&lt;/td&gt;
-      &lt;td&gt;The amount of data the container has received and sent over its network interface&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;BLOCK I/O&lt;/td&gt;
-      &lt;td&gt;The amount of data the container has written to and read from block devices on the host&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;PIDs&lt;/td&gt;
-      &lt;td&gt;The number of processes or threads the container has created&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;도커 컨테이너 내부에서 Gunicorn 프로세스의 메모리 사용량 확인:&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;컨테이너 내부에서 직접 Gunicorn 프로세스의 메모리 사용량을 확인할 수 있습니다.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ps&lt;/code&gt;나 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;top&lt;/code&gt; 명령을 사용할 수 있습니다. 예를 들어:
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name] ps aux
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-        &lt;p&gt;또는&lt;/p&gt;
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name] top
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-        &lt;ul&gt;
-          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
-          &lt;li&gt;이 명령은 컨테이너 내부에서 실행 중인 모든 프로세스의 목록과 자원 사용량을 표시합니다.&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;도커 컨테이너의 로그 확인:&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Gunicorn은 로그에 메모리 사용에 관한 정보를 기록할 수 있습니다. Gunicorn 로그를 확인하여 메모리 사용량을 파악할 수 있습니다.&lt;/li&gt;
-      &lt;li&gt;Gunicorn 로그는 일반적으로 STDOUT 또는 특정 로그 파일에 출력됩니다.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;도커 컨테이너의 메모리 리소스 사용 확인:&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;도커는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker stats&lt;/code&gt; 명령 외에도 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker inspect&lt;/code&gt;를 사용하여 컨테이너의 자세한 정보를 얻을 수 있습니다.
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      
-docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.Config.Memory}}&apos;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;container_name]
-      
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-        &lt;ul&gt;
-          &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_name&lt;/code&gt;은 Gunicorn이 실행 중인 컨테이너의 이름 또는 ID로 대체됩니다.&lt;/li&gt;
-          &lt;li&gt;이 명령은 컨테이너가 할당된 메모리 양을 표시합니다.&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;컨테이너의 메모리 한도 확인
-    &lt;ul&gt;
-      &lt;li&gt;컨테이너 메모리 구성을 확인하는 명령어
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      
- docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.Config.Memory}}&apos;&lt;/span&gt; &amp;lt;container_id_or_name&amp;gt;
- &lt;span class=&quot;c&quot;&gt;# 이게 안되면 Docker inspect 결과에서 &quot;Memory&quot; 필드가 존재하지 않는다는 의미이므로 아래와같이&lt;/span&gt;
- docker inspect &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{{.HostConfig.Memory}}&apos;&lt;/span&gt; &amp;lt;container_id_or_name&amp;gt;
-      
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-
-        &lt;p&gt;모든 설정을 보고 싶다면 다음과 같이!&lt;/p&gt;
-        &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; docker inspect 962ec674f2c5
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;이러한 방법 중 하나를 선택하여 Gunicorn이 실행 중인 도커 컨테이너의 메모리 사용량을 확인할 수 있다.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">도커 컨테이너에서 Gunicorn을 실행 중일 때, 메모리 사용량을 확인하는 방법</summary></entry></feed>
+&lt;p&gt;&lt;a href=&quot;https://this-programmer.tistory.com/345&quot;&gt;gunicorn은 대체 뭐하는 놈일까 (부제: CGI, WSGI는 대체 뭐냐)&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(Apache), 엔진엑스(Nginx) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다. 웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다.</summary></entry><entry><title type="html">javascript + django click 이벤트</title><link href="http://localhost:4000/2023/11/15/javascript-django-click/" rel="alternate" type="text/html" title="javascript + django click 이벤트" /><published>2023-11-15T00:00:00+09:00</published><updated>2023-11-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/11/15/javascript%20django%20click</id><content type="html" xml:base="http://localhost:4000/2023/11/15/javascript-django-click/">&lt;p&gt;참고 : &lt;a href=&quot;https://product.kyobobook.co.kr/detail/S000001818033&quot;&gt;Do it! 인터랙티브 웹 페이지 만들기&lt;/a&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">참고 : Do it! 인터랙티브 웹 페이지 만들기</summary></entry></feed>

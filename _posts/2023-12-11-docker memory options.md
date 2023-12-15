@@ -7,26 +7,47 @@ tags:
 
 AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
-한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : [Runtime options with Memory, CPUs, and GPUs](https://docs.docker.com/config/containers/resource_constraints/)
+한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
+번역했다 : [Runtime options with Memory, CPUs, and GPUs](https://docs.docker.com/config/containers/resource_constraints/){:
+target="_blank"}
 
 ---
 
 기본적으로, 컨테이너는 리소스 제한이 없다. 그리고 호스트의 커널 스케줄러가 허용하기만 한다면 주어진 리소스를 원하는 만큼 사용한다.
 
-도커에서 컨테이너가 사용할 수 있는 메모리와 CPU를 컨트롤할 수 있다.  
-
+도커에서 컨테이너가 사용할 수 있는 메모리와 CPU를 컨트롤할 수 있다.
 
 # 메모리
 
 ## 메모리 부족의 위험성 이해하기
 
+컨테이너가 호스트의 메모리를 너무 많이 사용하게 하는걸 막아야한다.
+리눅스에서는 커널이 충분한 메모리가 없다고 판단하면 OOME(Out of Memory Exception)을 내뱉고, 메모리를 확보하기위해 프로세스를 죽이기 시작한다(이게 계속 gunicorn 프로세스가 죽었던
+이유구나..).
+도커나 다른 다른 어플리케이션을 포함해서 어느 프로세스든 죽을 수 있다. 만약 중요한 프로세스가 kill되면? 전체 시스템이 다운될 것이다.
 
+도커는 이런 위험을 피하기 위해 노력한다. 도커 대몬에 <span style="background-color:#fff5b1">**OOM 우선순위**</span>를 적용시키는 것이다. 그렇게 해서 다른 시스템
+프로세스보다 죽을 가능성을 낮춘다.
+각 컨테이너에는 OOM 우선순위를 적용하지 않는다. 도커 대몬에 적용함으로써 개별 컨테이너를 종료할 가능성을 높이고, 도커 대몬이나 다른 시스템 프로세스가 죽을 확률을 낮춘다.
 
+```--oom-score-adj```[↗](https://docs.docker.com/compose/compose-file/05-services/#oom_score_adj){:target="_blank"}
+설정은 [-1000, 1000]사이의 숫자로 설정하여, 메모리 부족시 어떤 컨테이너를 먼저 죽일지 설정하게 해준다. 극단적으로 음수로 설정하면 안죽는 것이다.
+```--oom-kill-disable```[↗](https://docs.docker.com/compose/compose-file/05-services/#oom_kill_disable){:target="_blank"
+} 설정은 메모리 부족시에도 해당 컨테이너를 죽지 않게 할수도 있다. **하지만 이런 설정을 사용하는 것은 권장되지 않는다.**
 
+## OOM 위험을 줄이려면?
+
+다음과 같은 방법이 있다.
+
+- 컨테이너가 사용할 수 있는 메모리 양을 아래 설명된 대로 설정한다.
+- Docker 호스트에서 swap을 설정할 때 신중히... Swap은 메모리보단 느리지만, OOM 상황에 대한 버퍼 역할을 할 수 있다.
+- 컨테이너를 서비스로 변환한다. 즉 Kubernetes같은 오케스트레이션으로 컨테이너를 관리, 배포하는 것이다. 서비스는 여러 컨테이너 인스턴스를 실행하고 관리하는 개념이다. 서비스 수준의 조건 및 관리를 받게
+  하는 것이다.
 
 ## 컨테이너의 메모리 엑세스를 제한하기
 
-Docker는 하드 메모리 제한 또는 소프트 메모리 제한을 부여할 수 있습니다.
+Docker는 <span style="background-color:#fff5b1">하드 메모리 제한</span> 또는 <span style="background-color:#fff5b1">소프트 메모리
+제한</span>을 부여할 수 있습니다.
 
 - 하드 제한은 컨테이너가 고정된 메모리 양을 초과하지 못하게 합니다.
 
@@ -36,6 +57,11 @@ Docker는 하드 메모리 제한 또는 소프트 메모리 제한을 부여할
 
 대부분 양의 정수 + b, k, m, g처럼 바이트, 킬로바이트, 메가바이트, 기가바이트처럼 쓰인다.
 
+| 옵션                          | 설명                                                                                                                                                |
+|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| ```-m``` or ```--memory=``` | 컨테이너가 사용할 수 있는 메모리 최대량.                                                                                                                           |
+| ```--memory-swap=```        | 컨테이너가 disk로부터 사용할 수 있는 swap 메모리량. [자세히↗](https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details){:target="_blank"} |
+| ```--memory-reservation```  | ```--memory```보다 작게 soft limit을 건다. 도커가 호스트로부터 메모리 경합이나 낮은 메모리를 감지할때 동작하는 수치다.                                                         |
 
 
 

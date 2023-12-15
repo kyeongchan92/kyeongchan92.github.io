@@ -121,7 +121,7 @@ menu:
   about: /about/
   archives: /archives/
 #  tags: /tags/
-#  sitemap: /navigator/
+  sitemap: /navigator/
   #commonweal: /404.html
 
 
@@ -173,7 +173,7 @@ font:
   global:
     # external: true will load this font family from host.
     external: true
-    family: Bitter
+    family: Gowun Batang
 
   # Font settings for Headlines (h1, h2, h3, h4, h5, h6)
   # Fallback to `global` font settings.
@@ -211,8 +211,11 @@ font:
 # Social Links
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
-#social:
+social:
   #LinkLabel: Link
+  Github: https://github.com/kyeongchan92
+  LinkedIn: https://www.linkedin.com/in/nahcklee/
+
 
 
 # Social Links Icons
@@ -225,13 +228,14 @@ social_icons:
   # Icon Mappings.
   # KeyMapsToSocialItemKey: NameOfTheIconFromFontAwesome
   GitHub: github
+  LinkedIn: linkedin
   # Twitter: twitter
   # Weibo: weibo
 
 
 # Sidebar Avatar
 # in directory: /assets/images/avatar.gif
-#avatar:
+avatar: /assets/images/profile.jpg
 
 
 # Table Of Contents in the Sidebar
@@ -239,10 +243,10 @@ toc:
   enable: true
 
   # Automatically add list number to toc.
-  number: true
+  number: false
 
   # If true, all words will placed on next lines if header width longer then sidebar width.
-  wrap: false
+  wrap: true
 
 
 # Creative Commons 4.0 International License.

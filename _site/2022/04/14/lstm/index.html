@@ -70,7 +70,7 @@
   
     
     
-    <link href="//fonts.googleapis.com/css?family=Bitter:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Gowun Batang:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
   
 
 
@@ -114,7 +114,7 @@
 <meta name="description" content="원 논문 : Hochreiter, S., &amp;amp; Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735–1780.">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LSTM 정리">
+<meta property="og:title" content="LSTM(1997) 정리">
 <meta property="og:url" content="http://localhost:4000/2022/04/14/lstm/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
 <meta property="og:description" content="원 논문 : Hochreiter, S., &amp;amp; Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735–1780.">
@@ -122,8 +122,11 @@
 <meta property="og:image" content="/assets/images/lstm/RNN과 LSTM 비교.png">
 <meta property="og:image" content="/assets/images/lstm/LSTM 셀.png">
 <meta property="og:image" content="/assets/images/lstm/forget gate.png">
+<meta property="og:image" content="/assets/images/lstm/input gate.png">
+<meta property="og:image" content="/assets/images/lstm/output gate.png">
+<meta property="og:image" content="/assets/images/lstm/backpropagation.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LSTM 정리">
+<meta name="twitter:title" content="LSTM(1997) 정리">
 <meta name="twitter:description" content="원 논문 : Hochreiter, S., &amp;amp; Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735–1780.">
 <meta name="twitter:image" content="/assets/images/lstm/RNN과 LSTM 비교.png">
 
@@ -158,7 +161,7 @@
 
 
 
-  <title>LSTM 정리 | Leegang's AI Note</title>
+  <title>LSTM(1997) 정리 | Leegang's AI Note</title>
   
 
 
@@ -263,6 +266,18 @@
           </a>
         </li>
       
+        
+        
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/navigator/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
 
       
     </ul>
@@ -301,7 +316,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kyeongchan Lee">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="assets/images/avatar.gif">
+      <meta itemprop="image" content="/assets/images/profile.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -316,7 +331,7 @@
           <h1 class="post-title" itemprop="name headline">
           
           
-            LSTM 정리
+            LSTM(1997) 정리
           
         </h1>
         
@@ -398,17 +413,81 @@
 
 <p><img src="/assets/images/lstm/LSTM 셀.png" alt="" /></p>
 
-<p>기억 셀 기준으로 어떤 연산이 이루어지는지 살펴보면 편하다. cₜ₋₁이 cₜ로 되는 과정은 위 그림과 같다. 일단 모든 연산이 이전 hidden state인 hₜ₋₁과 현재 인풋 단어 x로부터 시작한다. 그럼 이제 저 구름 안에서는 어떤 연산이 벌어지는 지를 하나하나 보면 된다.</p>
+<p>기억 셀 기준으로 어떤 연산이 이루어지는지 살펴보면 편하다. 
+\(c_{t-1}\)이 \(c_t\)로 되는 과정은 위 그림과 같다. 
+일단 모든 연산이 이전 hidden state인 \(h_{t-1}\)과 현재 인풋 단어 \(x\)로부터 시작한다. 
+그럼 이제 저 구름 안에서는 어떤 연산이 벌어지는 지를 하나하나 보면 된다.</p>
 
 <h2 id="1-망각의-문-forget-gate">1. 망각의 문, forget gate</h2>
 
-<p>$c_{t-1}$가 통과하는 첫 번째 게이트는 망각의 문이다. f라는 게이트는 아래와 같은 수식으로 얻어진다.</p>
+<p>\(c_{t-1}\)가 통과하는 첫 번째 게이트는 망각의 문이다. \(f\)라는 게이트는 아래와 같은 수식으로 얻어진다.</p>
 
 <p><img src="/assets/images/lstm/forget gate.png" alt="" /></p>
 
 \[f=\sigma(x_tW_x^f + h_{t-1}W_h^f + b^f)\]
 
-<p>이것이 forget gate이다. 이를 과 원소별 곱을 한다. $c_{t-1}$과 원소별 곱을 한다.</p>
+<p>이것이 forget gate이다. 
+이를 \(c_{t-1}\)과 원소별 곱을 한다.</p>
+
+<h2 id="2-기억의-문-input-gate">2. 기억의 문, input gate</h2>
+
+<p>다음으로 지날 문은 기억의 문 \(i\)이다. 
+마찬가지로 \(h_{t-1}\)과 \(x\)를 사용한다. 
+우선 \(i\)를 구하기 위해선 우선 \(g\)라는 정보가 필요하다. 
+아래 그림과 같은 연산을 거친 뒤 \(g\)라는 정보가 탄생한다.</p>
+
+<p><img src="/assets/images/lstm/input gate.png" alt="" /></p>
+
+\[g=\sigma(x_t W_x^g + h_{t-1} W_h^g + b^g)\]
+
+<p>이를 책에서는 ‘새로운 기억 셀’이라고 한다. 원 논문에는 어떤 표현으로 쓰였는지는 잘 모르겠다.</p>
+
+<h2 id="3-나가는-문-output-gate">3. 나가는 문, output gate</h2>
+
+<p>\(c_t\)에는 과거부터 현재(\(t\))까지, 필요한 모든 정보가 담겨있다. 
+당장은 그렇지 않더라도 학습을 통해 그렇게 만들어져 갈 것이다. 
+이 \(c_t\)를 가지고 외부에 출력할 hidden state \(h_t\)를 만들 것이다. 
+\(c_t\)에 \(\tanh\)를 적용하여 \(h_t\)를 만든다.</p>
+
+\[h_t = \tanh(c_t)\]
+
+<p>\(c_t\)의 각 원소에 \(\tanh\)를 적용하였다. 
+근데 마지막으로 한번 더 \(h_t\)에 게이트를 하나 더 지나게 한다. 
+이를 output gate라고 한다. 
+이제 이 셀을 나가는 문이다. 
+문의 이름은 \(o\)이다.</p>
+
+<p><img src="/assets/images/lstm/output gate.png" alt="" /></p>
+
+\[o=\sigma(x_t W_x^o + h_{t-1} W_h^o + b^o)\]
+
+<p>output gate인 \(o\)는 “\(\tanh(c_t)\)가 다음 hidden state \(h_t\)에 얼마나 중요한가”, “\(\tanh(c_t)\)를 얼마나 흘려보낼까?”를 결정한다. 
+그러므로 \(o\)와 \(\tanh(h_t)\)를 원소별 곱을 수행하면 \(h_t\)를 얻는다.</p>
+
+<p>근데 어떤 건 sigmoid를 쓰고 어떤 것은 tanh를 썼다. 
+tanh의 출력은 -1~+1이다. 
+이는 ‘인코딩 된 정보의 강약’을 의미할 수 있다. 
+반면 sigmoid는 0~1의 값이므로 ‘얼마나 흘려보낼 지를 정하는 게이트(문)’이라고 생각할 수 있다. 
+따라서 게이트에는 sigmoid가, 정보를 품는 작업에는 tanh가 쓰인다.</p>
+
+<h1 id="이-문들이-어떤-원리로-기울기-소실-문제를-해결한단-말일까">이 문들이 어떤 원리로 “기울기 소실 문제”를 해결한단 말일까?</h1>
+
+<p><img src="/assets/images/lstm/backpropagation.png" alt="" />
+<em>기억 셀의 역전파</em></p>
+
+<p>기억 셀의 역전파를 보면, 더하기와 곱하기 밖에 없다. 
+더하기는 역전파 시 그대로 흘러가므로 기울기에 아무 연산도 하지 않고 흘러간다. 
+그리고 곱하기는 매 시각 다른 f와의 아다마르 곱(원소별 곱)이다.</p>
+
+<p>기존 RNN은 계속 같은 행렬을 행렬곱 했었기에 기울기가 폭발하거나 소실됐었다. 
+그러나 LSTM의 기억 셀은 매번 다른 행렬과 아다마르 곱을 수행하므로 기울기 폭발이나 소실이 일어나기 힘들다.</p>
+
+<p>곱하기는 forget gate와의 곱이므로, 순전파 때 0~1사이의 값이 곱해지는 과정이었다. 
+‘잊어야 한다’고 판단된 셀에서는 기울기가 작아진채로 역전파된다. 
+그러나 ‘잊어서는 안된다’라고 판단된 셀에서는 기울기가 작아지지 않고 전파된다.</p>
+
+<p>따라서, 기억 셀이 장기 의존 관계를 유지(학습)할 수 있다.</p>
+
 
       
     </div>
@@ -448,8 +527,8 @@
         <div class="post-nav" id="post-nav-id">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/12/27/Matrix-Factorization-in-RS/" rel="next" title="추천시스템에서의 Matrix Factorization">
-                <i class="fa fa-chevron-left"></i> 추천시스템에서의 Matrix Factorization
+              <a href="/2022/05/18/matrix-decomposition-01-determinant-and-trace/" rel="next" title="추천시스템과 Matrix Decompositions — 1. Determinant and Trace">
+                <i class="fa fa-chevron-left"></i> 추천시스템과 Matrix Decompositions — 1. Determinant and Trace
               </a>
             
           </div>
@@ -527,7 +606,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/assets/images/avatar.gif"
+               src="/assets/images/profile.jpg"
                alt="Kyeongchan Lee" />
           <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
            
@@ -539,7 +618,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -582,6 +661,30 @@
 
         <div class="links-of-author motion-element">
           
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.com/kyeongchan92" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/nahcklee/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -612,7 +715,7 @@
             
               <div class="post-toc-content">
     <ol class=nav>
-      <li class="nav-item nav-level-1"> <a class="nav-link" href="#rnn의-문제점은-무엇일까"> <span class="nav-number">1</span> <span class="nav-text">RNN의 문제점은 무엇일까?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#그렇다면-기울기-소실은"> <span class="nav-number">2</span> <span class="nav-text">그렇다면 기울기 소실은?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#lstm의-핵심은-기억-셀memory-cell-cell-state-c이다"> <span class="nav-number">3</span> <span class="nav-text">LSTM의 핵심은 기억 셀(memory cell, cell state, c)이다.</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#1-망각의-문-forget-gate"> <span class="nav-number">3.1</span> <span class="nav-text">1. 망각의 문, forget gate</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#rnn의-문제점은-무엇일까"> <span class="nav-text">RNN의 문제점은 무엇일까?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#그렇다면-기울기-소실은"> <span class="nav-text">그렇다면 기울기 소실은?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#lstm의-핵심은-기억-셀memory-cell-cell-state-c이다"> <span class="nav-text">LSTM의 핵심은 기억 셀(memory cell, cell state, c)이다.</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#1-망각의-문-forget-gate"> <span class="nav-text">1. 망각의 문, forget gate</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#2-기억의-문-input-gate"> <span class="nav-text">2. 기억의 문, input gate</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#3-나가는-문-output-gate"> <span class="nav-text">3. 나가는 문, output gate</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#이-문들이-어떤-원리로-기울기-소실-문제를-해결한단-말일까"> <span class="nav-text">이 문들이 어떤 원리로 “기울기 소실 문제”를 해결한단 말일까?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
     </ol>
   </div>
             

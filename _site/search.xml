@@ -6,7 +6,8 @@
       <url>/2023/12/11/docker-memory-options/</url>
       <content type="text">AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
-한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs
+한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
+번역했다 : Runtime options with Memory, CPUs, and GPUs
 
 
 
@@ -18,9 +19,34 @@
 
 메모리 부족의 위험성 이해하기
 
+컨테이너가 호스트의 메모리를 너무 많이 사용하게 하는걸 막아야한다.
+리눅스에서는 커널이 충분한 메모리가 없다고 판단하면 OOME(Out of Memory Exception)을 내뱉고, 메모리를 확보하기위해 프로세스를 죽이기 시작한다(이게 계속 gunicorn 프로세스가 죽었던
+이유구나..).
+도커나 다른 다른 어플리케이션을 포함해서 어느 프로세스든 죽을 수 있다. 만약 중요한 프로세스가 kill되면? 전체 시스템이 다운될 것이다.
+
+도커는 이런 위험을 피하기 위해 노력한다. 도커 대몬에 OOM 우선순위를 적용시키는 것이다. 그렇게 해서 다른 시스템
+프로세스보다 죽을 가능성을 낮춘다.
+각 컨테이너에는 OOM 우선순위를 적용하지 않는다. 도커 대몬에 적용함으로써 개별 컨테이너를 종료할 가능성을 높이고, 도커 대몬이나 다른 시스템 프로세스가 죽을 확률을 낮춘다.
+
+--oom-score-adj↗
+설정은 [-1000, 1000]사이의 숫자로 설정하여, 메모리 부족시 어떤 컨테이너를 먼저 죽일지 설정하게 해준다. 극단적으로 음수로 설정하면 안죽는 것이다.
+--oom-kill-disable↗ 설정은 메모리 부족시에도 해당 컨테이너를 죽지 않게 할수도 있다. 하지만 이런 설정을 사용하는 것은 권장되지 않는다.
+
+OOM 위험을 줄이려면?
+
+다음과 같은 방법이 있다.
+
+
+  컨테이너가 사용할 수 있는 메모리 양을 아래 설명된 대로 설정한다.
+  Docker 호스트에서 swap을 설정할 때 신중히… Swap은 메모리보단 느리지만, OOM 상황에 대한 버퍼 역할을 할 수 있다.
+  컨테이너를 서비스로 변환한다. 즉 Kubernetes같은 오케스트레이션으로 컨테이너를 관리, 배포하는 것이다. 서비스는 여러 컨테이너 인스턴스를 실행하고 관리하는 개념이다. 서비스 수준의 조건 및 관리를 받게
+하는 것이다.
+
+
 컨테이너의 메모리 엑세스를 제한하기
 
-Docker는 하드 메모리 제한 또는 소프트 메모리 제한을 부여할 수 있습니다.
+Docker는 하드 메모리 제한 또는 소프트 메모리
+제한을 부여할 수 있습니다.
 
 
   
@@ -34,6 +60,29 @@ Docker는 하드 메모리 제한 또는 소프트 메모리 제한을 부여할
 위 옵션 중 하나만 쓰일 때, 또는 한 개 이상 쓰일 때는 다른 효과가 나타난다.
 
 대부분 양의 정수 + b, k, m, g처럼 바이트, 킬로바이트, 메가바이트, 기가바이트처럼 쓰인다.
+
+
+  
+    
+      옵션
+      설명
+    
+  
+  
+    
+      -m or --memory=
+      컨테이너가 사용할 수 있는 메모리 최대량.
+    
+    
+      --memory-swap=
+      컨테이너가 disk로부터 사용할 수 있는 swap 메모리량. 자세히↗
+    
+    
+      --memory-reservation
+      --memory보다 작게 soft limit을 건다. 도커가 호스트로부터 메모리 경합이나 낮은 메모리를 감지할때 동작하는 수치다.
+    
+  
+
 
 </content>
       <categories>
@@ -2689,12 +2738,28 @@ print(pool.busy)  # 1
     <entry>
       <title>논문리뷰 - Contrastive Learning for Sequential Recommendation</title>
       <url>/2023/09/19/Contrastive-Learning-for-Sequential-Recommendation/</url>
-      <content type="text">본 논문의 목적은 Contrastive learning을 유저의 아이템 시퀀스에 적용함으로써 향상된 user representation을 얻는 것이다.
+      <content type="text">CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다.
+그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.
 
 논문 : Contrastive Learning for Sequential Recommendation
 
+
+
 Self-supervised Learning(SSL, 자기지도학습)
 self-supervised learning은 라벨없는 데이터에서 representation을 학습하는데에 우월하다고 한다. 기본 아이디어는 pretext task로 training signal을 구축하는 것이다.
+
+CL4SREC
+
+Notations &amp;amp; 문제 정의
+
+유저를 \(u\), 아이템을 \(v\)라고 하자.
+유저 \(u\)의 인터랙션 시퀀스 \(s_u\)는 \(s_u=\left[v_1^{(u)}, v_2^{(u)}, \cdots, v_{|s_u|}^{(u)}\right]\)처럼 쓸 수 있다.
+여기서 \(|s_u|\)는 시퀀스 길이가 된다.
+
+시퀀셜 추천을 정의하자. 유저 \(u\)가 \(|s_u|+1\) 시간에 가장 상호작용할 가능성이 높은 아이템을 예측한다.
+다른 보조적인 문맥 정보는 사용하지 않고, 오직 유저의 상호작용 시퀀스만 주어진다. 다음과 같이 수식화된다.
+
+\[v_u^* = \arg\max_{v_i \in \mathcal{V}} P\left( v_{|s_u|+1}^{(u)} = v_i | s_u \right)\]
 
 Contrastive Learning Framework
 
@@ -2718,8 +2783,8 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 
 손실함수는 두 representation이 같은 유저 시퀀스로부터 추출된 것인지 구별한다. 손실함수는 다음을 각각 최소화, 최대화한다.
 
-  최소화 : 하나의 시퀀스로부터 변형된 두 개의 시퀀스간 차이
-  최대화 : 다른 유저로부터 변형된 두 시퀀스간 차이
+  최소화 : 하나의 유저시퀀스로부터 변형된 두 시퀀스간 차이
+  최대화 : 각각 다른 유저 시퀀스로부터 변형된 두 시퀀스간 차이
 
 
 \[\mathcal{L}_{\text{cl}}(s_u^{a_i}, s_u^{a_j})=-\log \frac{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))}{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))+\sum_{s^- \in S^-}\exp(\text{sim}(s_u^{a_i}, s_u^-))}\]
@@ -2727,6 +2792,8 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 \(\text{sim}(u, v)=u^Tv\), 즉 내적이다. 손실을 작게 한다 = -를 뗀 log를 크게 한다 = \(s_u^{a_i}\)와 \(s_u^{a_j}\)를 유사하게 한다 + \(s_u^{a_i}\)와 \(S^-\)에 속한 것들과는 멀어지게 한다가 되겠다.
 
 Data Augmentation Operators
+
+
 
 1. Crop
 
@@ -2744,7 +2811,8 @@ User Representation Model
 인코더 모델로는 SASRec을 사용한다(SASRec 논문리뷰 참고). 유저 representation으로는 마지막 아이템까지 어텐션을 적용한 representation, 즉 \(t=|s_u|\)(마지막)째 아이템의 representation을 사용한다.
 
 Multi-task Training
-multi-task 전략을 사용한다고 하는데, 다른게 아니라 \(\mathcal{L}\_{\text{cl}}\)뿐만 아니라 SASRec 자체의 next item prediction 손실까지 더하겠다는 뜻이다. 이를 \(\mathcal{L}\_{\text{main}}\)이라고 할 때, total loss는 다음과 같다.
+multi-task 전략을 사용한다고 하는데, 특별한게 아니다. \(\mathcal{L}_{\text{cl}}\)뿐만 아니라 SASRec 자체의 next item prediction 손실까지 더하겠다는 뜻이다.
+이를 \(\mathcal{L}_{\text{main}}\)이라고 할 때, total loss는 다음과 같다.
 \(\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{main}} + \lambda \mathcal{L}_{\text{cl}}\)
 
 \(\mathcal{L}_{\text{main}}\)은 다음과 같이 정의된다.
@@ -2760,12 +2828,10 @@ Experiments
 
 Crop, mask, reorder에서 사용하는 비율은 다음과 같다.
 
-  eta : \(\eta\) : crop
-  gamma : \(\gamma\) : mask
-  beta : \(\beta\) : reorder
+  crop : \(\eta\)(eta)
+  mask : \(\gamma\)(gamma)
+  reorder : \(\beta\)(beta)
 
-
-\[\min_w \frac{1}{2} \rVert w \rVert^2 + \frac{C}{n} \sum_{i}^{n} \max_{y \in \mathcal{Y}} \left(0, \Delta(y_i, y) - \left( w \cdot F(x_i, y_i) - w \cdot F(x_i, y) \right) \right)\]
 </content>
       <categories>
         
@@ -2935,7 +3001,9 @@ $ndcg=\frac{dcg}{idcg}$로 계산합니다.
     <entry>
       <title>추천시스템에서의 Matrix Factorization</title>
       <url>/2022/12/27/Matrix-Factorization-in-RS/</url>
-      <content type="text">MF는 유저와 아이템을 latent feature의 실수 벡터와 연결한다. $\mathbf{p}_u$와 $\mathbf{q}_i$가 유저 와 아이템 를 나타낸다고 해보자. MF는 $\mathbf{p}_u$와 $\mathbf{q}_i$를 내적하여 상호작용 $y_{ui}$를 계산한다.
+      <content type="text">논문 Neural collaborative filtering에서 짧게 추천에 관한 Matrix Factorization에 대해 설명하길래 따로 정리해봤다.
+
+MF는 유저와 아이템을 latent feature의 실수 벡터와 연결한다. \(\mathbf{p}_u\)와 \(\mathbf{q}_i\)가 유저 와 아이템 를 나타낸다고 해보자. MF는 \(\mathbf{p}_u\)와 \(\mathbf{q}_i\)를 내적하여 상호작용 \(y_{ui}\)를 계산한다.
 
 \[\hat{y}_{ui}=f(u,i|\mathbf{p}_u, \mathbf{q}_i)=\mathbf{p}_u^T\mathbf{q}_i=\sum_{k=1}^{K}p_{uk}q_{ik}\]
 
@@ -2945,13 +3013,16 @@ Figure 1
 
 Figure 1은 내적이 어떻게 MF의 표현력을 제안할 수 있는지를 보여준다. 이 예시를 이해하기 위해 우선적으로 두 가지만 얘기하고 넘어가자. 첫 번째, MF는 유저와 아이템을 같은 잠재 공간(latent space)로 매핑하기 때문에 두 유저간의 유사도 또한 내적(같은 방법으로 잠재벡터 사이의 코사인 각도)으로 계산될 수 있다. 두 번째로, 일반화 손실 없이, 우리는 MF가 복구해야 하는 두 유저의 실제 유사도로서 자카드 계수를 사용한다.
 
-Figure 1a의 상위 3개의 row를 보자. $s_{23}(0.66) &amp;gt; s_{12}(0.5) &amp;gt; s_{13}(0.4)$를 계산하기는 쉽다. 그렇게 해서, 잠재 공간에서의 $\mathbf{p}_1$과 $\mathbf{p}_2$ , 그리고 $\mathbf{p}_3$의 기하학적 관계는 Figure 1b처럼 그릴 수 있다. 자 이제 새로운 유저 $u_4$를 고려해보자. $s_{41}(0.6) &amp;gt; s_{43}(0.4) &amp;gt; s_{42}(0.2)$로 계산되는데, 이는 $u_4$가 $u_1$과 가장 유사하고, 그 다음으로 $u_3$와, 그 다음으로  $u_2$순으로 유사하다는 뜻이다. 그러나, 만약 MF 모델이 $\mathbf{p}_4$를 $\mathbf{p}_1$에 가장 가깝게 놓는다면 $\mathbf{p}_4$가 $\mathbf{p}_3$보다 $\mathbf{p}_2$에 더 가까워지게 되어 큰 랭킹 손실이 생길 것이다.
+Figure 1a의 상위 3개의 row를 보자. \(s_{23}(0.66) &amp;gt; s_{12}(0.5) &amp;gt; s_{13}(0.4)\)를 계산하기는 쉽다. 
+그렇게 해서, 잠재 공간에서의 \(\mathbf{p}_1\)과 \(\mathbf{p}_2\) , 그리고 \(\mathbf{p}_3\)의 기하학적 관계는 Figure 1b처럼 그릴 수 있다. 
+자 이제 새로운 유저 \(u_4\)를 고려해보자. 
+\(s_{41}(0.6) &amp;gt; s_{43}(0.4) &amp;gt; s_{42}(0.2)\)로 계산되는데, 이는 \(u_4$가\)u_1\(과 가장 유사하고, 그 다음으로\)u_3\(와, 그 다음으로\)u_2\(순으로 유사하다는 뜻이다. 
+그러나, 만약 MF 모델이\)\mathbf{p}_4\(를\)\mathbf{p}_1\(에 가장 가깝게 놓는다면\)\mathbf{p}_4\(가\)\mathbf{p}_3\(보다\)\mathbf{p}_2$$에 더 가까워지게 되어 큰 랭킹 손실이 생길 것이다.
 
 위 예시는 MF가 복잡한 유저-아이템 상호작용을 저차원의 잠재 공간에서 간단하고 고정적인 내적으로 계산하려 할 때 발생할 수 있는 한계를 보여준다. 한 가지 해결 방법은 K를 늘리는 것이다. 그러나 이는 sparse한 상황에서는 역으로 모델의 일반화 성능을 저하시킬 수 있다(e.g., 오버피팅). 본 논문에서는 Deep Neural Network를 이용하여 상호작용 함수를 학습시킴으로써 이러한 한계를 다룬다.
 
 
 
-논문 Neural collaborative filtering를 참고했습니다.
 </content>
       <categories>
         
@@ -2963,7 +3034,240 @@ Figure 1a의 상위 3개의 row를 보자. $s_{23}(0.66) &amp;gt; s_{12}(0.5) &a
     </entry>
   
     <entry>
-      <title>LSTM 정리</title>
+      <title>추천시스템과 Matrix Decompositions — 1. Determinant and Trace</title>
+      <url>/2022/05/18/matrix-decomposition-01-determinant-and-trace/</url>
+      <content type="text">Determinant는 선형 대수에서 중요한 개념이다. 
+Determinant란 선형방정식 시스템의 분석 및 솔루션에 있어서, 수학적인 객체(mathematical object)이다. 
+Determinant는 오직 정방행렬에 대해서만 정의된다. 
+이 책에서는 determinant를 \(det(A)\) 또는 \(|A|\)로 표기한다.
+
+
+
+정방행렬 A의 determinant란 A를 실수로 mapping하는 함수이다. determinant의 정의를 살펴보기 전에, 동기 부여를 위한 예시를 함께 보자.
+
+
+  예제 4.1 (행렬 Invertibility 확인하기)
+
+  정방행렬 A가 Invertible(Section 2.2.2)인지 아닌 지를 알아보자. 가장 작은 행렬의 경우 우린 행렬이 invertible일 때를 알고 있다. 만약 \(A\)가 1×1행렬이라면, 즉, 스칼라라면, \(A=a \rightarrow A^{-1}=\frac{1}{a}\)이다. \(a\ne0\)이라면 \(a \times (1/a)=1\)이 성립하기 때문이다. 2×2 행렬이라면, inverse의 정의(Definition 2.3)에 의해 \(AA^{-1}=I\)인 것을 알고 있다. 그러면 2.24와 함께 \(A\)의 inverse는 다음과 같다.
+
+
+
+
+
+  그러므로, \(a_{11}a_{22}-a_{12}a_{21} \ne 0\) (4.3)이라면 \(A\)는 invertible하다. 바로 \(a_{11}a_{22}-a_{12}a_{21}\)라는 이 수가 2×2 행렬 A의 determinant이다. 즉, 다음과 같다.
+
+
+
+
+예제 4.1은 determinant와 역행렬 존재 여부 사이의 관계를 나타낸다. 아래 theorem은 n×n행렬에 대하여 동일한 결과를 설명하는 것이다.
+
+
+어느 정방행렬 A에 대하여, det(A)가 0이 아니라면 A는 invertible하다.
+
+작은 행렬들에 대해서는 determinant는 명확한 표현이 존재한다. \(n=1\)일 때,
+
+
+
+\(n=2\)일 때,
+
+
+
+이는 앞선 예제에서 살펴본 바와 같다.
+
+\(n=3\)일 때 Sarrus’ rule은 다음과 같다.
+
+
+
+Sarrus’ rule의 곱셈항을 기억하기 위해서는 행렬 안의 세 가지씩 곱한 요소들을 잘 추적해야한다.
+
+\(i&amp;gt;j\)에 대하여 만약 \(T_{ij}=0\)라면 정방행렬 \(T\)를 upper-triangular matrix라고 한다. 
+즉, 이 행렬은 대각선 밑으로는 0이다. 
+비슷하게, lower-triangular matrix를 대각선 위가 0인 행렬로 정의한다. 
+이와 같은 triangular 행렬 \(n × n\)의 \(T\)에 대하여, determinant는 대각 element들의 곱이다.
+
+
+
+
+  예제 4.2 부피 측정 수단으로서의 determinants
+determinant의 개념을 보면, 우리는 이를 \(\mathbb{R}^n\)에서 어느 객체를 span하는 n개의 벡터들을 매핑하는 것으로 바라봐도 자연스럽다. 행렬 \(A\)의 determinant인 \(det(A)\)가 \(A\)의 column들로 형성되는 n차원의 평행 육면체의 부호 있는 부피인 것이 알려져 있다. \(n=2\)일 때, 행렬의 각 column들은 평행사변형을 형성할 수 있다; Figure 4.2를 보자.
+
+
+
+Fiture 4.2 벡터 b와 g에 의해 span되는 평행사변형의 넓이(그림자 진 지역)는 \(|det([b,g])|\)이다.
+
+벡터들 사이의 각도가 작아질수록, 평행사변형의 넓이 또한 줄어든다. 
+두 벡터 \(\boldsymbol{b}\), \(\boldsymbol{g}\)가 행렬 \(A\)의 column이라고 생각해보자. 
+\(A=[\boldsymbol{b}, \boldsymbol{g}]\)이다. 
+그럼 \(A\)의 determinant의 절댓값은 꼭지점 0, \(\boldsymbol{b}\), \(\boldsymbol{g}\), \(\boldsymbol{b}+\boldsymbol{g}\)로 이루어진 평행사변형의 넓이이다. 
+만약 \(\boldsymbol{b}\)와 \(\boldsymbol{g}\)가 linearly dependent이어서 \(\boldsymbol{b}=\lambda \boldsymbol{g}\)라면(\(\lambda \in \mathbb{R}\)), 이들은 더 이상 2차원 평행사변형을 형성하지 않을 것이다. 
+그러므로 그때의 넓이는 0이다. 
+반대로, 만약 \(\boldsymbol{b}\), \(\boldsymbol{g}\)가 linearly independent이고 각각이 canonical basis 벡터 \(\mathbf{e}_1\), \(\mathbf{e}_2\)의 배수라면, 이들은 다음과 같이 쓰여질 수 있다.
+
+\[\boldsymbol{b} = \begin{bmatrix}
+b \\
+0 
+\end{bmatrix}\]
+
+\[\boldsymbol{g} = \begin{bmatrix}
+0 \\
+g 
+\end{bmatrix}\]
+
+그러면 determinant는 다음과 같다.
+
+\[\begin{vmatrix} b &amp;amp; 0 \\ 0 &amp;amp; g \end{vmatrix}\]
+
+determinant의 부호는 \(\boldsymbol{b}\), \(\boldsymbol{g}\)의 standard basis (\(\mathbf{e}_1\), \(\mathbf{e}_2\))에 대한 방향을 나타낸다. 
+우리의 그림에서는 \(\boldsymbol{g}\), \(\boldsymbol{b}\)로 뒤집는 것이 \(A\)의 column을 서로 바꾸고 그늘 진 지역의 방향을 역방향으로 바꾸는 것과 동일해진다. 이것이 바로 우리에게 친숙한 공식, ‘넓이=높이×길이’이다. 
+이는 더 높은 차원으로도 이어진다. 
+\(\mathbb{R}^3\)에서는, 평행 육면체의 모서리를 span하는 세 가지 벡터 \(\boldsymbol{r}, \boldsymbol{b}, boldsymbol{g} \in \mathbb{R}^3\)를 고려해보자. 
+즉, 마주보는 면이 평행한 평행 육면체인 것이다. Figure 4.3을 보자.
+
+
+Figure 4.3 세 벡터 r, g, b에 의해 span되는 평행육면체의 부피는 |det([r, b, g])|이다. determinant의 부호는 span중인 벡터들의 방향을 나타낸다.
+
+3×3 행렬 \([\boldsymbol{r}, \boldsymbol{b}, \boldsymbol{g}]\)의 determinant의 절댓값은 도형의 부피이다. 
+그러므로, determinant는 행렬을 구성하는 column 벡터들에 의해 형성되는 부호 있는 부피를 측정하는 함수로서 역할한다. 
+세 선형 독립 벡터 \(\boldsymbol{r}, \boldsymbol{b}, boldsymbol{g} \in \mathbb{R}^3\)이 다음과 같이 주어졌다고 해보자.
+
+
+
+이 벡터들을 행렬의 column으로 쓰는 것은 원하는 볼륨을 계산할 수 있도록 해준다.
+
+
+
+
+
+
+
+\(n×n\) 행렬의 determinant를 계산하는 것은 \(n&amp;gt;3\)인 케이스를 풀기 위한 일반적인 알고리즘을 요구한다. 
+이 경우에는 다음과 같이 살펴보자. 
+Theorem 4.2는 \(n\timesn\)행렬의 determinant를 계산하는 일을 \((n-1)\times(n-1)\) 행렬의 determinant를 계산하는 문제로 축소시킨다. 
+Laplace expansion (Theorem 4.2)을 재귀적으로 적용함으로써, 결과적으로는 \(2\times2\) 행렬의 determinant를 계산함으로써 \(n\times n\) 행렬의 determinant를 계산할 수 있다.
+
+
+
+\(A_{k, j} \in \mathbb{R}^{(n-1)\ times (n-1)}\)는 \(A\)행렬에서 \(k\)행과 \(j\)열을 삭제하여 얻을 수 있는 submatrix이다.
+
+
+  예제 4.3 (Laplace Expansion)
+첫 번째 row을 따라 Laplace expansion을 적용해가며 아래와 같은 행렬 \(A\)의 determinant를 계산해보자.
+
+
+
+
+식 4.13을 적용하면 결과는 다음과 같다.
+
+
+
+식 4.6을 이용해서 모든 \(2 \times 2\) 행렬의 determinant를 계산하고, 아래와 같은 답을 얻을 수 있다.
+
+
+
+위 결과를 Sarru’s rule을 이용해서 구한 결과와 비교해보자.
+
+행렬 \(A \in \mathbb{R}^{(n \times n)}\)에 대한 determinant를 아래와 같은 특성을 가진다.
+
+
+  행렬곱의 determinant는 각각의 determinant의 곱과 같다. \(det(AB)=det(A)det(B)\).
+  전치(Transposition)를 해도 determinant는 변하지 않는다. 즉, \(det(A)=det(A^T)\).
+  만약 \(A\)가 regular하다면 (invertible하다면), \(det(A^T)=\frac{1}{det(A)}\)이다.
+  Similar 행렬(Definition 2.22)들은 determinant가 같다. 그러므로, linear mapping \(\Phi: V \rightarrow V\)에 대한 \(\Phi\)의 모든 transformation 행렬 \(A_\Phi\)의 determinant는 모두 같다. 그러므로, linear mapping의 basis를 어떻게 선택한다해도 determinant는 변하지 않는다.
+  여러 개의 행/열을 다른 것에 더하는 것은 \(det(A)\)를 변화시키지 않는다.
+  행/열에 \(\lambda \in \mathbb{R}\)을 곱하는 것이면 \(det(A)\)도 \(\lambda\)만큼 곱해진다. 특히, \(det(\lambda A)=\lambda^n det(A)\)이다.
+  두 행/열을 뒤바꾸는 것은 \(det(A)\)의 부호를 변화시킨다.
+
+
+마지막 세 가지의 특성때문에 가우시안 소거법(Gaussian elimination)(Section 2.1)을 이용해 \(det(A)\)를 계산할 수 있다. 
+바로 \(A\)를 row-echelon form으로 변환함으로써 말이다. 
+\(A\)가 triangular form이 될 때까지 수행하면 된다. 
+즉 \(A\)의 대각 요소 아래 쪽이 모두 0이면 된다. 
+식 4.8을 다시 생각해보자. 
+triangular 행렬의 determinant는 대각 요소들의 곱이었다.
+
+
+정방 행렬 \(A \in \mathbb{R}^{n \times n}\)이 있을 때, \(rk(A)=n\)이라면 \(det(A) \ne 0\)이다. 즉, \(A가\) full rank라면 A는 invertible하다.
+
+수학이 주로 손으로 쓰여졌던 시절에는 행렬의 invertibility를 알아내기 위하여 determinant 계산이 필수적이었다. 
+그러나, 머신러닝 분야에서의 현대적인 접근은 바로 직접적인 숫자적 방법을 사용하는 것이다. 
+이것이 determinant를 하나하나 계산하는 것을 대체할 수 있다. 
+예를 들면, 챕터 2에서 우리는 가우시안 소거법으로 역행렬을 구하는 방법을 배웠었다. 
+그러므로 가우시안 소거법은 행렬의 determinant를 계산하는데에 사용될 수 있다.
+
+Determinant는 다음 섹션에서 이론적으로 중요한 역할을 한다. 
+특히 특성 방정식(characteristic polynomial)을 이용해 eigenvalues와 eigenvectors를 배울 때 그렇다.
+
+
+  Definition 4.4. 정방행렬 \(A \in \mathbb{R}^{n \times n}\)의 trace는 아래와 같이 정의된다.
+
+
+
+
+즉, trace는 \(A\)의 대각 요소들의 합이다.
+
+trace는 다음과 같은 특성들을 만족한다:
+
+
+  
+\[tr(A+B)=tr(A) + tr(B) \text{for} A, B \in \mathbb{R}^{n \times n}\]
+  
+  
+\[tr(\alpha A) = \alpha tr(A), \alpha \in \mathbb{R} \text{for} A \in \mathbb{R}^{n \times n}\]
+  
+  
+\[tr(I_n)=n\]
+  
+  
+\[tr(AB)=tr(BA) \text{for} A \in \mathbb{R}^{n \times k}, B \in \mathbb{R}^{k \times n}\]
+  
+
+
+trace의 행렬곱에 대한 특성들은 좀 더 일반적이다. 특히, trace는 cyclic permutations에 invariant하다. 즉, 행렬 \(A \in \mathbb{R}^{a \times k}, K \in \mathbb{R}^{k \times l}, L \in \mathbb{R}^{l \times a}\)에 대하여
+
+
+
+식을 만족한다. 이 특성은 행렬이 임의의 개수여도 적용된다. 식 (4.19)의 특별한 경우로, 두 벡터 \(x, y \in \mathbb{R}^n\)에 대하여 다음과 같다.
+
+
+
+\(V\)가 벡터 공간이라 하고 linear mapping \(\Phi : V \rightarrow V\)가 주어졌을 때, \(\Phi\) 행렬의 trace를 사용하여 이 매핑의 trace를 정의할 수 있다. 
+\(V\)의 basis가 주어졌을 때, transformation 행렬 \(A\)를 이용하여 \(\Phi\)를 설명할 수 있다. 
+그러면 \(\Phi\)의 trace는 \(A\)의 trace이다. 
+\(V\)의 basis가 달라진다면, \(\Phi\)에 대응하는 transformation 행렬 \(B\)는 적절한 \(S\)에 대한 \(S^{-1}AS\)처럼 basis를 바꿈으로써 얻어질 수 있다(Section 2.7.2). 
+\(\Phi\)의 대응하는 trace에 대하여, 다음과 같다.
+
+
+
+그러므로, linear mapping의 행렬 표현이 basis에 dependent한 반면 linear mapping Φ의 trace는 basis에 independent하다.
+
+이번 섹션에서는 정방 행렬을 특성화하는 함수로서의 determinant와 trace에 대해 다뤘다. 
+이 두 가지에 대한 이해를 바탕으로 이제는 행렬 \(A\)를 설명하는 중요한 식을 특성 다항식의 관점에서 정의할 수 있다. 
+이는 다음 섹션에서 광범위하게 다뤄질 것이다.
+
+
+
+이 때 \(c_0, \cdots, c_{n-1} \in \mathbb{R}\)이며, 위 식은 \(A\)의 특성방정식이라고 불린다. 특히,
+
+
+
+를 만족한다. 특성 방정식(4.22a)는 다음 섹션에서 다룰 eigenvalue와 eigenvector를 계산하도록 도와준다.
+
+끝! 다음은 4.2 Eigenvalues and Eigenvectors.
+
+
+본 게시글은 ‘Mathematics of Machine Learning’ 책을 번역하였습니다. 한 호흡에 읽히도록, 복습 시 빨리 읽히도록 적어 놓는 것이 이 글의 목적입니다.
+</content>
+      <categories>
+        
+      </categories>
+      <tags>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title>LSTM(1997) 정리</title>
       <url>/2022/04/14/lstm/</url>
       <content type="text">원 논문 : Hochreiter, S., &amp;amp; Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735–1780.
 
@@ -2996,17 +3300,81 @@ LSTM의 핵심은 기억 셀(memory cell, cell state, c)이다.
 
 
 
-기억 셀 기준으로 어떤 연산이 이루어지는지 살펴보면 편하다. cₜ₋₁이 cₜ로 되는 과정은 위 그림과 같다. 일단 모든 연산이 이전 hidden state인 hₜ₋₁과 현재 인풋 단어 x로부터 시작한다. 그럼 이제 저 구름 안에서는 어떤 연산이 벌어지는 지를 하나하나 보면 된다.
+기억 셀 기준으로 어떤 연산이 이루어지는지 살펴보면 편하다. 
+\(c_{t-1}\)이 \(c_t\)로 되는 과정은 위 그림과 같다. 
+일단 모든 연산이 이전 hidden state인 \(h_{t-1}\)과 현재 인풋 단어 \(x\)로부터 시작한다. 
+그럼 이제 저 구름 안에서는 어떤 연산이 벌어지는 지를 하나하나 보면 된다.
 
 1. 망각의 문, forget gate
 
-$c_{t-1}$가 통과하는 첫 번째 게이트는 망각의 문이다. f라는 게이트는 아래와 같은 수식으로 얻어진다.
+\(c_{t-1}\)가 통과하는 첫 번째 게이트는 망각의 문이다. \(f\)라는 게이트는 아래와 같은 수식으로 얻어진다.
 
 
 
 \[f=\sigma(x_tW_x^f + h_{t-1}W_h^f + b^f)\]
 
-이것이 forget gate이다. 이를 과 원소별 곱을 한다. $c_{t-1}$과 원소별 곱을 한다.
+이것이 forget gate이다. 
+이를 \(c_{t-1}\)과 원소별 곱을 한다.
+
+2. 기억의 문, input gate
+
+다음으로 지날 문은 기억의 문 \(i\)이다. 
+마찬가지로 \(h_{t-1}\)과 \(x\)를 사용한다. 
+우선 \(i\)를 구하기 위해선 우선 \(g\)라는 정보가 필요하다. 
+아래 그림과 같은 연산을 거친 뒤 \(g\)라는 정보가 탄생한다.
+
+
+
+\[g=\sigma(x_t W_x^g + h_{t-1} W_h^g + b^g)\]
+
+이를 책에서는 ‘새로운 기억 셀’이라고 한다. 원 논문에는 어떤 표현으로 쓰였는지는 잘 모르겠다.
+
+3. 나가는 문, output gate
+
+\(c_t\)에는 과거부터 현재(\(t\))까지, 필요한 모든 정보가 담겨있다. 
+당장은 그렇지 않더라도 학습을 통해 그렇게 만들어져 갈 것이다. 
+이 \(c_t\)를 가지고 외부에 출력할 hidden state \(h_t\)를 만들 것이다. 
+\(c_t\)에 \(\tanh\)를 적용하여 \(h_t\)를 만든다.
+
+\[h_t = \tanh(c_t)\]
+
+\(c_t\)의 각 원소에 \(\tanh\)를 적용하였다. 
+근데 마지막으로 한번 더 \(h_t\)에 게이트를 하나 더 지나게 한다. 
+이를 output gate라고 한다. 
+이제 이 셀을 나가는 문이다. 
+문의 이름은 \(o\)이다.
+
+
+
+\[o=\sigma(x_t W_x^o + h_{t-1} W_h^o + b^o)\]
+
+output gate인 \(o\)는 “\(\tanh(c_t)\)가 다음 hidden state \(h_t\)에 얼마나 중요한가”, “\(\tanh(c_t)\)를 얼마나 흘려보낼까?”를 결정한다. 
+그러므로 \(o\)와 \(\tanh(h_t)\)를 원소별 곱을 수행하면 \(h_t\)를 얻는다.
+
+근데 어떤 건 sigmoid를 쓰고 어떤 것은 tanh를 썼다. 
+tanh의 출력은 -1~+1이다. 
+이는 ‘인코딩 된 정보의 강약’을 의미할 수 있다. 
+반면 sigmoid는 0~1의 값이므로 ‘얼마나 흘려보낼 지를 정하는 게이트(문)’이라고 생각할 수 있다. 
+따라서 게이트에는 sigmoid가, 정보를 품는 작업에는 tanh가 쓰인다.
+
+이 문들이 어떤 원리로 “기울기 소실 문제”를 해결한단 말일까?
+
+
+기억 셀의 역전파
+
+기억 셀의 역전파를 보면, 더하기와 곱하기 밖에 없다. 
+더하기는 역전파 시 그대로 흘러가므로 기울기에 아무 연산도 하지 않고 흘러간다. 
+그리고 곱하기는 매 시각 다른 f와의 아다마르 곱(원소별 곱)이다.
+
+기존 RNN은 계속 같은 행렬을 행렬곱 했었기에 기울기가 폭발하거나 소실됐었다. 
+그러나 LSTM의 기억 셀은 매번 다른 행렬과 아다마르 곱을 수행하므로 기울기 폭발이나 소실이 일어나기 힘들다.
+
+곱하기는 forget gate와의 곱이므로, 순전파 때 0~1사이의 값이 곱해지는 과정이었다. 
+‘잊어야 한다’고 판단된 셀에서는 기울기가 작아진채로 역전파된다. 
+그러나 ‘잊어서는 안된다’라고 판단된 셀에서는 기울기가 작아지지 않고 전파된다.
+
+따라서, 기억 셀이 장기 의존 관계를 유지(학습)할 수 있다.
+
 </content>
       <categories>
         

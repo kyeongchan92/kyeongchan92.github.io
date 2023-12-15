@@ -70,7 +70,7 @@
   
     
     
-    <link href="//fonts.googleapis.com/css?family=Bitter:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Gowun Batang:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
   
 
 
@@ -111,19 +111,20 @@
 
 
 
-<meta name="description" content="본 논문의 목적은 Contrastive learning을 유저의 아이템 시퀀스에 적용함으로써 향상된 user representation을 얻는 것이다.">
+<meta name="description" content="CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다. 그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
 <meta property="og:type" content="article">
 <meta property="og:title" content="논문리뷰 - Contrastive Learning for Sequential Recommendation">
 <meta property="og:url" content="http://localhost:4000/2023/09/19/Contrastive-Learning-for-Sequential-Recommendation/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
-<meta property="og:description" content="본 논문의 목적은 Contrastive learning을 유저의 아이템 시퀀스에 적용함으로써 향상된 user representation을 얻는 것이다.">
+<meta property="og:description" content="CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다. 그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="/assets/images/cl4rec_framework.png">
+<meta property="og:image" content="/assets/images/cl4srec/augmentations.png">
 <meta property="og:image" content="/assets/images/cl4srec_dataset_statistics.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="논문리뷰 - Contrastive Learning for Sequential Recommendation">
-<meta name="twitter:description" content="본 논문의 목적은 Contrastive learning을 유저의 아이템 시퀀스에 적용함으로써 향상된 user representation을 얻는 것이다.">
+<meta name="twitter:description" content="CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다. 그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.">
 <meta name="twitter:image" content="/assets/images/cl4rec_framework.png">
 
 
@@ -262,6 +263,18 @@
           </a>
         </li>
       
+        
+        
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/navigator/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
 
       
     </ul>
@@ -300,7 +313,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kyeongchan Lee">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="assets/images/avatar.gif">
+      <meta itemprop="image" content="/assets/images/profile.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -366,12 +379,28 @@
       
 
       
-        <p>본 논문의 목적은 Contrastive learning을 유저의 아이템 시퀀스에 적용함으로써 향상된 user representation을 얻는 것이다.</p>
+        <p>CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다.
+그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.</p>
 
 <p>논문 : <a href="https://arxiv.org/pdf/2010.14395.pdf">Contrastive Learning for Sequential Recommendation</a></p>
 
+<hr />
+
 <h1 id="self-supervised-learningssl-자기지도학습">Self-supervised Learning(SSL, 자기지도학습)</h1>
 <p>self-supervised learning은 라벨없는 데이터에서 representation을 학습하는데에 우월하다고 한다. 기본 아이디어는 pretext task로 training signal을 구축하는 것이다.</p>
+
+<h1 id="cl4srec">CL4SREC</h1>
+
+<h2 id="notations--문제-정의">Notations &amp; 문제 정의</h2>
+
+<p>유저를 \(u\), 아이템을 \(v\)라고 하자.
+유저 \(u\)의 인터랙션 시퀀스 \(s_u\)는 \(s_u=\left[v_1^{(u)}, v_2^{(u)}, \cdots, v_{|s_u|}^{(u)}\right]\)처럼 쓸 수 있다.
+여기서 \(|s_u|\)는 시퀀스 길이가 된다.</p>
+
+<p>시퀀셜 추천을 정의하자. 유저 \(u\)가 \(|s_u|+1\) 시간에 가장 상호작용할 가능성이 높은 아이템을 예측한다.
+다른 보조적인 문맥 정보는 사용하지 않고, 오직 유저의 상호작용 시퀀스만 주어진다. 다음과 같이 수식화된다.</p>
+
+\[v_u^* = \arg\max_{v_i \in \mathcal{V}} P\left( v_{|s_u|+1}^{(u)} = v_i | s_u \right)\]
 
 <h1 id="contrastive-learning-framework">Contrastive Learning Framework</h1>
 
@@ -395,8 +424,8 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 
 <p>손실함수는 두 representation이 같은 유저 시퀀스로부터 추출된 것인지 구별한다. 손실함수는 다음을 각각 최소화, 최대화한다.</p>
 <ul>
-  <li>최소화 : 하나의 시퀀스로부터 변형된 두 개의 시퀀스간 차이</li>
-  <li>최대화 : 다른 유저로부터 변형된 두 시퀀스간 차이</li>
+  <li>최소화 : 하나의 유저시퀀스로부터 변형된 두 시퀀스간 차이</li>
+  <li>최대화 : 각각 다른 유저 시퀀스로부터 변형된 두 시퀀스간 차이</li>
 </ul>
 
 \[\mathcal{L}_{\text{cl}}(s_u^{a_i}, s_u^{a_j})=-\log \frac{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))}{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))+\sum_{s^- \in S^-}\exp(\text{sim}(s_u^{a_i}, s_u^-))}\]
@@ -404,6 +433,8 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 <p>\(\text{sim}(u, v)=u^Tv\), 즉 내적이다. 손실을 작게 한다 = -를 뗀 log를 크게 한다 = \(s_u^{a_i}\)와 \(s_u^{a_j}\)를 유사하게 한다 + \(s_u^{a_i}\)와 \(S^-\)에 속한 것들과는 멀어지게 한다가 되겠다.</p>
 
 <h1 id="data-augmentation-operators">Data Augmentation Operators</h1>
+
+<p><img src="/assets/images/cl4srec/augmentations.png" alt="0" /></p>
 
 <p>1. Crop</p>
 
@@ -421,7 +452,8 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 <p>인코더 모델로는 SASRec을 사용한다(SASRec 논문리뷰 참고). 유저 representation으로는 마지막 아이템까지 어텐션을 적용한 representation, 즉 \(t=|s_u|\)(마지막)째 아이템의 representation을 사용한다.</p>
 
 <h1 id="multi-task-training">Multi-task Training</h1>
-<p>multi-task 전략을 사용한다고 하는데, 다른게 아니라 \(\mathcal{L}\_{\text{cl}}\)뿐만 아니라 SASRec 자체의 next item prediction 손실까지 더하겠다는 뜻이다. 이를 \(\mathcal{L}\_{\text{main}}\)이라고 할 때, total loss는 다음과 같다.
+<p>multi-task 전략을 사용한다고 하는데, 특별한게 아니다. \(\mathcal{L}_{\text{cl}}\)뿐만 아니라 SASRec 자체의 next item prediction 손실까지 더하겠다는 뜻이다.
+이를 \(\mathcal{L}_{\text{main}}\)이라고 할 때, total loss는 다음과 같다.
 \(\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{main}} + \lambda \mathcal{L}_{\text{cl}}\)</p>
 
 <p>\(\mathcal{L}_{\text{main}}\)은 다음과 같이 정의된다.</p>
@@ -437,12 +469,10 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 
 <p>Crop, mask, reorder에서 사용하는 비율은 다음과 같다.</p>
 <ul>
-  <li>eta : \(\eta\) : crop</li>
-  <li>gamma : \(\gamma\) : mask</li>
-  <li>beta : \(\beta\) : reorder</li>
+  <li>crop : \(\eta\)(eta)</li>
+  <li>mask : \(\gamma\)(gamma)</li>
+  <li>reorder : \(\beta\)(beta)</li>
 </ul>
-
-\[\min_w \frac{1}{2} \rVert w \rVert^2 + \frac{C}{n} \sum_{i}^{n} \max_{y \in \mathcal{Y}} \left(0, \Delta(y_i, y) - \left( w \cdot F(x_i, y_i) - w \cdot F(x_i, y) \right) \right)\]
 
       
     </div>
@@ -561,7 +591,7 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/assets/images/avatar.gif"
+               src="/assets/images/profile.jpg"
                alt="Kyeongchan Lee" />
           <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
            
@@ -573,7 +603,7 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -616,6 +646,30 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
 
         <div class="links-of-author motion-element">
           
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.com/kyeongchan92" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/nahcklee/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -646,7 +700,7 @@ Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_
             
               <div class="post-toc-content">
     <ol class=nav>
-      <li class="nav-item nav-level-1"> <a class="nav-link" href="#self-supervised-learningssl-자기지도학습"> <span class="nav-number">1</span> <span class="nav-text">Self-supervised Learning(SSL, 자기지도학습)</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#contrastive-learning-framework"> <span class="nav-number">2</span> <span class="nav-text">Contrastive Learning Framework</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#data-augmentation-operators"> <span class="nav-number">3</span> <span class="nav-text">Data Augmentation Operators</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#user-representation-model"> <span class="nav-number">4</span> <span class="nav-text">User Representation Model</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#multi-task-training"> <span class="nav-number">5</span> <span class="nav-text">Multi-task Training</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#experiments"> <span class="nav-number">6</span> <span class="nav-text">Experiments</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#self-supervised-learningssl-자기지도학습"> <span class="nav-text">Self-supervised Learning(SSL, 자기지도학습)</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#cl4srec"> <span class="nav-text">CL4SREC</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#notations--문제-정의"> <span class="nav-text">Notations &amp; 문제 정의</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#contrastive-learning-framework"> <span class="nav-text">Contrastive Learning Framework</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#data-augmentation-operators"> <span class="nav-text">Data Augmentation Operators</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#user-representation-model"> <span class="nav-text">User Representation Model</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#multi-task-training"> <span class="nav-text">Multi-task Training</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#experiments"> <span class="nav-text">Experiments</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
     </ol>
   </div>
             
