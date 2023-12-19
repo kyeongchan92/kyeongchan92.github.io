@@ -9,7 +9,7 @@ nDCG의 기본 수식은 다음과 같습니다 :
 
 $$ NDCG@K = Z_K \sum_{i=1}^{K} \frac{2^{rel_i}-1}{\log_2(i+1)} $$
 
-$Z_K$는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. $rel_i$는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 $rel_i$는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
+$$Z_K$$는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. $$rel_i$$는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 $$rel_i$$는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
 
 # 예시
 예를 들어 K=5라고 해보겠습니다.
@@ -34,7 +34,7 @@ $$\begin{align*}\text{idcg(ideal dcg)} &= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2
 
 4, 5 아이템이 1, 2등인 상황에서 구한 값입니다.
 
-이제 dcg를 구해봅시다. dcg는 $K=5$까지 계산한 값입니다:
+이제 dcg를 구해봅시다. dcg는 $$k=5$$까지 계산한 값입니다:
 
 $$\begin{align*}\text{dcg} &= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)}\\
 &=\frac{0}{\log_2{(1+1)}}+\frac{1}{\log_2{(2+1)}}+\frac{0}{\log_2{(3+1)}}+\frac{1}{\log_2{(4+1)}}+\frac{0}{\log_2{(5+1)}}\\
@@ -42,9 +42,9 @@ $$\begin{align*}\text{dcg} &= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)}\\
 \end{align*}$$
 
 
-$ndcg=\frac{dcg}{idcg}$로 계산합니다.
+$$ndcg=\frac{dcg}{idcg}$$로 계산합니다.
 $$\text{nDCG@5}=\frac{dcg}{idcg}=\frac{1.0616}{1.6309}=0.6509$$
 
 ---
 
-논문 [TriRank: Review-aware Explainable Recommendation by Modeling Aspects](https://dl.acm.org/doi/abs/10.1145/2806416.2806504)의 일부를 참고했습니다.
+논문 [TriRank: Review-aware Explainable Recommendation by Modeling Aspects](https://dl.acm.org/doi/abs/10.1145/2806416.2806504){:target="_blank"}의 일부를 참고했습니다.
