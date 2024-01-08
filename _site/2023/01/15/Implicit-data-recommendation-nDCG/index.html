@@ -403,7 +403,7 @@
 
 \[NDCG@K = Z_K \sum_{i=1}^{K} \frac{2^{rel_i}-1}{\log_2(i+1)}\]
 
-<p>$Z_K$는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. $rel_i$는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 $rel_i$는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.</p>
+<p>\(Z_K\)는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. \(rel_i\)는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 \(rel_i\)는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.</p>
 
 <h1 id="예시">예시</h1>
 <p>예를 들어 K=5라고 해보겠습니다.
@@ -428,19 +428,19 @@
 
 <p>4, 5 아이템이 1, 2등인 상황에서 구한 값입니다.</p>
 
-<p>이제 dcg를 구해봅시다. dcg는 $K=5$까지 계산한 값입니다:</p>
+<p>이제 dcg를 구해봅시다. dcg는 \(k=5\)까지 계산한 값입니다:</p>
 
 \[\begin{align*}\text{dcg} &amp;= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)}\\
 &amp;=\frac{0}{\log_2{(1+1)}}+\frac{1}{\log_2{(2+1)}}+\frac{0}{\log_2{(3+1)}}+\frac{1}{\log_2{(4+1)}}+\frac{0}{\log_2{(5+1)}}\\
 &amp;=1.0616
 \end{align*}\]
 
-<p>$ndcg=\frac{dcg}{idcg}$로 계산합니다.
+<p>\(ndcg=\frac{dcg}{idcg}\)로 계산합니다.
 \(\text{nDCG@5}=\frac{dcg}{idcg}=\frac{1.0616}{1.6309}=0.6509\)</p>
 
 <hr />
 
-<p>논문 <a href="https://dl.acm.org/doi/abs/10.1145/2806416.2806504">TriRank: Review-aware Explainable Recommendation by Modeling Aspects</a>의 일부를 참고했습니다.</p>
+<p>논문 <a href="https://dl.acm.org/doi/abs/10.1145/2806416.2806504" target="_blank">TriRank: Review-aware Explainable Recommendation by Modeling Aspects</a>의 일부를 참고했습니다.</p>
 
       
     </div>
@@ -571,32 +571,14 @@
           
             <div class="site-state-item site-state-posts">
               <a href="">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
           
 
           
-            
-            
-            <div class="site-state-item site-state-categories">
-              <a href="/categories/">
-                <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">categories</span>
-              </a>
-            </div>
-          
 
-          
-            
-            
-            <div class="site-state-item site-state-tags">
-              <a href="/tags/">
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">tags</span>
-              </a>
-            </div>
           
 
         </nav>

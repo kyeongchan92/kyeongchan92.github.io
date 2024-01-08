@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/opinion/2014/02/16/Mathjax-with-jekyll/</loc>
-<lastmod>2014-02-16T00:00:00+09:00</lastmod>
-</url>
-<url>
 <loc>http://localhost:4000/2022/04/14/lstm/</loc>
 <lastmod>2022-04-14T00:00:00+09:00</lastmod>
 </url>
@@ -45,10 +41,6 @@
 <lastmod>2023-11-15T00:00:00+09:00</lastmod>
 </url>
 <url>
-<loc>http://localhost:4000/2023/11/15/javascript-django-click/</loc>
-<lastmod>2023-11-15T00:00:00+09:00</lastmod>
-</url>
-<url>
 <loc>http://localhost:4000/2023/11/15/what-is-gunicorn-wsgi-cgi/</loc>
 <lastmod>2023-11-15T00:00:00+09:00</lastmod>
 </url>
@@ -71,10 +63,6 @@
 <url>
 <loc>http://localhost:4000/2023/11/28/huggingface-tokenizer-truncation/</loc>
 <lastmod>2023-11-28T00:00:00+09:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/2023/12/01/coursera-lecture/</loc>
-<lastmod>2023-12-01T00:00:00+09:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/2023/12/11/docker-memory-options/</loc>

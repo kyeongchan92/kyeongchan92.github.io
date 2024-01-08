@@ -95,20 +95,6 @@ Docker는 하드 메모리 제한 또는 소프트 메모리
     </entry>
   
     <entry>
-      <title>Coursera 강의 정리 - 추천시스템</title>
-      <url>/2023/12/01/coursera-lecture/</url>
-      <content type="text">
-</content>
-      <categories>
-        
-      </categories>
-      <tags>
-        
-      </tags>
-      <tags></tags>
-    </entry>
-  
-    <entry>
       <title>Huggingface 토크나이저 Padding and truncation</title>
       <url>/2023/11/28/huggingface-tokenizer-truncation/</url>
       <content type="text">huggingface에서 tokenizer를 .from_pretrained 메서드로 가져다 쓰는데, 갑자기 padding과 truncation, max_length 인자에 대해 헷갈렸다. 그래서 한 번 정리해보고자 한다.
@@ -2375,20 +2361,6 @@ gunicorn은 대체 뭐하는 놈일까 (부제: CGI, WSGI는 대체 뭐냐)
     </entry>
   
     <entry>
-      <title>javascript + django click 이벤트</title>
-      <url>/2023/11/15/javascript-django-click/</url>
-      <content type="text">참고 : Do it! 인터랙티브 웹 페이지 만들기
-</content>
-      <categories>
-        
-      </categories>
-      <tags>
-        
-      </tags>
-      <tags></tags>
-    </entry>
-  
-    <entry>
       <title>Docker 내 gunicorn 사용시 memory usage 확인</title>
       <url>/2023/11/15/docker-gunicorn-memory-usage-check/</url>
       <content type="text">도커 컨테이너에서 Gunicorn을 실행 중일 때, 메모리 사용량을 확인하는 방법
@@ -2932,7 +2904,7 @@ urlpatterns = [
 
 \[NDCG@K = Z_K \sum_{i=1}^{K} \frac{2^{rel_i}-1}{\log_2(i+1)}\]
 
-$Z_K$는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. $rel_i$는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 $rel_i$는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
+\(Z_K\)는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. \(rel_i\)는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 \(rel_i\)는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
 
 예시
 예를 들어 K=5라고 해보겠습니다.
@@ -2957,14 +2929,14 @@ idcg를 구해봅시다. idcg는 모델 예측이 true label set으로 1위부�
 
 4, 5 아이템이 1, 2등인 상황에서 구한 값입니다.
 
-이제 dcg를 구해봅시다. dcg는 $K=5$까지 계산한 값입니다:
+이제 dcg를 구해봅시다. dcg는 \(k=5\)까지 계산한 값입니다:
 
 \[\begin{align*}\text{dcg} &amp;amp;= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)}\\
 &amp;amp;=\frac{0}{\log_2{(1+1)}}+\frac{1}{\log_2{(2+1)}}+\frac{0}{\log_2{(3+1)}}+\frac{1}{\log_2{(4+1)}}+\frac{0}{\log_2{(5+1)}}\\
 &amp;amp;=1.0616
 \end{align*}\]
 
-$ndcg=\frac{dcg}{idcg}$로 계산합니다.
+\(ndcg=\frac{dcg}{idcg}\)로 계산합니다.
 \(\text{nDCG@5}=\frac{dcg}{idcg}=\frac{1.0616}{1.6309}=0.6509\)
 
 
@@ -3380,106 +3352,6 @@ tanh의 출력은 -1~+1이다.
         
       </categories>
       <tags>
-        
-      </tags>
-      <tags></tags>
-    </entry>
-  
-    <entry>
-      <title>MathJax with Jekyll</title>
-      <url>/opinion/2014/02/16/Mathjax-with-jekyll/</url>
-      <content type="text">One of the rewards of switching my website to Jekyll is the
-ability to support MathJax, which means I can write LaTeX-like equations that get
-nicely displayed in a web browser, like this one \( \sqrt{\frac{n!}{k!(n-k)!}} \) or
-this one \( x^2 + y^2 = r^2 \).
-
-
-
-
-
-What’s MathJax?
-
-If you check MathJax website (www.mathjax.org) you’ll see
-that it is an open source JavaScript display engine for mathematics that works in all
-browsers.
-
-How to implement MathJax with Jekyll
-
-I followed the instructions described by Dason Kurkiewicz for
-using Jekyll and Mathjax.
-
-Here are some important details. I had to modify the Ruby library for Markdown in
-my _config.yml file. Now I’m using redcarpet so the corresponding line in the
-configuration file is: markdown: redcarpet
-
-To load the MathJax javascript, I added the following lines in my layout page.html
-(located in my folder _layouts)
-
-&amp;lt;script type=&quot;text/javascript&quot;
-    src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&amp;gt;
-&amp;lt;/script&amp;gt;
-
-Of course you can choose a different file location in your jekyll layouts.
-
-A Couple of Examples
-
-Here’s a short list of examples. To know more about the details behind MathJax, you can
-always checked the provided documentation available at
-http://docs.mathjax.org/en/latest/
-
-I’m assuming you are familiar with LaTeX. However, you should know that MathJax does not
-have the exactly same behavior as LaTeX. By default, the tex2jax preprocessor defines the
-LaTeX math delimiters, which are \\(...\\) for in-line math, and \\[...\\] for
-displayed equations. It also defines the TeX delimiters $$...$$ for displayed
-equations, but it does not define $...$ as in-line math delimiters. Fortunately,
-you can change these predefined specifications if you want to do so.
-
-Let’s try a first example. Here’s a dummy equation:
-
-\[a^2 + b^2 = c^2\]
-
-How do you write such expression? Very simple: using double dollar signs
-
-$$a^2 + b^2 = c^2$$
-
-To display inline math use \\( ... \\) like this \\( sin(x^2) \\) which gets
-rendered as \( sin(x^2) \)
-
-Here’s another example using type \mathsf
-
-$$ \mathsf{Data = PCs} \times \mathsf{Loadings} $$
-
-which gets displayed as
-
-\[\mathsf{Data = PCs} \times \mathsf{Loadings}\]
-
-Or even better:
-
-\\[ \mathbf{X} = \mathbf{Z} \mathbf{P^\mathsf{T}} \\]
-
-is displayed as
-
-\[ \mathbf{X} = \mathbf{Z} \mathbf{P^\mathsf{T}} \]
-
-If you want to use subscripts like this \( \mathbf{X}_{n,p} \) you need to scape the
-underscores with a backslash like so \mathbf{X}\_{n,p}:
-
-$$ \mathbf{X}\_{n,p} = \mathbf{A}\_{n,k} \mathbf{B}\_{k,p} $$
-
-will be displayed as
-
-\[ \mathbf{X}_{n,p} = \mathbf{A}_{n,k} \mathbf{B}_{k,p} \]
-</content>
-      <categories>
-        
-          <category> opinion </category>
-        
-      </categories>
-      <tags>
-        
-          <tag> resources </tag>
-        
-          <tag> jekyll </tag>
         
       </tags>
       <tags></tags>
