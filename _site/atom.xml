@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-12-26T16:58:20+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-01-09T00:02:51+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
 번역했다 : &lt;a href=&quot;https://docs.docker.com/config/containers/resource_constraints/&quot; target=&quot;_blank&quot;&gt;Runtime options with Memory, CPUs, and GPUs&lt;/a&gt;&lt;/p&gt;
@@ -2573,97 +2573,16 @@ busy는 pool 속의 세션 중에서 현재 작업 중인 세션(=connection 인
 &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;만약 increment가 2였다면, 두 번째 세션을 얻는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;connection2 = pool.acquire()&lt;/code&gt;를 할 때 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pool.opened&lt;/code&gt;는 3이 된다. 2개를 여니까.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.</summary></entry><entry><title type="html">논문리뷰 - Contrastive Learning for Sequential Recommendation</title><link href="http://localhost:4000/2023/09/19/Contrastive-Learning-for-Sequential-Recommendation/" rel="alternate" type="text/html" title="논문리뷰 - Contrastive Learning for Sequential Recommendation" /><published>2023-09-19T00:00:00+09:00</published><updated>2023-09-19T00:00:00+09:00</updated><id>http://localhost:4000/2023/09/19/Contrastive%20Learning%20for%20Sequential%20Recommendation</id><content type="html" xml:base="http://localhost:4000/2023/09/19/Contrastive-Learning-for-Sequential-Recommendation/">&lt;p&gt;CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다.
-그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.&lt;/p&gt;
+&lt;p&gt;만약 increment가 2였다면, 두 번째 세션을 얻는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;connection2 = pool.acquire()&lt;/code&gt;를 할 때 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pool.opened&lt;/code&gt;는 3이 된다. 2개를 여니까.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.</summary></entry><entry><title type="html">논문리뷰 - Collaborative filtering for Implicit Feedback Datasets</title><link href="http://localhost:4000/2023/10/15/cf-for-implicit/" rel="alternate" type="text/html" title="논문리뷰 - Collaborative filtering for Implicit Feedback Datasets" /><published>2023-10-15T00:00:00+09:00</published><updated>2023-10-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/10/15/cf-for-implicit</id><content type="html" xml:base="http://localhost:4000/2023/10/15/cf-for-implicit/">&lt;p&gt;오랜만에 Collaborative Filtering for implicit datasets 논문 리뷰!! 가짜연구소 ‘추천시스템 논문에서 서비스까지’ 스터디 진행 중 이 논문을 리뷰하고 구현하면 좋을 것 같아 이번에 annotation 방식으로 리뷰해본다.&lt;/p&gt;
 
-&lt;p&gt;논문 : &lt;a href=&quot;https://arxiv.org/pdf/2010.14395.pdf&quot;&gt;Contrastive Learning for Sequential Recommendation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 1.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;hr /&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 2.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;self-supervised-learningssl-자기지도학습&quot;&gt;Self-supervised Learning(SSL, 자기지도학습)&lt;/h1&gt;
-&lt;p&gt;self-supervised learning은 라벨없는 데이터에서 representation을 학습하는데에 우월하다고 한다. 기본 아이디어는 pretext task로 training signal을 구축하는 것이다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 3.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;cl4srec&quot;&gt;CL4SREC&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 4.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;notations--문제-정의&quot;&gt;Notations &amp;amp; 문제 정의&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 5.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;유저를 \(u\), 아이템을 \(v\)라고 하자.
-유저 \(u\)의 인터랙션 시퀀스 \(s_u\)는 \(s_u=\left[v_1^{(u)}, v_2^{(u)}, \cdots, v_{|s_u|}^{(u)}\right]\)처럼 쓸 수 있다.
-여기서 \(|s_u|\)는 시퀀스 길이가 된다.&lt;/p&gt;
-
-&lt;p&gt;시퀀셜 추천을 정의하자. 유저 \(u\)가 \(|s_u|+1\) 시간에 가장 상호작용할 가능성이 높은 아이템을 예측한다.
-다른 보조적인 문맥 정보는 사용하지 않고, 오직 유저의 상호작용 시퀀스만 주어진다. 다음과 같이 수식화된다.&lt;/p&gt;
-
-\[v_u^* = \arg\max_{v_i \in \mathcal{V}} P\left( v_{|s_u|+1}^{(u)} = v_i | s_u \right)\]
-
-&lt;h1 id=&quot;contrastive-learning-framework&quot;&gt;Contrastive Learning Framework&lt;/h1&gt;
-
-&lt;p&gt;프레임워크는 크게 세 가지로 구성된다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/cl4rec_framework.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;1. 증강 모듈(Data Augmentation Module)&lt;/p&gt;
-
-&lt;p&gt;\(\mathcal{A}\)를 augmentation method들의 집합이라고 하자. 즉 \(\mathcal{A}\)에는 뒤에 나올 crop, mask, reorder가 들어있다. 
-증강 모듈은 하나의 데이터에 대해 2개의 augmentation을 만든다. 만약 두 augmentation이 같은 샘플로부터 나온 것이라면 이 둘은 positive pair라고 정의한다.
-각각 다른 샘플로부터 변형된 것이라면 negative pair라고 정의한다.
-Augmentation 방법은 \(\mathcal{A}\)로부터 무작위로 2개를 뽑아 \(a_i\)와 \(a_j\)라고 부르기로 하고(예를 들면 \(a_i\) : Crop, \(a_j\) : Mask), 이를 \(s_u\)라는 시퀀스에 적용한다.
-결과는 각각 \(s_u^{a_i}\)와 \(s_u^{a_j}\)라고 나타낸다.&lt;/p&gt;
-
-&lt;p&gt;2. 유저 인코더(User Representation Encoder)&lt;/p&gt;
-
-&lt;p&gt;인코더로 트랜스포머를 사용한다. 증강된 시퀀스로부터 유저 representation을 추출한다.&lt;/p&gt;
-
-&lt;p&gt;3. 대조 손실 함수(Contrastive Loss Function)&lt;/p&gt;
-
-&lt;p&gt;손실함수는 두 representation이 같은 유저 시퀀스로부터 추출된 것인지 구별한다. 손실함수는 다음을 각각 최소화, 최대화한다.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;최소화 : 하나의 유저시퀀스로부터 변형된 두 시퀀스간 차이&lt;/li&gt;
-  &lt;li&gt;최대화 : 각각 다른 유저 시퀀스로부터 변형된 두 시퀀스간 차이&lt;/li&gt;
-&lt;/ul&gt;
-
-\[\mathcal{L}_{\text{cl}}(s_u^{a_i}, s_u^{a_j})=-\log \frac{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))}{\exp(\text{sim}(s_u^{a_i}, s_u^{a_j}))+\sum_{s^- \in S^-}\exp(\text{sim}(s_u^{a_i}, s_u^-))}\]
-
-&lt;p&gt;\(\text{sim}(u, v)=u^Tv\), 즉 내적이다. 손실을 작게 한다 = -를 뗀 log를 크게 한다 = \(s_u^{a_i}\)와 \(s_u^{a_j}\)를 유사하게 한다 + \(s_u^{a_i}\)와 \(S^-\)에 속한 것들과는 멀어지게 한다가 되겠다.&lt;/p&gt;
-
-&lt;h1 id=&quot;data-augmentation-operators&quot;&gt;Data Augmentation Operators&lt;/h1&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/cl4srec/augmentations.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;1. Crop&lt;/p&gt;
-
-&lt;p&gt;시퀀스 내부의 연속된 일부만 떼어낸다. 예를 들어 \([v_1, v_2, v_3, v_4, v_5, v_6, v_7]\)이라는 7개의 아이템으로 구성된 시퀀스가 있고, 전체 길이 7의 0.6만큼만 crop한다고 하고(내림하여 4개), 2번 아이템부터 crop한다고 했을때 augmentation 결과는 \([v_2, v_3, v_4, v_5]\)가 된다.&lt;/p&gt;
-
-&lt;p&gt;2. Mask&lt;/p&gt;
-
-&lt;p&gt;일부 아이템을 \([mask]\)라는 스페셜 아이템으로 변환한다. 만약 시퀀스 길이의 0.3만큼만 마스킹하고싶다면 7 X 0.3 = 2.1을 내림한 2개를 랜덤으로 마스킹한다.&lt;/p&gt;
-
-&lt;p&gt;3. Reorder&lt;/p&gt;
-
-&lt;p&gt;시퀀스 내부의 연속된 시퀀스를 무작위 재배치한다. 예를들어 3번 아이템부터 0.6만큼의 아이템, 즉 4개를 재배치한다면 \([v_1, v_2, v_5, v_3, v_6, v_4, v_7]\)처럼 된다.&lt;/p&gt;
-
-&lt;h1 id=&quot;user-representation-model&quot;&gt;User Representation Model&lt;/h1&gt;
-&lt;p&gt;인코더 모델로는 SASRec을 사용한다(SASRec 논문리뷰 참고). 유저 representation으로는 마지막 아이템까지 어텐션을 적용한 representation, 즉 \(t=|s_u|\)(마지막)째 아이템의 representation을 사용한다.&lt;/p&gt;
-
-&lt;h1 id=&quot;multi-task-training&quot;&gt;Multi-task Training&lt;/h1&gt;
-&lt;p&gt;multi-task 전략을 사용한다고 하는데, 특별한게 아니다. \(\mathcal{L}_{\text{cl}}\)뿐만 아니라 SASRec 자체의 next item prediction 손실까지 더하겠다는 뜻이다.
-이를 \(\mathcal{L}_{\text{main}}\)이라고 할 때, total loss는 다음과 같다.
-\(\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{main}} + \lambda \mathcal{L}_{\text{cl}}\)&lt;/p&gt;
-
-&lt;p&gt;\(\mathcal{L}_{\text{main}}\)은 다음과 같이 정의된다.&lt;/p&gt;
-
-\[\mathcal{L}_{\text{main}}(s_{u, t}) = \frac{\exp(s_{u,t}^T v_{t+1}^+)}{\exp(s_{u, t}^T v_{t+1}^+) + \sum_{v_{t+1}^- \in \mathcal{V}^-} \exp(s_{u,t}^T v_{t+1}^-)}\]
-
-&lt;p&gt;\(s_{u, t}\)는 계산된 유저 representation을 의미하고, \(v_{t+1}^+\)는 \(t+1\)에서의 아이템, \(v_{t+1}^-\)는 무작위 샘플링된 네거티브 아이템을 의미한다.&lt;/p&gt;
-
-&lt;h1 id=&quot;experiments&quot;&gt;Experiments&lt;/h1&gt;
-
-&lt;p&gt;사용한 데이터셋은 다음과 같다.
-&lt;img src=&quot;/assets/images/cl4srec_dataset_statistics.png&quot; alt=&quot;1&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Crop, mask, reorder에서 사용하는 비율은 다음과 같다.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;crop : \(\eta\)(eta)&lt;/li&gt;
-  &lt;li&gt;mask : \(\gamma\)(gamma)&lt;/li&gt;
-  &lt;li&gt;reorder : \(\beta\)(beta)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">CL4SREC은 전통적인 ‘next item prediction’ 태스크의 장점을 이용할 뿐만 아니라 contrastive learning의 프레임워크를 사용하여 아이템 시퀀스로부터 self-supervision signal을 추출한다. 그렇기에 더욱 의미 있는 유저 패턴을 추출할 수 있고 유저 표현을 더욱 효과적으로 인코딩할 수 있다.</summary></entry></feed>
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 6.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">오랜만에 Collaborative Filtering for implicit datasets 논문 리뷰!! 가짜연구소 ‘추천시스템 논문에서 서비스까지’ 스터디 진행 중 이 논문을 리뷰하고 구현하면 좋을 것 같아 이번에 annotation 방식으로 리뷰해본다.</summary></entry></feed>
