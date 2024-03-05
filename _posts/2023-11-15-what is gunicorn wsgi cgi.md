@@ -1,14 +1,21 @@
 ---
-title: gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어
+title: gunicorn, WSGI, CGI란 무엇인가, 그리고 gunicorn 사용 명령어
 description:
 categories:
 tags:
 ---
 
-웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(`Apache`), 엔진엑스(`Nginx`) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다.
-웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다.
+**웹 서버**
 
-gunicorn은 wsgi의 일종이다. wsgi는 cgi에서 파생된 개념이다.
+웹 서버란 웹 브라우저(크롬 등)의 요청을 처리하는 서버이다. 웹 서버에 요청이 들어온다 치자. 예를 들어 ```www.pseudorec.com```, ```www.pseudorec.com/movie/sasrec/``` 등을 주소창에 치는 것이다. 
+
+
+웹 서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표적인 웹 서버에는 아파치(`Apache`), 엔진엑스(`Nginx`) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다.
+웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다. 동적 요청이란 DB의 데이터를 가져온다든지 하는, 요청을 처리한 후 응답하여 응답이 계속 변하는 요청을 말한다.  
+
+**gunicorn과 WSGI**
+
+gunicorn은 wsgi(발음 위스키)의 일종이다. wsgi는 cgi에서 파생된 개념이다.
 
 cgi는 common gateway interface의 약자로, 공통 경로 인터페이스이다. 개발하는 언어가 제각각이니, 중간의 동시통역사처럼 '이 문을 지나면 이러한 형태가 된다'고 정해놓은 규약이다.
 사용자의 http 요청은 웹서버로 들어온다. 이 때 cgi를 통해 일관된 형태로 해석되어(번역되어) 웹서버에 전달, 웹서버 내부로 들어오는 것이다.
@@ -34,6 +41,7 @@ pip install gunicorn
 gunicorn --bind 0:8000 config.wsgi:application
 ```
 `--bind 0:8000` : 8000번 포트를 사용하겠다는 것이다.
+
 `config.wsgi:application` : config/wsgi.py 파일의 application이란 어플리케이션을 실행하겠다는 것이다.
 config/wsgi.py의 application이란 예를 들면 다음과 같이 작성된다.
 
@@ -58,7 +66,7 @@ Gunicorn은 여러 개의 worker 프로세스를 생성하여 동시에 여러 �
 **각 worker는 고유한 메모리 공간을 가지고 있어**, 하나의 worker가 오류로 인해 종료되더라도 다른 worker는 계속해서 서비스를 제공할 수 있습니다.
 Worker의 수를 늘리면 동시에 처리할 수 있는 요청의 수가 늘어나지만, 이에 따라 메모리 사용량이 늘어나게 됩니다.
 
-**Worker 수 설정**
+Worker 수 설정
 
 --workers 또는 -w 옵션을 사용하여 Gunicorn이 생성할 worker 프로세스의 수를 지정할 수 있습니다. 예를 들어, -w 4는 4개의 worker를 생성하도록 지시합니다.
 worker의 수는 일반적으로 코어 1개당 2-4개를 곱해 사용하면 된다.
