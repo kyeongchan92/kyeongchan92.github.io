@@ -1131,7 +1131,7 @@ javascript 기본 내용이 있어서 읽고 정리하게 되었다. 아직 장�
             
                 
                 <a class="post-title-link" href="/2023/11/15/what-is-gunicorn-wsgi-cgi/" itemprop="url">
-                gunicorn, wsgi, cgi란 무엇인가, 그리고 gunicorn 사용 명령어
+                gunicorn, WSGI, CGI란 무엇인가, 그리고 gunicorn 사용 명령어
               </a>
             
           
@@ -1183,8 +1183,7 @@ javascript 기본 내용이 있어서 읽고 정리하게 되었다. 아직 장�
 
       
         
-          <p>웹서버는 동적 요청이 들어오면 알맞는 파이썬 프로그램을 호출해야 할 것이다. (대표 적인 웹 서버에는 아파치(<code class="language-plaintext highlighter-rouge">Apache</code>), 엔진엑스(<code class="language-plaintext highlighter-rouge">Nginx</code>) 등이 있다.) 하지만 대부분의 웹서버는 파이썬 프로그램을 호출할 수 있는 기능이 없고, 그래서 파이썬 프로그램을 호출하는 WSGI가 필요하다.
-웹 서버에 동적 요청이 발생하면 웹 서버가 WSGI 서버를 호출하고, WSGI 서버는 파이썬 프로그램을 호출하여 동적 페이지 요청을 대신 처리하는 것이다.</p>
+          <p>pseudorec을 배포하면서 Django를 다루는 책에 gunicorn과 nginx를 다루고 있었다. 그런데 책의 마지막 챕터라 그런지 이것들에 대한 설명은 많지 않고 CS 베이스도 부족한 나는 이것들을 왜 쓰는지, 무엇인지 이해도 안갔다. 그래서 기초 수준으로 개념을 정리해본다.</p>
 
 
           <!--noindex-->
@@ -1674,7 +1673,7 @@ cx_Oracle 공식문서인 <a href="https://cx-oracle.readthedocs.io/en/latest/us
           
             <div class="site-state-item site-state-posts">
               <a href="">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

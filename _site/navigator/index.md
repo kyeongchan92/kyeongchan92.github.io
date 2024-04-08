@@ -34,6 +34,10 @@
 
 - [Django MTV 기초↗][Django]
 
+## Statistics
+
+- [Maximum Likelihood Estimation↗][Maximum Likelihood Estimation]
+
 ## CSS/JavaScript
 
 - [CSS basic↗][css basic]
@@ -61,6 +65,8 @@
 [docker memory options]:{{ site.baseurl }}{% link _posts/2023-12-11-docker memory options.md %}
 
 [Django]:{{ site.baseurl }}{% link _posts/2023-08-30-Django.md %}
+
+[Maximum Likelihood Estimation]:{{ site.baseurl }}{% link _posts/2022-04-27-maximum likelihood estimation.md %}
 
 [css basic]:{{ site.baseurl }}{% link _posts/2023-11-22-css basic.md %}
 [css basic2]:{{ scite.baseurl }}{% link _posts/2023-11-22-css basic2.md %}

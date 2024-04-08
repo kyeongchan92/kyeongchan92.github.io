@@ -109,17 +109,24 @@
 
 
 
-<meta name="description" content="AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다. 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다. 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs">
+<meta name="description" content="유튜버 AI Holic님의 ‘Likelihood 쉽게 설명드려요 — 머신러닝, 인공지능을 위한 수학’ 영상을 보고 정리하였음.">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
 <meta property="og:type" content="article">
-<meta property="og:title" content="도커 컨테이너의 메모리 옵션">
-<meta property="og:url" content="http://localhost:4000/2023/12/11/docker-memory-options/">
+<meta property="og:title" content="Maximum Likelihood Estimation">
+<meta property="og:url" content="http://localhost:4000/2022/04/27/maximum-likelihood-estimation/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
-<meta property="og:description" content="AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다. 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다. 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs">
+<meta property="og:description" content="유튜버 AI Holic님의 ‘Likelihood 쉽게 설명드려요 — 머신러닝, 인공지능을 위한 수학’ 영상을 보고 정리하였음.">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/mean4-std0.5.png">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/probability.png">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/my cat.png">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/cat dist.png">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/cat dist right move.png">
+<meta property="og:image" content="/assets/images/maximum likelihood estimation/likelihood calculation.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="도커 컨테이너의 메모리 옵션">
-<meta name="twitter:description" content="AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다. 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다. 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을 번역했다 : Runtime options with Memory, CPUs, and GPUs">
+<meta name="twitter:title" content="Maximum Likelihood Estimation">
+<meta name="twitter:description" content="유튜버 AI Holic님의 ‘Likelihood 쉽게 설명드려요 — 머신러닝, 인공지능을 위한 수학’ 영상을 보고 정리하였음.">
+<meta name="twitter:image" content="/assets/images/maximum likelihood estimation/mean4-std0.5.png">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -152,7 +159,7 @@
 
 
 
-  <title>도커 컨테이너의 메모리 옵션 | Leegang's AI Note</title>
+  <title>Maximum Likelihood Estimation | Leegang's AI Note</title>
   
 
 
@@ -324,7 +331,7 @@
   
 
   <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/12/11/docker-memory-options/">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2022/04/27/maximum-likelihood-estimation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kyeongchan Lee">
@@ -344,7 +351,7 @@
           <h1 class="post-title" itemprop="name headline">
           
           
-            도커 컨테이너의 메모리 옵션
+            Maximum Likelihood Estimation
           
         </h1>
         
@@ -358,8 +365,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-12-11T00:00:00+09:00">
-                2023-12-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-04-27T00:00:00+09:00">
+                2022-04-27
               </time>
             
 
@@ -395,86 +402,89 @@
       
 
       
-        <p>AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
-메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
-한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
-번역했다 : <a href="https://docs.docker.com/config/containers/resource_constraints/" target="_blank">Runtime options with Memory, CPUs, and GPUs</a></p>
+        <p>유튜버 AI Holic님의 ‘<a href="https://www.youtube.com/watch?v=mxCmB1WE3R8">Likelihood 쉽게 설명드려요 — 머신러닝, 인공지능을 위한 수학</a>’ 영상을 보고 정리하였음.</p>
+
+<h1 id="확률">확률.</h1>
+
+<p>우도에 대해 알아보기 전에, 일단 가장 친숙한 확률이라는 것부터 살펴보자. 고양이들 1,000마리의 몸무게를 재서 다음과 같은 히스토그램 분포가 나왔다고 해보자. <strong>평균은 4, 표준편차는 0.5</strong>라고 해보자.</p>
+
+<p><img src="/assets/images/maximum likelihood estimation/mean4-std0.5.png" alt="0" /></p>
+
+<p>“<strong>확률</strong>”이란, 다음처럼 우리가 고등학교 때 많이 구하던 바로 그것이다!</p>
+
+<p><img src="/assets/images/maximum likelihood estimation/probability.png" alt="0" /></p>
+
+<p>평균은 얼마고, 표준편차는 얼마일 때, 몸무게가 4보다 크거나 같고 5보다 작거나 같을 확률은 얼마인가?</p>
+
+\[\mathbb{P}(4 \le \text{몸무게} \le 5|\mathcal{N}(4, 0.5)) =0.477\]
+
+<p>평균은 얼마고, 표준편차는 얼마일 때, 몸무게가 3.5보다 크거나 같고 4보다 작거나 같을 확률은 얼마인가?</p>
+
+\[\mathbb{P}(3.5 \le \text{몸무게} \le 4|\mathcal{N}(4, 0.5)) =0.34\]
+
+<p><img src="/assets/images/maximum likelihood estimation/my cat.png" alt="0" /></p>
+
+<p>“<strong>확률</strong>”이란…</p>
+
+<p>사건의 범위는 변하지만, 분포는 고정되어 있는 형태다. 내가 한 마리의 고양이를 키우고 있다고 가정해보자. 위의 분포에서는, 즉, 내가 관측한 고양이들의 몸무게들 중에서는, 내 고양이의 몸무게가 4kg에서
+5kg사이일 확률은 47.7%이고, 3.5kg에서 4kg 사이일 확률은 34%이다.</p>
+
+\[\mathbb{P}(\text{data} | \text{distribution})\]
+
+<p>보통 “<strong>확률</strong>”이란, 위와 같은 형태이다. distribution이 정해져 있는 상태에서, 지금 이 데이터가 관측 될 확률이다.</p>
 
 <hr />
 
-<p>기본적으로, 컨테이너는 리소스 제한이 없다. 그리고 호스트의 커널 스케줄러가 허용하기만 한다면 주어진 리소스를 원하는 만큼 사용한다.</p>
+<h1 id="그럼-likelihood는-무엇일까">그럼 Likelihood는 무엇일까?</h1>
 
-<p>도커에서 컨테이너가 사용할 수 있는 메모리와 CPU를 컨트롤할 수 있다.</p>
+<p>아래 그림을 보자.</p>
 
-<h1 id="메모리">메모리</h1>
+<p><img src="/assets/images/maximum likelihood estimation/cat dist.png" alt="0" /></p>
 
-<h2 id="메모리-부족의-위험성-이해하기">메모리 부족의 위험성 이해하기</h2>
+<p>우리집 고양이가 5kg이라고 해보자. (뚱냥이다!)</p>
 
-<p>컨테이너가 호스트의 메모리를 너무 많이 사용하게 하는걸 막아야한다.
-리눅스에서는 커널이 충분한 메모리가 없다고 판단하면 OOME(Out of Memory Exception)을 내뱉고, 메모리를 확보하기위해 프로세스를 죽이기 시작한다(이게 계속 gunicorn 프로세스가 죽었던
-이유구나..).
-도커나 다른 다른 어플리케이션을 포함해서 어느 프로세스든 죽을 수 있다. 만약 중요한 프로세스가 kill되면? 전체 시스템이 다운될 것이다.</p>
+<p>우리집 뚱냥이의 몸무게라는 데이터(5kg)를 내가 관측했다. <strong>그럼 이 데이터는 어떤 분포로부터 나왔다고 하는 게 가장 말이 될까?</strong></p>
 
-<p>도커는 이런 위험을 피하기 위해 노력한다. 도커 대몬에 <span style="background-color:#fff5b1"><strong>OOM 우선순위</strong></span>를 적용시키는 것이다. 그렇게 해서 다른 시스템
-프로세스보다 죽을 가능성을 낮춘다.
-각 컨테이너에는 OOM 우선순위를 적용하지 않는다. 도커 대몬에 적용함으로써 개별 컨테이너를 종료할 가능성을 높이고, 도커 대몬이나 다른 시스템 프로세스가 죽을 확률을 낮춘다.</p>
+<p>만약 고양이 몸무게의 진짜, 온 세상 모든 고양이의 진리적인 분포가 위 그림처럼 평균 4, 분산 0.5인 정규분포라고 가정해보자. 그럼 이 가정 하에서 우리집 뚱냥이의 likelihood는? 0.108이다.</p>
 
-<p><code class="language-plaintext highlighter-rouge">--oom-score-adj</code><a href="https://docs.docker.com/compose/compose-file/05-services/#oom_score_adj" target="_blank">↗</a>
-설정은 [-1000, 1000]사이의 숫자로 설정하여, 메모리 부족시 어떤 컨테이너를 먼저 죽일지 설정하게 해준다. 극단적으로 음수로 설정하면 안죽는 것이다.
-<code class="language-plaintext highlighter-rouge">--oom-kill-disable</code><a href="https://docs.docker.com/compose/compose-file/05-services/#oom_kill_disable" target="_blank">↗</a> 설정은 메모리 부족시에도 해당 컨테이너를 죽지 않게 할수도 있다. <strong>하지만 이런 설정을 사용하는 것은 권장되지 않는다.</strong></p>
+<p>x=5인 경우의 확률분포의 y절편에 해당한다. 즉, 세로 선의 길이이다.</p>
 
-<h2 id="oom-위험을-줄이려면">OOM 위험을 줄이려면?</h2>
+\[\mathcal{L}(\mathcal{N}(4, 0.5) | \text{고양이몸무게}=5)=0.108\]
 
-<p>다음과 같은 방법이 있다.</p>
+<p>“고양이 몸무게가 5kg이라고 주어졌을 때, 정규분포 (4, 0.5)의 likelihood는 0.108이다”라고 해석한다.</p>
 
-<ul>
-  <li>컨테이너가 사용할 수 있는 메모리 양을 아래 설명된 대로 설정한다.</li>
-  <li>Docker 호스트에서 swap을 설정할 때 신중히… Swap은 메모리보단 느리지만, OOM 상황에 대한 버퍼 역할을 할 수 있다.</li>
-  <li>컨테이너를 서비스로 변환한다. 즉 Kubernetes같은 오케스트레이션으로 컨테이너를 관리, 배포하는 것이다. 서비스는 여러 컨테이너 인스턴스를 실행하고 관리하는 개념이다. 서비스 수준의 조건 및 관리를 받게
-하는 것이다.</li>
-</ul>
+<p>다시다시, 분포를 오른쪽으로 조금 움직여봅시다!</p>
 
-<h2 id="컨테이너의-메모리-엑세스를-제한하기">컨테이너의 메모리 엑세스를 제한하기</h2>
+<p><img src="/assets/images/maximum likelihood estimation/cat dist right move.png" alt="0" /></p>
 
-<p>Docker는 <span style="background-color:#fff5b1">하드 메모리 제한</span> 또는 <span style="background-color:#fff5b1">소프트 메모리
-제한</span>을 부여할 수 있습니다.</p>
+\[\mathcal{L}(\mathcal{N}(5, 0.5) | \text{고양이몸무게}=5)=0.798\]
 
-<ul>
-  <li>
-    <p>하드 제한은 컨테이너가 고정된 메모리 양을 초과하지 못하게 합니다.</p>
-  </li>
-  <li>
-    <p>소프트 제한은 컨테이너가 특정 조건만 충족된다면 필요로 하는 만큼의 메모리를 사용할 수 있게 합니다. 커널이 호스트에서 낮은 메모리 or 메모리 경합을 감지할 때와 같이.</p>
-  </li>
-</ul>
+<p>내 고양이 몸무게가 5kg일 때, 이 데이터가 정규분포(5, 0.5)라는 분포의 likelihood는 0.798이다.</p>
 
-<p>위 옵션 중 하나만 쓰일 때, 또는 한 개 이상 쓰일 때는 다른 효과가 나타난다.</p>
+<p>likelihood가 가장 높은 분포를 선택하는 것이 가장 말이 된다는 것은 이해가 간다. 아니 근데, 관측한 데이터로 분포를 때려 맞춘다고 했는데, 그 분포(분포란 평균과 표준편차를 의미함)의 likelihood
+계산은 어떻게 하는가?</p>
 
-<p>대부분 양의 정수 + b, k, m, g처럼 바이트, 킬로바이트, 메가바이트, 기가바이트처럼 쓰인다.</p>
+<p><img src="/assets/images/maximum likelihood estimation/likelihood calculation.png" alt="0" /></p>
 
-<table>
-  <thead>
-    <tr>
-      <th>옵션</th>
-      <th>설명</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code class="language-plaintext highlighter-rouge">-m</code> or <code class="language-plaintext highlighter-rouge">--memory=</code></td>
-      <td>컨테이너가 사용할 수 있는 메모리 최대량.</td>
-    </tr>
-    <tr>
-      <td><code class="language-plaintext highlighter-rouge">--memory-swap=</code></td>
-      <td>컨테이너가 disk로부터 사용할 수 있는 swap 메모리량. <a href="https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details" target="_blank">자세히↗</a></td>
-    </tr>
-    <tr>
-      <td><code class="language-plaintext highlighter-rouge">--memory-reservation</code></td>
-      <td><code class="language-plaintext highlighter-rouge">--memory</code>보다 작게 soft limit을 건다. 도커가 호스트로부터 메모리 경합이나 낮은 메모리를 감지할때 동작하는 수치다.</td>
-    </tr>
-  </tbody>
-</table>
+<h1 id="likelihood">likelihood</h1>
 
+<p>=지금 얻은 데이터(내 뚱냥이 몸무게 = 5kg)가 이 분포로부터 나왔을 가능도</p>
+
+<p>=각 데이터 샘플에서 후보 분포에 대한 높이(likelihood, 기여도)의 곱(iid)</p>
+
+<p>다시다시, 내가 여러 마리의 고양이 몸무게를 측정했다(나는 현재 x들을 알고있다).</p>
+
+<p>그렇다면, <strong>이 몸무게들의 원래 분포는 무엇일까?</strong> → \(\theta\)는 무엇일까? → 이 글의 경우에는 정규분포라고 가정했으므로 \(\theta\)가 무엇일까?는 곧 평균과 분산이 무엇일까?가 된다.</p>
+
+<p>→ 이 과정이 바로 최대 우도 추정이다. \(\mathbb{P}(x | \theta)\)가 가장 커지는 \(\theta\)를 추정하는 것이 가장 그럴 듯하다. 즉, 최대 우도 추정이란, \(\mathbb{P}(x |
+\theta)\)가 가장 커지는 \(\theta\)(여기서는 평균과 표준편차)를 구하는 것이고, 모든 데이터를 이 분포에 빗대어 likelihood를 구해 모두 곱하고, 이 값이 가장 커지는 \(\theta\)를
+구하는 과정이다.</p>
+
+<p>똑똑한 누군가는 말한다.</p>
+
+<blockquote>
+  <p>“이 \(\theta\)일 때, 즉 이 분포일 때, 내가 측정한 고양이들의 몸무게 x들이 가장 나옴직해!”</p>
+</blockquote>
 
       
     </div>
@@ -514,14 +524,18 @@
         <div class="post-nav" id="post-nav-id">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2022/05/18/matrix-decomposition-01-determinant-and-trace/" rel="next" title="추천시스템과 Matrix Decompositions — 1. Determinant and Trace">
+                <i class="fa fa-chevron-left"></i> 추천시스템과 Matrix Decompositions — 1. Determinant and Trace
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2023/11/28/huggingface-tokenizer-truncation/" rel="prev" title="Huggingface 토크나이저 Padding and truncation">
-                Huggingface 토크나이저 Padding and truncation <i class="fa fa-chevron-right"></i>
+              <a href="/2022/04/14/lstm/" rel="prev" title="LSTM(1997) 정리">
+                LSTM(1997) 정리 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -673,7 +687,7 @@
             
               <div class="post-toc-content">
     <ol class=nav>
-      <li class="nav-item nav-level-1"> <a class="nav-link" href="#메모리"> <span class="nav-text">메모리</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#메모리-부족의-위험성-이해하기"> <span class="nav-text">메모리 부족의 위험성 이해하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#oom-위험을-줄이려면"> <span class="nav-text">OOM 위험을 줄이려면?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#컨테이너의-메모리-엑세스를-제한하기"> <span class="nav-text">컨테이너의 메모리 엑세스를 제한하기</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#확률"> <span class="nav-text">확률.</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#그럼-likelihood는-무엇일까"> <span class="nav-text">그럼 Likelihood는 무엇일까?</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#likelihood"> <span class="nav-text">likelihood</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
     </ol>
   </div>
             

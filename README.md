@@ -33,3 +33,6 @@ bundle exec jekyll serve
 # 형식 바꾸기
 
 scaffolding/base.scss 에서 바꾸면 된다. main.scss에서 바꿔봤는데 계속 다시 원래대로 돌아간다 스스로....
+
+# Topics 탭 파일
+navigator > index.md
