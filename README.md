@@ -39,3 +39,7 @@ navigator > index.md
 
 # 이미지 캡션 달기
 ![0](/assets/images/ngcf/figure2.png)*Figure2. NGCF 아키텍쳐. 화살표는 정보가 흐른다는 것을 의미한다. 그림 가장 밑에 $$u_1$$과 $$i_4$$가 있다. 각각 여러개의 임베딩 전파 레이어를 거치고 마지막엔 레이어의 아웃풋들이 concat되어, 최종 예측 스코어 계산에 쓰인다.*
+
+# 수식 번호 붙이기
+$$수식수식 \tag(1.1)$$ 처럼 끝에 \tag{수식번호}만 붙이면 된다
+$$  \mathcal{L} = \sum_{s \in \mathcal{S}} \sum_{e_m \in s} \sum_{-n \lt j \lt n, j \ne 0} \sum_{k=1, \cdots , T_m} \log \mathbb{P}(e_{m+j} \mid p_{mk}) \tag{3.2}$$

@@ -13,6 +13,10 @@
 <lastmod>2022-05-18T00:00:00+09:00</lastmod>
 </url>
 <url>
+<loc>http://localhost:4000/2022/07/04/prod2vec/</loc>
+<lastmod>2022-07-04T00:00:00+09:00</lastmod>
+</url>
+<url>
 <loc>http://localhost:4000/2022/11/10/ngcf-review/</loc>
 <lastmod>2022-11-10T00:00:00+09:00</lastmod>
 </url>
@@ -79,10 +83,6 @@
 <url>
 <loc>http://localhost:4000/2023/12/11/docker-memory-options/</loc>
 <lastmod>2023-12-11T00:00:00+09:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/2023/12/18/prod2vec/</loc>
-<lastmod>2023-12-18T00:00:00+09:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/</loc>

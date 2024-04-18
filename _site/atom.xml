@@ -1,43 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-04-18T15:42:39+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">Prod2vec</title><link href="http://localhost:4000/2023/12/18/prod2vec/" rel="alternate" type="text/html" title="Prod2vec" /><published>2023-12-18T00:00:00+09:00</published><updated>2023-12-18T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/18/prod2vec</id><content type="html" xml:base="http://localhost:4000/2023/12/18/prod2vec/">&lt;p&gt;제안된 방법은 이전 구매 내역(이메일로 날라온 영수증)을 이용하여 그 영수증 안의 상품들을 학습하여 추천하는 방법이다. 영수증을 패키지 상품으로, 영수증 안의 상품들 목록을 패키지의 여행 일정으로 대응시켜 하나투어 패키지 상품 추천시스템에 적용 가능할지 확인해볼 필요가 있다. Prod2vec을 발전시킨 Meta-prod2vec이 네이버 상품 추천시스템 중 유사아이템 추천시스템에 참고되었다.
-제안된 방법은 상품을 저차원 공간에서의 표현(representation)으로 학습하는 방법을 제안한다. 임베딩 공간 안에서 최근접 이웃을 찾음으로써 추천이 이루어진다.
-\(\mathcal{S}\)는 이메일 영수증들의 집합으로써, N명의 유저로부터 얻어진 것이다. 유저의 로그는 \(s=(e_1, e_2, …, e_M)\)으로 구성되며 \(s \in \mathcal{S}\)이다. 각각의 이메일 e는 \(T_m\)개의 상품들 p로 구성되어있음. 
-즉, \(e_m = (p_{m_1}, p_{m_2}, …, p_{m_{T_m}})\)이다.&lt;/p&gt;
-
-&lt;p&gt;목적 : 각각의 상품 p의 D차원 표현인 \(\mathbf{v}_p\)를 찾는 것. 이 때 당연하지만 유사한 아이템은 근처에 위치해야함.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/prod2vec/user_logs.png&quot; alt=&quot;0&quot; /&gt;&lt;em&gt;s는 이메일(e)의 시퀀스이며, 이메일은 product로 구성되어있다.&lt;/em&gt;&lt;/p&gt;
-
-&lt;h1 id=&quot;저차원의-상품-임베딩&quot;&gt;저차원의 상품 임베딩&lt;/h1&gt;
-
-&lt;p&gt;&lt;strong&gt;prod2vec&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;prod2vec 모델은 NLP 분야에서의 용어를 빌리자면 구매 시퀀스를 문장으로, 시퀀스 안의 상품들을 단어로 보고 상품의 벡터 표현을 학습하는 것이다. 본 논문에서는 Skip-gram 방식[24]을 사용하였다. 그리하여 아래의 목적함수를 최대화시킨다. 목적함수란 만약 사각형을 가장 크게 만들고 싶다고 가정할때 사각형의 넓이같은 것을 의미한다. MLE가 대표적인 목적함수이다.&lt;/p&gt;
-
-\[\mathcal{L} = \sum_{s \in \mathcal{S}} \sum_{p_i \in s} \sum_{-c \le j \le c, j \ne 0}  \log \mathbb{P}(p_{i+j} | p_i)\]
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$$\mathbb{P}(p_{i+j}&lt;/td&gt;
-      &lt;td&gt;p_j)\(는 상품\)p_i\(가 주어졌을 때 이웃하는 상품\)p_{i+j}$$를 관측할 확률이며 아래와 같이 소프트맥스 함수로 정의된다.&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;같은 s 안에 있는 상품들은 임의로 배열된다. $$\mathbb{P}(p_{i+j}&lt;/td&gt;
-      &lt;td&gt;p_i) = \frac{\exp (\mathbf{v}^T_{p_i} \mathbf{v}’_{p_{i+j}})} {\sum_{p=1}^{P} \exp(\mathbf{v}^T_{p_i} \mathbf{v}’_p)} $$&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;\(\mathbf{v}_p\)는 인풋, \(\mathbf{v}&apos;_p\)은 아웃풋 벡터 표현을 의미한다. c는 컨텍스트의 길이이다. P는 단어의 수이다.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/prod2vec/context_neighbor.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;bagged-prod2vec&lt;/strong&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">제안된 방법은 이전 구매 내역(이메일로 날라온 영수증)을 이용하여 그 영수증 안의 상품들을 학습하여 추천하는 방법이다. 영수증을 패키지 상품으로, 영수증 안의 상품들 목록을 패키지의 여행 일정으로 대응시켜 하나투어 패키지 상품 추천시스템에 적용 가능할지 확인해볼 필요가 있다. Prod2vec을 발전시킨 Meta-prod2vec이 네이버 상품 추천시스템 중 유사아이템 추천시스템에 참고되었다. 제안된 방법은 상품을 저차원 공간에서의 표현(representation)으로 학습하는 방법을 제안한다. 임베딩 공간 안에서 최근접 이웃을 찾음으로써 추천이 이루어진다. \(\mathcal{S}\)는 이메일 영수증들의 집합으로써, N명의 유저로부터 얻어진 것이다. 유저의 로그는 \(s=(e_1, e_2, …, e_M)\)으로 구성되며 \(s \in \mathcal{S}\)이다. 각각의 이메일 e는 \(T_m\)개의 상품들 p로 구성되어있음. 즉, \(e_m = (p_{m_1}, p_{m_2}, …, p_{m_{T_m}})\)이다.</summary></entry><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-04-18T16:43:45+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">도커 컨테이너의 메모리 옵션</title><link href="http://localhost:4000/2023/12/11/docker-memory-options/" rel="alternate" type="text/html" title="도커 컨테이너의 메모리 옵션" /><published>2023-12-11T00:00:00+09:00</published><updated>2023-12-11T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/11/docker%20memory%20options</id><content type="html" xml:base="http://localhost:4000/2023/12/11/docker-memory-options/">&lt;p&gt;AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
 메모리 사용률을 확인해보니 간당간당하게 소프트제한에 다다르고 있었다. 왜냐면 worker 수만큼 곱해졌기 때문이다.
 한참 알아보던 중, 도커 컨테이너에서 soft 및 hard 메모리 제한이 있다는걸 알게됐다. 다음 글을
 번역했다 : &lt;a href=&quot;https://docs.docker.com/config/containers/resource_constraints/&quot; target=&quot;_blank&quot;&gt;Runtime options with Memory, CPUs, and GPUs&lt;/a&gt;&lt;/p&gt;
@@ -2621,4 +2582,16 @@ busy는 pool 속의 세션 중에서 현재 작업 중인 세션(=connection 인
 &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;만약 increment가 2였다면, 두 번째 세션을 얻는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;connection2 = pool.acquire()&lt;/code&gt;를 할 때 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pool.opened&lt;/code&gt;는 3이 된다. 2개를 여니까.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.</summary></entry></feed>
+&lt;p&gt;만약 increment가 2였다면, 두 번째 세션을 얻는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;connection2 = pool.acquire()&lt;/code&gt;를 할 때 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pool.opened&lt;/code&gt;는 3이 된다. 2개를 여니까.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">python에서 oracle db에 연결할 때 cs_Oracle이란 라이브러리를 사용하게 된다. 이 때 cursor, connection을 매번 호출하는 것보다 pool을 만들어놓고 재사용하면 효율이 좋아진다고 해서 알아보게 되었다. cx_Oracle 공식문서인 Connecting to Oracle Database를 번역했습니다.</summary></entry><entry><title type="html">논문리뷰 - Collaborative filtering for Implicit Feedback Datasets</title><link href="http://localhost:4000/2023/10/15/cf-for-implicit/" rel="alternate" type="text/html" title="논문리뷰 - Collaborative filtering for Implicit Feedback Datasets" /><published>2023-10-15T00:00:00+09:00</published><updated>2023-10-15T00:00:00+09:00</updated><id>http://localhost:4000/2023/10/15/cf-for-implicit</id><content type="html" xml:base="http://localhost:4000/2023/10/15/cf-for-implicit/">&lt;p&gt;오랜만에 논문 리뷰!! 가짜연구소 ‘추천시스템 논문에서 서비스까지’ 스터디 진행 중 이 논문을 리뷰하고 구현하면 좋을 것 같아 이번에 annotation 방식으로 리뷰해본다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 1.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 2.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 3.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 4.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 5.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/cf for implicit/cf for implicit annotation 6.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">오랜만에 논문 리뷰!! 가짜연구소 ‘추천시스템 논문에서 서비스까지’ 스터디 진행 중 이 논문을 리뷰하고 구현하면 좋을 것 같아 이번에 annotation 방식으로 리뷰해본다.</summary></entry></feed>
