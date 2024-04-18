@@ -321,6 +321,140 @@
   
 
   <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/12/18/prod2vec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/profile.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+                
+                <a class="post-title-link" href="/2023/12/18/prod2vec/" itemprop="url">
+                Prod2vec
+              </a>
+            
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-12-18T00:00:00+09:00">
+                2023-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+<p>제안된 방법은 이전 구매 내역(이메일로 날라온 영수증)을 이용하여 그 영수증 안의 상품들을 학습하여 추천하는 방법이다. 영수증을 패키지 상품으로, 영수증 안의 상품들 목록을 패키지의 여행 일정으로 대응시켜 하나투어 패키지 상품 추천시스템에 적용 가능할지 확인해볼 필요가 있다. Prod2vec을 발전시킨 Meta-prod2vec이 네이버 상품 추천시스템 중 유사아이템 추천시스템에 참고되었다.
+제안된 방법은 상품을 저차원 공간에서의 표현(representation)으로 학습하는 방법을 제안한다. 임베딩 공간 안에서 최근접 이웃을 찾음으로써 추천이 이루어진다.
+\(\mathcal{S}\)는 이메일 영수증들의 집합으로써, N명의 유저로부터 얻어진 것이다. 유저의 로그는 \(s=(e_1, e_2, …, e_M)\)으로 구성되며 \(s \in \mathcal{S}\)이다. 각각의 이메일 e는 \(T_m\)개의 상품들 p로 구성되어있음. 
+즉, \(e_m = (p_{m_1}, p_{m_2}, …, p_{m_{T_m}})\)이다.</p>
+
+
+          <!--noindex-->
+<!--          <div class="post-button text-center">-->
+<!--            <a class="btn" href="/2023/12/18/prod2vec/#more" rel="contents">-->
+<!--              Read more &raquo;-->
+<!--            </a>-->
+<!--          </div>-->
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+        
+        
+        
+        
+          <div class="post-eof"></div>
+        
+      
+    </footer>
+  </article>
+
+  
+    
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/12/11/docker-memory-options/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1482,136 +1616,6 @@ cx_Oracle 공식문서인 <a href="https://cx-oracle.readthedocs.io/en/latest/us
         
         
         
-          <div class="post-eof"></div>
-        
-      
-    </footer>
-  </article>
-
-  
-    
-    
-
-  
-
-  
-  
-  
-
-  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/10/15/cf-for-implicit/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kyeongchan Lee">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/assets/images/profile.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Leegang's AI Note">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-                
-                <a class="post-title-link" href="/2023/10/15/cf-for-implicit/" itemprop="url">
-                논문리뷰 - Collaborative filtering for Implicit Feedback Datasets
-              </a>
-            
-          
-        </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-10-15T00:00:00+09:00">
-                2023-10-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>오랜만에 논문 리뷰!! 가짜연구소 ‘추천시스템 논문에서 서비스까지’ 스터디 진행 중 이 논문을 리뷰하고 구현하면 좋을 것 같아 이번에 annotation 방식으로 리뷰해본다.</p>
-
-
-          <!--noindex-->
-<!--          <div class="post-button text-center">-->
-<!--            <a class="btn" href="/2023/10/15/cf-for-implicit/#more" rel="contents">-->
-<!--              Read more &raquo;-->
-<!--            </a>-->
-<!--          </div>-->
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-        
-        
-        
-        
       
     </footer>
   </article>
@@ -1627,7 +1631,7 @@ cx_Oracle 공식문서인 <a href="https://cx-oracle.readthedocs.io/en/latest/us
 
 
 
-    <span class="page-number current">1</span> <a class="page-number" href="/page2">2</a> <a class="extend prev" rel="next" href="/page2"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span> <a class="page-number" href="/page2">2</a> <a class="page-number" href="/page3">3</a> <a class="extend prev" rel="next" href="/page2"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1673,7 +1677,7 @@ cx_Oracle 공식문서인 <a href="https://cx-oracle.readthedocs.io/en/latest/us
           
             <div class="site-state-item site-state-posts">
               <a href="">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

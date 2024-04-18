@@ -1,0 +1,1383 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Gowun Batang:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Neural graph collaborative filtering(2019) 논문의 Methodology 부분을 다룹니다. 논문에서 Methodology에 대한 설명은 크게 세 부분으로 구성되어 있습니다.">
+<meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
+<meta property="og:type" content="article">
+<meta property="og:title" content="논문리뷰 - NGCF">
+<meta property="og:url" content="http://localhost:4000/2022/11/10/ngcf-review/">
+<meta property="og:site_name" content="Leegang&apos;s AI Note">
+<meta property="og:description" content="Neural graph collaborative filtering(2019) 논문의 Methodology 부분을 다룹니다. 논문에서 Methodology에 대한 설명은 크게 세 부분으로 구성되어 있습니다.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/images/ngcf/embedding_layer.png">
+<meta property="og:image" content="/assets/images/ngcf/message_construction.png">
+<meta property="og:image" content="/assets/images/ngcf/hop.png">
+<meta property="og:image" content="/assets/images/ngcf/leakyrelu.png">
+<meta property="og:image" content="/assets/images/ngcf/message_aggregation.png">
+<meta property="og:image" content="/assets/images/ngcf/figure2.png">
+<meta property="og:image" content="/assets/images/ngcf/figure3.png">
+<meta property="og:image" content="/assets/images/ngcf/high_order_propagation1.png">
+<meta property="og:image" content="/assets/images/ngcf/high_order_propagation2.png">
+<meta property="og:image" content="/assets/images/ngcf/high_order_propagation3.png">
+<meta property="og:image" content="/assets/images/ngcf/laplacian1.png">
+<meta property="og:image" content="/assets/images/ngcf/laplacian2.png">
+<meta property="og:image" content="/assets/images/ngcf/laplacian3.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="논문리뷰 - NGCF">
+<meta name="twitter:description" content="Neural graph collaborative filtering(2019) 논문의 Methodology 부분을 다룹니다. 논문에서 Methodology에 대한 설명은 크게 세 부분으로 구성되어 있습니다.">
+<meta name="twitter:image" content="/assets/images/ngcf/embedding_layer.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>논문리뷰 - NGCF | Leegang's AI Note</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-129549627-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leegang's AI Note</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Recommendation system, NLP, Machine Learning, MLOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/navigator/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-list"></i> <br />
+            
+            Topics
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2022/11/10/ngcf-review/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/profile.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            논문리뷰 - NGCF
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-11-10T00:00:00+09:00">
+                2022-11-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://arxiv.org/abs/1905.08108" target="_blank">Neural graph collaborative filtering(2019)</a> 논문의 Methodology 부분을 다룹니다. 논문에서 Methodology에 대한 설명은 크게 세 부분으로 구성되어 있습니다.</p>
+
+<p>pytorch 코드 : huangtinglin/NGCF-PyTorch</p>
+
+<ol>
+  <li>Embedding Layer</li>
+  <li>Embedding Propagation Layers
+    <ol>
+      <li>First-order propagation</li>
+      <li>High-order propagation</li>
+    </ol>
+  </li>
+  <li>Model Prediction</li>
+  <li>Optimization</li>
+</ol>
+
+<h1 id="1-embedding-layer">1. Embedding Layer</h1>
+
+<p>메인스트림 추천모델인 <a href="https://arxiv.org/abs/1902.06236" target="_blank">Unifying Knowledge Graph Learning and Recommendation</a>, <a href="https://arxiv.org/abs/1708.05031" target="_blank">NCF</a>, <a href="https://arxiv.org/abs/1205.2618" target="_blank">BPR</a>에 따르면, 유저 \(u\)(아이템 \(i\))는 임베딩 벡터 \(\mathbf{e}_u \in \mathbb{R}^d(\mathbf{e}_i \in \mathbb{R}^d)\)로 나타낸다. 즉 \(d\)차원의 임베딩 벡터로.</p>
+
+<p><img src="/assets/images/ngcf/embedding_layer.png" alt="0" /></p>
+
+<p>MF나 NCF같은 기존 모델은 임베딩을 바로 interaction layer로 전달하여, 즉 바로 내적하거나 신경망에 전달해서 예측 스코어를 계산합니다.
+하지만 NGCF는 유저-아이템 그래프 상에서 propagating하여 임베딩을 정교화(refine이라고 표현)합니다.
+이걸 임베딩 정교화(embedding refinement) step이라고 하는데, 이 과정을 통해 collaborative signal을 임베딩에 주입할 수 있기 때문이라고 합니다.</p>
+
+<h1 id="2-embedding-propagation-layers">2. Embedding Propagation Layers</h1>
+
+<p>GNN의 <strong>message-passing 아키텍쳐</strong>를 이용하여 그래프 구조를 따라 <strong>CF 시그널</strong>을 잡아내고 유저-아이템 임베딩을 정교화합니다.
+우선 하나의 레이어에서 어떻게 전파가 이루어지는지 확인하고, 여러 레이어로 확장해봅시다.</p>
+
+<h2 id="1-first-order-propagation">1. First-order propagation</h2>
+
+<p>직관적으로 봤을 때, 어느 유저에 의해 사용된(클릭된) 아이템은 해당 유저의 선호도를 구성할 수 있습니다.
+마찬가지로, 특정 아이템을 사용한 유저들은 해당 아이템의 특징을 구성하고 있습니다.
+또한 두 아이템의 유사도를 측정하는데 사용될 수도 있을 겁니다.
+이러한 가정을 기반으로, 상호작용한 유저와 아이템 사이에 임베딩 전파를 수행합니다.
+이 때, message construction과 message aggregation이라는 개념이 사용됩니다.</p>
+
+<p><strong>Message Construction</strong></p>
+
+<p>서로 연결된 유저-아이템 쌍 \((u, i)\)에 대하여, \(i\)에서 \(u\)로의 message를 다음과 같이 정의합니다.</p>
+
+\[m_{u \leftarrow i} = f(e_i, e_u, p_{ui})\]
+
+<p>\(m_{u \leftarrow i}\)는 메시지 임베딩, 즉 전파되는 정보를 의미합니다. \(f(\cdot)\)는 메시지 인코딩 함수라고 하며, 임베딩 \(e_i\)
+와 \(e_u\), 그리고 \(\text{edge}(u, i)\)의 전파에 대한 감쇠인자(decay factor)를 조정하기 위한 계수 p_{ui}를 인풋으로 받습니다.</p>
+
+<p>본 논문에서는 \(f(\cdot)\)을 다음과 같이 정의합니다:</p>
+
+\[m_{u \leftarrow i} = \frac{1}{\sqrt{|N_{u}||N_i|}}(W_1 \textbf{e}_i + W_2(e_i \odot e_u))\]
+
+<p>\(W_1, W_2 \in \mathbb{R}^{d' \times d}\)는 학습 가능한 가중치 행렬입니다.
+이 행렬은 전파라는 것이 유용한 정보를 추출(또는 정제, distill)합니다.
+전통적인 Graph convolutional networks(
+<a href="https://arxiv.org/abs/1606.09375" target="_blank">2016.Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering.</a>, 
+<a href="https://arxiv.org/abs/1609.02907" target="_blank">2017. Semi-Supervised Classification with Graph Convolutional Networks.</a>,
+<a href="https://arxiv.org/abs/1706.02263" target="_blank">2017. Graph Convolutional Matrix Completion.</a>,
+<a href="https://arxiv.org/abs/1806.01973" target="_blank">2018. Graph Convolutional Neural Networks for Web-Scale Recommender Systems.</a>
+)에서는 메시지에 오직 \(e_i\)의 contribution만 고려됐었습니다.
+하지만 NGCF는 \(e_i\)와 \(e_u\)사이의 상호작용을 \(\mathbf{e}_i \odot \mathbf{e}_u\)라는 (element-wise product) 형태로 메시지에 추가로 인코딩해줍니다.
+이는 \(\mathbf{e}_i\)와 \(\mathbf{e}_u\) 사이의 유사성(또는 관련성, affinity)에 메시지가 의존하게 되죠.
+예를 들어, 유사한 아이템 아이템들과는 \(\odot\) 값도 클 테니 유사한 아이템들의 정보를 더 많이 받게 되겠죠.
+이는 모델의 표현 능력(representation ability)도 향상시킬 수 있고 자연히 추천 성능도 향상된다고 합니다. (증명은 실험 부분에서 한다고 하네요)</p>
+
+<p><img src="/assets/images/ngcf/message_construction.png" alt="0" /></p>
+
+<p><a href="https://arxiv.org/abs/1609.02907" target="\_blank">2017. Semi-Supervised Classification with Graph Convolutional Networks.</a>처럼, 여기서는 graph Laplacian norm이라는 개념을 \(p_{ui}=\frac{1}{\sqrt{|N_u||N_i|}}\)을 도입합니다.
+여기서 \(N_u\)과 \(N_u\)는 각각 유저 \(u\)와 아이템 \(i\)의 first-hop 이웃을 나타냅니다.
+representation 학습의 관점에서 보면, \(p_{ui}\)는 아이템 \(i\)가 유저 \(u\)의 선호도에 얼만큼 공헌했는지를 의미합니다.
+아이템 \(i\)를 소비한 유저가 많다면, 그 중 한 유저에게 보내는 메시지는 영향력이 적겠죠? 유저 입장에서도 마찬가지입니다.
+유저 \(u\)가 아주 많은 아이템을 소비했다면, 그 중 특정 아이템 \(i\) 사이의 메시지 \(m_{u \leftarrow i}\)의 영향력이 줄어드는 것이 맞겠죠.</p>
+
+<p><img src="/assets/images/ngcf/hop.png" alt="0" /></p>
+
+<p>한편 메시지 패싱 관점에서는 \(p_{ui}\)를 감쇠 인자로 해석됩니다.
+즉, 경로의 길이가 길어짐에 따라 공헌도가 감소해야 한다는 것을 반영합니다.</p>
+
+<p><strong>Message Aggregation</strong></p>
+
+<p>이제 유저 \(u\)의 이웃으로부터 전파되는 메시지들을 결합함으로써 \(u\)의 표현을 정교화(refine)합니다.
+Aggregation의 함수는 다음과 같습니다:</p>
+
+\[e_u^{(1)} = \text{LeakyReLU}(m_{u \leftarrow u} + \sum_{i \in N_u} m_{u \leftarrow i})\]
+
+<p>\(e_u^{(1)}\)은 유저 \(u\)의 representation인데, 위첨자 \(^{(1)}\)은 첫 번째 임베딩 전파 레이어 이후 얻은 것을 의미합니다.
+활성화 함수로 쓰이는 LeakyReLU는 양수가 들어오는 경우 그대로 통과시키고 음수는 0.01을 곱한 값을 내놓는 함수입니다.
+주목할 점은 이웃 \(N_u\)로부터 전파된 메시지들 뿐만 아니라, 유저 \(u\)의 self-connection \(m_{u \leftarrow u}=W_1e_u\)을 고려했다는 것입니다.
+\(m_{u \leftarrow u}\)는 원본 특징(original feature)의 정보를 보유하고 있습니다.
+\(W_1\)은 \(m_{u \leftarrow i}\)에서 쓰였던 \(W_1\)과 동일한 가중치 행렬입니다.
+같은 행렬이 다시 한 번 쓰이는 것입니다.
+유사하게, 아이템 \(i\)에 대한 표현 \(e_i^{(1)}\)도 얻을 수 있습니다. 이 때는 연결된 유저들로부터의 정보를 전파하면 됩니다.</p>
+
+<p><img src="/assets/images/ngcf/leakyrelu.png" alt="0" /></p>
+
+<p><img src="/assets/images/ngcf/message_aggregation.png" alt="0" /></p>
+
+<p>요약하자면 전파 레이어의 장점은 1차 연결 정보(first-order connection information)를 이용하여 유저와 아이템 각각의 표현을 연관짓게 한다는 것입니다!</p>
+
+<h2 id="2-high-order-propagation">2. High-order propagation</h2>
+
+<p><img src="/assets/images/ngcf/figure2.png" alt="0" /><em>Figure2. NGCF 아키텍쳐. 화살표는 정보가 흐른다는 것을 의미한다. 그림 가장 밑에 \(u_1\)과 \(i_4\)가 있다. 각각 여러개의 임베딩 전파 레이어를 거치고 마지막엔 레이어의 아웃풋들이 concat되어, 최종 예측 스코어 계산에 쓰인다.</em></p>
+
+<p><img src="/assets/images/ngcf/figure3.png" alt="0" /><em>Figure3. \(u_1\)에 대한 3차(third-order) 임베딩 전파</em></p>
+
+<p>1차로 얻은 연결성 모델링을 통해 좀 더 강화된(augmented) 표현을 얻었습니다. 레이어를 더 쌓아 고차원 연결의 정보를 얻을 수 있습니다.
+이런 고차원 연결성(high-order connectivity)은 CF 시그널을 인코딩하는데에 매우 중요하겠죠?</p>
+
+<p>\(l\)개의 전파 레이어를 쌓음으로써, 유저(혹은 아이템)은 자신의 \(l\)-hop으로부터 전파된 메시지를 받을 수 있습니다.
+Figure 2를 통해 볼 수 있는 것처럼, \(l\)번째 스텝에서는 유저 \(u\)의 표현이 재귀적으로 다음과 같이 공식화됩니다:</p>
+
+\[e_u^{(l)} = \text{LeakyReLU}(m_{u \leftarrow u}^{(l)} + \sum_{i \in N_u}m_{u \leftarrow i}^{(l)})\]
+
+<p>그렇다면 \(l\)-hop으로부터 오는 메시지는 어떻게 공식화될까요? 다음과 같습니다. 이런 식으로 재귀적으로 수행되겠죠:</p>
+
+\[m_{u \leftarrow i}^{(l)} = p_{ui}(W_1^{(l)}e_i^{(l-1)} + W_2^{(l)}(e_i^{(l-1)} \odot e_u^{(l-1)}))\]
+
+\[m_{u \leftarrow u}^{(l)}=W_1^{(l)} e_u^{(l-1)}\]
+
+<p>\(W_1^{(l)}, W_2^{(l)} \in \mathbb{R}^{d_l \times d_{l-1}}\)은 학습가능한 transformation 행렬이고, \(d_l\)은 변형 후 사이즈입니다.
+\(e_i^{l-1}\)은 이전 스텝으로부터 생성된 아이템 표현입니다.
+이 표현은 \((l-1)\)-hop 이웃으로부터의 메시지를 기억하고 있습니다.
+Figure 3에서 볼 수 있듯이, \(u_1 \leftarrow i_2 \leftarrow u_2 \leftarrow i_4\)와 같은 collaborative signal이 전파 과정에 의해 학습될 수 있습니다.
+\(i_4\)로부터의 메시지는 \(e_{u_1}^{(3)}\)에 명시적으로 인코딩됩니다.</p>
+
+<p><img src="/assets/images/ngcf/high_order_propagation1.png" alt="0" /></p>
+
+<p>\(4번 아이템\)i_4\(에서 1번 유저\)u_1\(까지의 메시지,\)m_{4 \leftarrow 1}$$가 어떻게 구해지는지 다시 한 번 천천히 살펴봅시다.</p>
+
+<p>위와 같은 그래프(Figure 3과 동일)가 있다고 할 때, 가장 첫 작업(첫 번째 레이어)에서 \(u_2\)는 \(i_4\)로부터 오는 메시지를 받아 업데이트 될 것입니다.
+즉, \(e_{u_2}^{(1)}\)은 \(i_4\) 정보를 포함하게 됩니다. 물론 이 단계에서 모든 아이템과 유저 임베딩이 동일하게 업데이트 될 것입니다.</p>
+
+<p><img src="/assets/images/ngcf/high_order_propagation2.png" alt="0" /></p>
+
+<p>두 번째 작업(레이어)에서는 \(i_2\) 주변 유저들로부터 메시지를 받아 업데이트 될 것입니다.
+그런데 이 유저 중 한 명인 \(u_2\)는 이전 레이어에서 \(i_4\)의 정보를 포함하게 됐었죠.
+그래서 두 번째 레이어까지 업데이트를 마친 결과, 결과적으로 \(i_4\)의 정보를 포함한 \(u_2\), \(u_2\)의 정보를 포함한 \(i_2\)가 되었습니다.</p>
+
+<p><img src="/assets/images/ngcf/high_order_propagation3.png" alt="0" /></p>
+
+<p>그 다음단계에서 \(u_1\)은 마찬가지로 주변 아이템 \(i_1, i_2, i_3\)로부터 메시지를 맞아 업데이트 되겠죠.
+근데 \(i_2\)는 \(i_4\)의 정보까지 포함하고 있었네요.
+따라서 이번 레이어에서의 작업을 마치면 \(u_1\)은 \(i_4\)의 정보까지 포함하게 될 것입니다.</p>
+
+<p>즉, 메시지 전파를 전체적으로 3판(?) 수행하면 각 판마다 \(\mathbf{e}^1_{u_1}, \mathbf{e}^2_{u_1}, \mathbf{e}^3_{u_1}\)이 생길텐데, 이 중 \(\mathbf{e}^3_{u_1}\)은 \(\mathbf{e}^0_{i_4}\)를 받아들이게 되는 것이죠.</p>
+
+<p><strong>Propagation Rule in Matrix Form.</strong></p>
+
+<p>임베딩 전파 및 배치 수행을 위해서는, 실제로는 행렬을 이용해 연산을 수행합니다. 레이어 단위로 수행되는 전파는 아래 수식을 따릅니다.</p>
+
+\[E^{(l)} = \text{LeakyReLU}((\mathcal{L}+I)E^{(l-1)}W_1^{(l-1)} + \mathcal{L} E^{(l-1)} \odot E^{(l-1)} W_2 ^{(l)}  )\]
+
+<p>\(E\)의 shape는 \(E^{(l)} \in \mathbb{R}^{(N+M) \times d_l  }\) 입니다. \(N\)은 유저의 수, \(M\)은 아이템의 수입니다.</p>
+
+<p>\(\mathcal{L}\)은 유저-아이템 그래프에 대한 Laplacian 행렬이며 다음과 같이 정의됩니다:</p>
+
+\[\mathcal{L} = \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}} \\
+\\
+\\ \;\;
+\text{and}\;\; \mathbf{A}=\begin{bmatrix}
+\mathbf{0}  &amp; \mathbf{R} \\
+\mathbf{R}^\top &amp; \mathbf{0}
+\end{bmatrix}\]
+
+<p>\(\mathbf{R} \in R^{N \times M}\)은 유저-아이템 상호작용 행렬이며, \(\mathbf{0}\)는 영행렬입니다.
+\(\mathbf{A}\)는 인접행렬이며, \(\mathbf{D}\)는 대각 degree 행렬입니다.
+\(\mathbf{D}\)의 \(t\)-th 대각 요소는 \(D_{tt} = |\mathcal{N}_t|\), 즉 이웃의 수 입니다.</p>
+
+<p>뭔 말인가 싶어서 Laplacian 행렬에 대해 찾아보고 직접 예를 들어 계산해봤습니다.</p>
+
+<p><strong>\(\mathcal{L} = \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\)가 등장한 이유</strong></p>
+
+<p>\(\mathcal{L} = \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}}\)는 어떤 노드가 주변 노드의 정보를 aggregation할 때 그 message의 decay factor가 들어있는 행렬입니다.</p>
+
+<p><img src="/assets/images/ngcf/laplacian1.png" alt="0" /></p>
+
+<p>논문에 나오는 그래프를 예로 들어봅시다. 3명의 유저와 5개의 아이템이 있습니다.
+본 논문에서 정의한 인접행렬 \(\mathbf{A}\)에는 \(\mathbf{R}\)이라는 인터랙션 행렬이 블록행렬 형태로 들어가 있습니다.
+인접행렬에서 1이었던 자리는 유저와 아이템의 인터랙션이 존재했음을 의미합니다.</p>
+
+<p>Laplacian \mathcal{L} = \mathbf{D}^{-\frac{1}{2}}\mathbf{A}\mathbf{D}^{-\frac{1}{2}} 계산을 해봅시다.</p>
+
+<p><img src="/assets/images/ngcf/laplacian2.png" alt="0" /></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>앞뒤로 각 노드의 degree의 $$\frac{1}{\sqrt{\mathcal{</td>
+      <td>N</td>
+      <td>}}}$$을 곱해주니까, 1이 있던 자리에는 유저의 이웃 수와 아이템의 이웃 수를 각각 루트를 씌워 역수를 취한 후 두 수를 곱한 수가 되었습니다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>이 숫자의 의미는 앞 장에서 설명했던 것처럼, 인기가 많은 아이템(다른 유저와 인터랙션이 많은 아이템)으로부터의 메시지의 정보 크기는 그 이웃 수만큼 줄인다는 것입니다.</p>
+
+<p><img src="/assets/images/ngcf/laplacian3.png" alt="0" /></p>
+
+<p>\((\mathcal{L} + I)E\)를 수행하게 되면, 연결된 주변 노드로부터 decay factor가 곱해진 정보를 받아들여 더해지게 됩니다.</p>
+
+<p>이제 \(E^{(l)} = \text{LeakyReLU}((\mathcal{L}+I)E^{(l-1)}W_1^{(l-1)} + \mathcal{L} E^{(l-1)} \odot E^{(l-1)} W_2 ^{(l)}  )\) 이 수식이 좀 보이시나요?
+\(\mathcal{L}_{ui} = 1 / \sqrt{|\mathcal{N}_u||\mathcal{N}_i|} = p_{ui}\)가 됩니다. 이 수는 message construction에서 봤던 그 계수와 동일합니다.</p>
+
+<p>행렬 계산 형태로 propagation을 수행함으로써, 우리는 모든 유저와 아이템에 대한 표현을 동시에 효과적으로, 한 번에 업데이트할 수 있습니다. Graph convolutional network(<a href="https://arxiv.org/abs/1807.05560" target="_blank">2018.
+DeepInf: Social Influence Prediction with Deep Learning.</a>)에서는 보통 노드 샘플링 과정이 있는데, 이렇게 행렬 계산을 함으로써 이 과정도 없어집니다.</p>
+
+<h1 id="3-model-prediction">3. Model Prediction</h1>
+
+<p>\(L\)번의 propagating을 거치고 난 후 유저 \(u\)에 대해 여러 개의 representation, 즉 \({ \mathbf{e}_u^{(1)}, \cdots, \mathbf{e}_u^{(L)} }\)을 얻게 된다.
+각 레이어마다의 representation들은 다른 커넥션들을 거쳐 패싱되어왔기 때문에 유저의 선호도에 각기 다른 측면을 갖고 있다. 각각 공헌한다.
+그래서 이들은 concat한다. 아이템도 똑같이
+\(u\)와 \(i\)에 대한 final embedding은 다음과 같다.</p>
+
+\[\mathbf{e}_u^* = \mathbf{e}_u^{(0)} \parallel \cdots \parallel \mathbf{e}_u^{(L)}, \mathbf{e}_i^* = \mathbf{e}_i^{(0)} \parallel \cdots \parallel \mathbf{e}_i^{(L)}\]
+
+<p>최종적으로, 유저 \(u\)의 아이템 \(i\)에 대한 선호도를 계산하기 위해 내적한다.</p>
+
+\[\hat{y}_{\text{NGCF}} (u, i) = {\mathbf{e}_u^*}^\top \mathbf{e}_i^*\]
+
+<h1 id="4-optimization-bpr">4. Optimization (BPR)</h1>
+
+<p>pairwise BPR loss (<a href="https://arxiv.org/abs/1205.2618" target="_blank">2009. BPR: Bayesian Personalized Ranking from Implicit Feedback.</a>)를 최적화했다.
+이는 추천시스템에서 광범위하게 쓰인다. 이는 관측된, 그리고 관측 안 된(observed and unobserved) 인터랙션 사이의 상대적인 순서를 고려합니다.
+BPR은 ‘observed 아이템은 unobserved 아이템보다 유저의 선호도에 더욱 크게 반영되어야 하고, 더 높은 예측 값을 가져야한다’를 가정합니다.
+목적 함수는 다음과 같습니다:</p>
+
+\[\text{Loss} = \sum_{(u, i, j) \in \mathcal{O}} -\ln \sigma (\hat{y}_{ui} - \hat{y}_{uj}) + \lambda \parallel \Theta \parallel_2^2\]
+
+<p>\(\mathcal{O} = \left\{ (u, i, j) | (u, i) \in \mathcal{R}^+ , (u, j) \in \mathcal{R}^- \right\}\)은 pairwise 형태의 학습 데이터입니다.
+\(\mathcal{R}^+\)는 observed interactions을 ,\(\mathcal{R}^-\)는 unobserved interactions를 나타냅니다.</p>
+
+<p>\(\sigma (\cdot)\)은 sigmoid function이구요. \(\Theta = \left\{ \mathbf{E}, \left\{ \mathbf{W}_1^{(l)}, \mathbf{W}_2^{(l)} \right\}_{l=1}^{L} \right\}\)는 모든 학습 가능한 파라미터들을 의미합니다.
+그리고 \(\lambda\)는 파라미터의 오버피팅을 막기 위한 \(L_2\) regularization 강도를 조절합니다.</p>
+
+<p>특히, \((u, i, j) \in \mathcal{O}\)는 랜덤하게 샘플링하는데, 이 때 \(L\)번의 propagation을 통해 representation \(\left[ \mathbf{e}^{(0)}, \cdots, \mathbf{e}^{(L)} \right]\)을 먼저 구하고, 그 다음에 손실 함수의 gradient를 사용하여 파라미터를 업데이트합니다.</p>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/12/27/Matrix-Factorization-in-RS/" rel="next" title="추천시스템에서의 Matrix Factorization">
+                <i class="fa fa-chevron-left"></i> 추천시스템에서의 Matrix Factorization
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/05/18/matrix-decomposition-01-determinant-and-trace/" rel="prev" title="추천시스템과 Matrix Decompositions — 1. Determinant and Trace">
+                추천시스템과 Matrix Decompositions — 1. Determinant and Trace <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/profile.jpg"
+               alt="Kyeongchan Lee" />
+          <p class="site-author-name" itemprop="name">Kyeongchan Lee</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://github.com/kyeongchan92" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              
+              
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/nahcklee/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#1-embedding-layer"> <span class="nav-text">1. Embedding Layer</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#2-embedding-propagation-layers"> <span class="nav-text">2. Embedding Propagation Layers</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-2"> <a class="nav-link" href="#1-first-order-propagation"> <span class="nav-text">1. First-order propagation</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#2-high-order-propagation"> <span class="nav-text">2. High-order propagation</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#3-model-prediction"> <span class="nav-text">3. Model Prediction</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-1"> <a class="nav-link" href="#4-optimization-bpr"> <span class="nav-text">4. Optimization (BPR)</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kyeongchan Lee</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+  
+
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

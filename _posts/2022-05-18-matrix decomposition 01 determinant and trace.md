@@ -24,12 +24,12 @@ Determinant는 오직 정방행렬에 대해서만 정의된다.
 
 ![0](/assets/images/matrix%20decomposition%201/4.3.png)
 
-예제 4.1은 determinant와 역행렬 존재 여부 사이의 관계를 나타낸다. 아래 theorem은 n×n행렬에 대하여 동일한 결과를 설명하는 것이다.
+예제 4.1은 determinant와 역행렬 존재 여부 사이의 관계를 나타낸다. 다음 theorem은 n × n 행렬에 대해 동일한 결과를 명시합니다.
 
 ![0](/assets/images/matrix%20decomposition%201/theorem 4.1.png){: .align-center}
-*어느 정방행렬 A에 대하여, det(A)가 0이 아니라면 A는 invertible하다.*
+*어느 정방행렬 A에 대하여, $$det(A)\ne0$$라면 A는 invertible하다.*
 
-작은 행렬들에 대해서는 determinant는 명확한 표현이 존재한다. $$n=1$$일 때,
+작은 행렬들에 대해서는 determinant의 명확한 표현이 존재한다. $$n=1$$일 때,
 
 ![0](/assets/images/matrix%20decomposition%201/4.5.png)
 
@@ -46,15 +46,16 @@ $$n=3$$일 때 Sarrus’ rule은 다음과 같다.
 
 Sarrus’ rule의 곱셈항을 기억하기 위해서는 행렬 안의 세 가지씩 곱한 요소들을 잘 추적해야한다.
 
-$$i>j$$에 대하여 만약 $$T_{ij}=0$$라면 정방행렬 $$T$$를 upper-triangular matrix라고 한다. 
+$$i>j$$에 대하여 $$T_{ij}=0$$라면 정방행렬 $$T$$를 upper-triangular matrix라고 한다. 
 즉, 이 행렬은 대각선 밑으로는 0이다. 
 비슷하게, lower-triangular matrix를 대각선 위가 0인 행렬로 정의한다. 
 이와 같은 triangular 행렬 $$n × n$$의 $$T$$에 대하여, determinant는 대각 element들의 곱이다.
 
 ![0](/assets/images/matrix%20decomposition%201/4.8.png)
 
-> 예제 4.2 부피 측정 수단으로서의 determinants
-> determinant의 개념을 보면, 우리는 이를 $$\mathbb{R}^n$$에서 어느 객체를 span하는 n개의 벡터들을 매핑하는 것으로 바라봐도 자연스럽다. 행렬 $$A$$의 determinant인 $$det(A)$$가 $$A$$의 column들로 형성되는 n차원의 평행 육면체의 부호 있는 부피인 것이 알려져 있다. $$n=2$$일 때, 행렬의 각 column들은 평행사변형을 형성할 수 있다; Figure 4.2를 보자.
+> 예제 4.2 (부피 측정 수단으로서의 determinants)
+> 
+> determinant의 개념을 보면, 우리는 이를 $$\mathbb{R}^n$$에서 어느 객체를 span하는 n개의 벡터들을 매핑하는 것으로 바라봐도 자연스럽다. 행렬 $$A$$의 determinant인 $$det(A)$$가 $$A$$의 column들로 형성되는 n차원의 평행 육면체의 부호를 가진 부피인 것이 알려져 있다. $$n=2$$일 때, 행렬의 각 column들은 평행사변형을 형성할 수 있다; Figure 4.2를 보자.
 
 ![0](/assets/images/matrix%20decomposition%201/figure 4.2.png)
 *Fiture 4.2 벡터 b와 g에 의해 span되는 평행사변형의 넓이(그림자 진 지역)는 $$|det([b,g])|$$이다.*

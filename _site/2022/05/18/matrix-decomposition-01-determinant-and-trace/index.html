@@ -443,12 +443,12 @@ Determinant는 오직 정방행렬에 대해서만 정의된다.
 
 <p><img src="/assets/images/matrix%20decomposition%201/4.3.png" alt="0" /></p>
 
-<p>예제 4.1은 determinant와 역행렬 존재 여부 사이의 관계를 나타낸다. 아래 theorem은 n×n행렬에 대하여 동일한 결과를 설명하는 것이다.</p>
+<p>예제 4.1은 determinant와 역행렬 존재 여부 사이의 관계를 나타낸다. 다음 theorem은 n × n 행렬에 대해 동일한 결과를 명시합니다.</p>
 
 <p><img src="/assets/images/matrix%20decomposition%201/theorem 4.1.png" alt="0" class="align-center" />
-<em>어느 정방행렬 A에 대하여, det(A)가 0이 아니라면 A는 invertible하다.</em></p>
+<em>어느 정방행렬 A에 대하여, \(det(A)\ne0\)라면 A는 invertible하다.</em></p>
 
-<p>작은 행렬들에 대해서는 determinant는 명확한 표현이 존재한다. \(n=1\)일 때,</p>
+<p>작은 행렬들에 대해서는 determinant의 명확한 표현이 존재한다. \(n=1\)일 때,</p>
 
 <p><img src="/assets/images/matrix%20decomposition%201/4.5.png" alt="0" /></p>
 
@@ -464,7 +464,7 @@ Determinant는 오직 정방행렬에 대해서만 정의된다.
 
 <p>Sarrus’ rule의 곱셈항을 기억하기 위해서는 행렬 안의 세 가지씩 곱한 요소들을 잘 추적해야한다.</p>
 
-<p>\(i&gt;j\)에 대하여 만약 \(T_{ij}=0\)라면 정방행렬 \(T\)를 upper-triangular matrix라고 한다. 
+<p>\(i&gt;j\)에 대하여 \(T_{ij}=0\)라면 정방행렬 \(T\)를 upper-triangular matrix라고 한다. 
 즉, 이 행렬은 대각선 밑으로는 0이다. 
 비슷하게, lower-triangular matrix를 대각선 위가 0인 행렬로 정의한다. 
 이와 같은 triangular 행렬 \(n × n\)의 \(T\)에 대하여, determinant는 대각 element들의 곱이다.</p>
@@ -472,8 +472,9 @@ Determinant는 오직 정방행렬에 대해서만 정의된다.
 <p><img src="/assets/images/matrix%20decomposition%201/4.8.png" alt="0" /></p>
 
 <blockquote>
-  <p>예제 4.2 부피 측정 수단으로서의 determinants
-determinant의 개념을 보면, 우리는 이를 \(\mathbb{R}^n\)에서 어느 객체를 span하는 n개의 벡터들을 매핑하는 것으로 바라봐도 자연스럽다. 행렬 \(A\)의 determinant인 \(det(A)\)가 \(A\)의 column들로 형성되는 n차원의 평행 육면체의 부호 있는 부피인 것이 알려져 있다. \(n=2\)일 때, 행렬의 각 column들은 평행사변형을 형성할 수 있다; Figure 4.2를 보자.</p>
+  <p>예제 4.2 (부피 측정 수단으로서의 determinants)</p>
+
+  <p>determinant의 개념을 보면, 우리는 이를 \(\mathbb{R}^n\)에서 어느 객체를 span하는 n개의 벡터들을 매핑하는 것으로 바라봐도 자연스럽다. 행렬 \(A\)의 determinant인 \(det(A)\)가 \(A\)의 column들로 형성되는 n차원의 평행 육면체의 부호를 가진 부피인 것이 알려져 있다. \(n=2\)일 때, 행렬의 각 column들은 평행사변형을 형성할 수 있다; Figure 4.2를 보자.</p>
 </blockquote>
 
 <p><img src="/assets/images/matrix%20decomposition%201/figure 4.2.png" alt="0" />
@@ -679,8 +680,8 @@ triangular 행렬의 determinant는 대각 요소들의 곱이었다.</p>
         <div class="post-nav" id="post-nav-id">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/12/27/Matrix-Factorization-in-RS/" rel="next" title="추천시스템에서의 Matrix Factorization">
-                <i class="fa fa-chevron-left"></i> 추천시스템에서의 Matrix Factorization
+              <a href="/2022/11/10/ngcf-review/" rel="next" title="논문리뷰 - NGCF">
+                <i class="fa fa-chevron-left"></i> 논문리뷰 - NGCF
               </a>
             
           </div>
@@ -761,7 +762,7 @@ triangular 행렬의 determinant는 대각 요소들의 곱이었다.</p>
           
             <div class="site-state-item site-state-posts">
               <a href="">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

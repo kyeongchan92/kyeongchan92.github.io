@@ -2,6 +2,7 @@
 
 ## 추천 알고리즘 논문 리뷰
 
+- [NGCF↗][ngcf]
 - [SASRec↗][sasrec]
 - [CL4SREC↗][cl4srec]
 - [Collaborative filtering for Implicit Feedback Datasets↗][cf4implicit]
@@ -44,7 +45,7 @@
 - [CSS basic 2↗][css basic2]
 - [JavaScript basic↗][javascript basic]
 
-
+[ngcf]: {{ site.baseurl }}{% link _posts/2022-11-10-ngcf review.md %}
 [sasrec]: {{ site.baseurl }}{% link _posts/2023-3-26-SASRec review.md %}
 [cl4srec]: {{ site.baseurl }}{% link _posts/2023-09-19-Contrastive Learning for Sequential Recommendation.md %}
 [cf4implicit]: {{ site.baseurl }}{% link _posts/2023-10-15-cf-for-implicit.md %}
