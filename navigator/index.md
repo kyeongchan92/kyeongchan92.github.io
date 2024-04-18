@@ -4,8 +4,10 @@
 
 - [NGCF↗][ngcf]
 - [SASRec↗][sasrec]
-- [CL4SREC↗][cl4srec]
 - [Collaborative filtering for Implicit Feedback Datasets↗][cf4implicit]
+- [Prod2Vec↗][prod2vec]
+- [CL4SREC↗][cl4srec]
+
 
 ## 추천시스템 기본
 
@@ -49,6 +51,7 @@
 [sasrec]: {{ site.baseurl }}{% link _posts/2023-3-26-SASRec review.md %}
 [cl4srec]: {{ site.baseurl }}{% link _posts/2023-09-19-Contrastive Learning for Sequential Recommendation.md %}
 [cf4implicit]: {{ site.baseurl }}{% link _posts/2023-10-15-cf-for-implicit.md %}
+[prod2vec]: {{ site.baseurl }}{% link _posts/2022-07-04-prod2vec.md %}
 
 [implicit data recommendation nDCG]: {{ site.baseurl }}{% link _posts/2023-01-15-Implicit data recommendation nDCG.md %}
 [Matrix Factorization in RS]: {{ site.baseurl }}{% link _posts/2022-12-27-Matrix Factorization in RS.md %}
