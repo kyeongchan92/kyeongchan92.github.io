@@ -2,6 +2,32 @@
 <search>
   
     <entry>
+      <title>Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?</title>
+      <url>/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/</url>
+      <content type="text">127p Example 4.14 (영화 평점과 유저)
+
+
+세 명의 유저 Ali, Beatrix, Chandra가 있고, 4개의 영화 Star Wars, Blade Runner, Amelie, Delicatessen이 있다고 해보자.
+평점은 0(worst)에서 5(best) 사이이고, 데이터는 \(\mathbf{A} \in \mathbb{R}^{4 \times 3}\)으로 나타내어진다.
+각 row는 영화를, column은 유저를 나타낸다.
+column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}}\)로 나타낼 수 있다.
+
+\(\mathbf{A}\)를 SVD를 사용해 분해(Factoring)하면 유저와 영화의 관계를 알 수 있다! Left-singular 벡터를 \(u_i\), right-singular 벡터를 \(v_j\)라고 하자.
+
+이어서..
+
+참고 : Mathematics for Machine Learning
+</content>
+      <categories>
+        
+      </categories>
+      <tags>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
       <title>도커 컨테이너의 메모리 옵션</title>
       <url>/2023/12/11/docker-memory-options/</url>
       <content type="text">AWS ECS에서 container 소프트제한을 걸어두고 gunicorn worker를 1보다 높게 설정해놨는데 workder가 메모리 oom으로 인해 1개씩 가끔 죽는 현상이 있었다.
@@ -3286,8 +3312,8 @@ BPR은 ‘observed 아이템은 unobserved 아이템보다 유저의 선호도�
       <url>/2022/07/04/prod2vec/</url>
       <content type="text">논문 링크 : E commerce in Your Inbox  Product Recommendations at Scale
 
-제안된 방법은 이전 구매 내역(이메일로 날라온 영수증)을 이용하여 그 영수증 안의 상품들을 학습하여 추천하는 방법이다. 영수증을 패키지 상품으로, 영수증 안의 상품들 목록을 패키지의 여행 일정으로 대응시켜 하나투어
-패키지 상품 추천시스템에 적용 가능할지 확인해볼 필요가 있다. Prod2vec을 발전시킨 Meta-prod2vec이 네이버 상품 추천시스템 중 유사아이템 추천시스템에 참고되었다.
+제안된 방법은 이전 구매 내역(이메일로 날라온 영수증)을 이용하여 그 영수증 안의 상품들을 학습하여 추천하는 방법이다.
+Prod2vec을 발전시킨 Meta-prod2vec이 네이버 상품 추천시스템 중 유사아이템 추천시스템에 참고되었다(2021 DEVIEW).
 
 제안된 방법은 상품을 저차원 공간에서의 표현(representation)으로 학습하는 방법을 제안한다. 임베딩 공간 안에서 최근접 이웃을 찾음으로써 추천이 이루어진다.
 

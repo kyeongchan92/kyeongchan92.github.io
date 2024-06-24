@@ -83,7 +83,7 @@
 <link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리" />
+  <meta name="keywords" content="" />
 
 
 
@@ -109,14 +109,19 @@
 
 
 
+<meta name="description" content="127p Example 4.14 (영화 평점과 유저)">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Leegang&apos;s AI Note">
-<meta property="og:url" content="http://localhost:4000/categories/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?">
+<meta property="og:url" content="http://localhost:4000/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
+<meta property="og:description" content="127p Example 4.14 (영화 평점과 유저)">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Leegang&apos;s AI Note">
+<meta name="twitter:title" content="Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?">
+<meta name="twitter:description" content="127p Example 4.14 (영화 평점과 유저)">
+<meta name="twitter:image" content="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -149,7 +154,7 @@
 
 
 
-  <title>              Categories | Leegang's AI Note      </title>
+  <title>Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까? | Leegang's AI Note</title>
   
 
 
@@ -305,41 +310,169 @@
       <div class="main-inner">
         <div class="content-wrap">
           <div id="content" class="content">
-            
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
 <div id="posts" class="posts-expand">
-<header class="post-header">
+  
+  
 
-	<h1 class="post-title" itemprop="name headline">
-    
-      Categories
-    
-  </h1>
-
-
-
-</header>
+  
 
   
   
-    <div class="category-all-page">
-      <div class="category-all-title">
-          
-            No categories
-          
-      </div>
-      <div class="category-all">
-        
+  
 
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/">
 
-        
-  <ul class="category-list">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kyeongchan Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/profile.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leegang's AI Note">
+    </span>
+
     
-  </ul>
+      <header class="post-header">
 
-      </div>
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2024-06-24T00:00:00+09:00">
+                2024-06-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>127p Example 4.14 (영화 평점과 유저)
+<img src="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png" alt="0" /></p>
+
+<p>세 명의 유저 Ali, Beatrix, Chandra가 있고, 4개의 영화 Star Wars, Blade Runner, Amelie, Delicatessen이 있다고 해보자.
+평점은 0(worst)에서 5(best) 사이이고, 데이터는 \(\mathbf{A} \in \mathbb{R}^{4 \times 3}\)으로 나타내어진다.
+각 row는 영화를, column은 유저를 나타낸다.
+column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}}\)로 나타낼 수 있다.</p>
+
+<p>\(\mathbf{A}\)를 SVD를 사용해 분해(Factoring)하면 유저와 영화의 관계를 알 수 있다! Left-singular 벡터를 \(u_i\), right-singular 벡터를 \(v_j\)라고 하자.</p>
+
+<p>이어서..</p>
+
+<p>참고 : Mathematics for Machine Learning</p>
+
+      
     </div>
-  
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/12/11/docker-memory-options/" rel="prev" title="도커 컨테이너의 메모리 옵션">
+                도커 컨테이너의 메모리 옵션 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
 </div>
+
 
 
           </div>
@@ -347,6 +480,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -362,6 +499,14 @@
 
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
 
       
 
