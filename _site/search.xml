@@ -2,6 +2,71 @@
 <search>
   
     <entry>
+      <title>추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title>
+      <url>/2024/07/01/matrix-decomposision-02-eigenvalues-and-eigenvectors/</url>
+      <content type="text">행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!
+
+
+  선형 사상(linear mapping)이란?
+
+  간단히 말해서, 두 벡터를 더한 후 매핑한 결과랑, 각각 매핑하고 더한 결과가 같으면 이 매핑은 linear mapping이다.
+
+  내가 이해하기론 ‘선형 사상 = 행렬 곱’ 이다.
+
+
+모든 선형 사상은 ordered basis에 대해 고유한 변환 행렬(transformation matrix)를 갖는다.
+linear mapping과 이에 연관된 변환 행렬들은 “고유(eigen)” 분석을 하는 거라고 볼 수 있다.
+앞으로 살펴보겠지만, 고유벡터(eigenvectors)라고 하는 특별한 벡터들이 선형 사상에 의해 어떻게 변형되는가를 고유값(eigenvalue)을 통해 알 수 있다.
+
+
+  Definition 4.6. \(A \in \mathbb{R}^{n \times n}\)를 정방행렬이라고 하자.
+\(A\)가 \(Ax=\lambda x\)를 만족한다면, \(\lambda \in \mathbb{R}\)를 \(A\)의 고유값(eigenvalue)라고 부르고, \(x \in \mathbb{R}^n \backslash \left\{ 0 \right\}\)은 이에 상응하는 고유벡터(eigenvector)라고 부른다.
+
+
+이를 고유값 방정식(eigenvalue equation)이라고 한다.
+
+
+
+
+  Definition 4.7 (Collinearity and Codirection). 같은 방향을 가리키는 두 벡터를 codirected라고 부른다. 같은 방향을 가리키거나 반대 방향을 가리키는 경우엔 collinear라고 한다.
+
+
+비고. 만약 \(x\)가 \(A\)의 고유벡터이고 \(\lambda\)가 고유값이라면, 어떠한 \(c \in \mathbb{R} \backslash \left\{ 0 \right\}\)에 대해서 \(cx\)는 A의 고유벡터이다.
+왜냐하면 \(A(cx) = cAx = c \lambda x = c \lambda x = \lambda (cx)\), 즉 \(A(cx) = \lambda (cx)\) (고유값 방정식 만족!)이기 때문이다.
+그러므로, x와 collinear 관계에 있는 모든 벡터들 또한 A의 고유벡터이다.
+
+기하학적으로 0이 아닌 고유값에 대한 고유벡터는 선형 사상에 의해 고유값만큼 늘어난다(stretched). 그리고 고유벡터는 선형 사상 \(\phi\)에 의해 방향이 변하지 않는 벡터이다.
+
+행렬 \(A\)와 \(A\)의 전치행렬 \(A^\top\)는 같은 고유값을 갖는다. 하지만 반드시 같은 고유벡터를 갖지는 않는다!
+
+
+
+  Example 4.5 고유값, 고유벡터, 고유공간(Eigenspace) 계산하기
+
+  아래의 2 X 2 행렬 \(A\)에 대해 고유값과 고유 벡터를 찾아보자.
+
+\[A = \begin{bmatrix}
+4 &amp;amp; 2 \\
+1 &amp;amp; 3
+\end{bmatrix}\]
+
+  Step 1: 특성방정식(Characteristic Polynomial)
+고유값과 고유벡터의 정의에 따라 \(Ax=\lambda x\), 즉, \((A-\lambda I)x=0\)를 만족하는 벡터 \(x \ne 0\)가 존재할 것이다.
+
+  \(x\)는 \(0\)벡터가 아니므로,
+
+
+</content>
+      <categories>
+        
+      </categories>
+      <tags>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
       <title>Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?</title>
       <url>/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/</url>
       <content type="text">127p Example 4.14 (영화 평점과 유저)
@@ -9,10 +74,22 @@
 
 세 명의 유저 Ali, Beatrix, Chandra가 있고, 4개의 영화 Star Wars, Blade Runner, Amelie, Delicatessen이 있다고 해보자.
 평점은 0(worst)에서 5(best) 사이이고, 데이터는 \(\mathbf{A} \in \mathbb{R}^{4 \times 3}\)으로 나타내어진다.
-각 row는 영화를, column은 유저를 나타낸다.
+각 row는 영화를, column은 유저를 나타낸다.**
 column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}}\)로 나타낼 수 있다.
 
 \(\mathbf{A}\)를 SVD를 사용해 분해(Factoring)하면 유저와 영화의 관계를 알 수 있다! Left-singular 벡터를 \(u_i\), right-singular 벡터를 \(v_j\)라고 하자.
+
+가정 하나를 만든다. ‘유저의 선호도는 \(v_j\)의 선형 조합으로 표현될 수 있음.’ 또, ‘영화의 호감도는 \(u_i\)‘의 선형 조합으로 표현될 수 있다.’
+
+그러므로, SVD의 정의역에 존재하는 벡터는 유저로, 공역에 존재하는 벡터는 영화로 해석될 수 있다.
+
+left-singular vector \(u_1\)은 science fiction에 큰 절대값을 갖고, 큰 first singular value를 갖는다. 그림에서 빨간색으로 칠해진 곳이다.
+그러므로, 이는 특정 영화들(science fiction)에 대해 유저들을 한 타입으로 그룹화한다.
+
+유사하게, first right-singular \(v_1\)은 science fiction 영화들에게 높은 별점을 준 Ali와 Beatrix에게 큰 절댓값을 주게 된다. 이는 \(v1\)이 science fiction을 좋아하는 사람들을 나타내는 것이라 볼 수 있다!
+
+유사하게, \(u2\)는 프랑스 예술 영화 테마를 잘 포착하고 있는 것 같으며, \(v2\)는 Chandra가 그러한 영화를 이상적으로 사랑하는 사람임을 나타낸다.
+공상 과학 영화 애호가는 순수주의자이며, 오직 공상 과학 영화만을 좋아한다. 그래서 공상 과학 영화를 좋아하는 사람 \(v1\)은 공상 과학 테마가 아닌 모든 것에 대해 0점을 준다. 이 논리는 특이값 행렬 \(\Sigma\)의 대각 하부구조에 암시되어 있습니다
 
 이어서..
 
@@ -3495,7 +3572,7 @@ Figure 4.3 세 벡터 r, g, b에 의해 span되는 평행육면체의 부피는 
 
 3×3 행렬 \([\boldsymbol{r}, \boldsymbol{b}, \boldsymbol{g}]\)의 determinant의 절댓값은 도형의 부피이다. 
 그러므로, determinant는 행렬을 구성하는 column 벡터들에 의해 형성되는 부호 있는 부피를 측정하는 함수로서 역할한다. 
-세 선형 독립 벡터 \(\boldsymbol{r}, \boldsymbol{b}, boldsymbol{g} \in \mathbb{R}^3\)이 다음과 같이 주어졌다고 해보자.
+세 선형 독립 벡터 \(\boldsymbol{r}, \boldsymbol{b}, \boldsymbol{g} \in \mathbb{R}^3\)이 다음과 같이 주어졌다고 해보자.
 
 
 
@@ -3509,7 +3586,7 @@ Figure 4.3 세 벡터 r, g, b에 의해 span되는 평행육면체의 부피는 
 
 \(n×n\) 행렬의 determinant를 계산하는 것은 \(n&amp;gt;3\)인 케이스를 풀기 위한 일반적인 알고리즘을 요구한다. 
 이 경우에는 다음과 같이 살펴보자. 
-Theorem 4.2는 \(n\timesn\)행렬의 determinant를 계산하는 일을 \((n-1)\times(n-1)\) 행렬의 determinant를 계산하는 문제로 축소시킨다. 
+Theorem 4.2는 \(n\times n\)행렬의 determinant를 계산하는 일을 \((n-1)\times(n-1)\) 행렬의 determinant를 계산하는 문제로 축소시킨다. 
 Laplace expansion (Theorem 4.2)을 재귀적으로 적용함으로써, 결과적으로는 \(2\times2\) 행렬의 determinant를 계산함으로써 \(n\times n\) 행렬의 determinant를 계산할 수 있다.
 
 
