@@ -14,6 +14,7 @@
 - [Implicit data 추천시스템에서의 nDCG↗][implicit data recommendation nDCG]
 - [추천시스템에서의 Matrix Factorization↗][Matrix Factorization in RS]
 - [추천시스템과 Matrix Decompositions — 1. Determinant and Trace↗][matrix decomposition 01 determinant and trace]
+- [추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors↗][matrix decomposition 02 eigenvalues and eigenvectors]
 
 ## NLP
 
@@ -56,6 +57,7 @@
 [implicit data recommendation nDCG]: {{ site.baseurl }}{% link _posts/2023-01-15-Implicit data recommendation nDCG.md %}
 [Matrix Factorization in RS]: {{ site.baseurl }}{% link _posts/2022-12-27-Matrix Factorization in RS.md %}
 [matrix decomposition 01 determinant and trace]:{{ site.baseurl }}{% link _posts/2022-05-18-matrix decomposition 01 determinant and trace.md %}
+[matrix decomposition 02 eigenvalues and eigenvectors]:{{ site.baseurl }}{% link _posts/2024-07-01-matrix decomposition 02 eigenvalues and eigenvectors.md %}
 
 [lstm]:{{ site.baseurl }}{% link _posts/2022-04-14-lstm.md %}
 [huggingface tokenizer truncation]:{{ site.baseurl }}{% link _posts/2023-11-28-huggingface tokenizer truncation.md %}

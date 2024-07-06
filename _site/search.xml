@@ -3,7 +3,7 @@
   
     <entry>
       <title>추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title>
-      <url>/2024/07/01/matrix-decomposision-02-eigenvalues-and-eigenvectors/</url>
+      <url>/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/</url>
       <content type="text">행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!
 
 
@@ -39,6 +39,8 @@ linear mapping과 이에 연관된 변환 행렬들은 “고유(eigen)” 분�
 
 행렬 \(A\)와 \(A\)의 전치행렬 \(A^\top\)는 같은 고유값을 갖는다. 하지만 반드시 같은 고유벡터를 갖지는 않는다!
 
+고유값, 고유벡터 계산를 계산해보자. 들어가기에 앞서, kernel(=null space)에 대한 정의 리마인드 해보자.
+
 
 
   Example 4.5 고유값, 고유벡터, 고유공간(Eigenspace) 계산하기
@@ -51,49 +53,48 @@ linear mapping과 이에 연관된 변환 행렬들은 “고유(eigen)” 분�
 \end{bmatrix}\]
 
   Step 1: 특성방정식(Characteristic Polynomial)
-고유값과 고유벡터의 정의에 따라 \(Ax=\lambda x\), 즉, \((A-\lambda I)x=0\)를 만족하는 벡터 \(x \ne 0\)가 존재할 것이다.
 
-  \(x\)는 \(0\)벡터가 아니므로,
+  고유값과 고유벡터의 정의에 따라 \(Ax=\lambda x\), 즉, \((A-\lambda I)x=0\)를 만족하는 벡터 \(x \ne 0\)가 존재할 것이다.
 
+  다시 \(Ax=\lambda x\)를 자세히 보면, \((A - \lambda I)x=0\)을 만족하는 \(0\)벡터가 아닌 \(x\)가 고유벡터이다.
 
-</content>
-      <categories>
-        
-      </categories>
-      <tags>
-        
-      </tags>
-      <tags></tags>
-    </entry>
+  고유벡터를 구하고 싶은데, 잠시 \((A-\lambda I)^{-1}\)이 존재하는지 아닌지 보자.
+\((A-\lambda x)^{-1}\)가 존재한다면,  \((A - \lambda I)x=0\)의 양변에 \((A-\lambda x)^{-1}\)를 곱하면 \(x = \mathbf{0}\)이 될 수밖에 없다.
+
+  고로 고유값, 고유벡터의 정의에 의해 \((A-\lambda x)^{-1}\)는 존재하지 말아야 한다.
+이 말은 \((A-\lambda x)\)는 not invertible하다는 것과 동일한 말이고, 
+\(\text{det}(A-\lambda I) = 0\)이라는 것이다.
+
+  즉, \(\text{det}(A-\lambda I) = 0\) 식의 \(\lambda\)를 구하면 그 값이 고유값이다! 와우.
+
+  행렬 \(A\)의 특성 다항식은 \(p_{A}(\lambda) := det(A - \lambda I)\)로 정의된다. \(\lambda\)는 스칼라 값이다.
+특성다항식의 근은 행렬 \(A\)의 고유값이라는 것이다.
+
+  Step 2: 고유값
+
+\[\begin{align} p_A(A) &amp;amp;= \text{det}(A - \lambda I) \\ &amp;amp;= \text{det}(\begin{bmatrix} 4 &amp;amp; 2 \\ 1 &amp;amp; 3 \end{bmatrix} - \begin{bmatrix} \lambda &amp;amp; 0 \\ 0 &amp;amp; \lambda \end{bmatrix}) \\ &amp;amp;= \begin{vmatrix} 4-\lambda &amp;amp; 2 \\ 1 &amp;amp; 3 - \lambda \end{vmatrix} \\ &amp;amp;= (4 - \lambda)(3 - \lambda) - 2 \cdot 1 \\ &amp;amp;= \lambda^2 - 7\lambda + 10 \\ &amp;amp;= (2-\lambda)(5-\lambda) \end{align}\]
+
+  근 \(\lambda_1 = 2\)와 \(\lambda_2 = 5\)를 얻었다.
+
+  Step 3: 고유벡터와 고유값
+
+  고유값에 상응하는 고유벡터를 다음 식으로 얻을 수 있다:
+
+\[\begin{bmatrix} 4 - \lambda &amp;amp; 2 \\ 1 &amp;amp; 3 - \lambda \end{bmatrix}x = \mathbf{0}\]
+
+  \(\lambda = 5\)에 대하여 아래 식이 된다.
+
+\[\begin{bmatrix} 4 - 5 &amp;amp; 2 \\ 1 &amp;amp; 3 - 5 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -1 &amp;amp; 2 \\ 1 &amp;amp; -2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0}\]
+
+  이를 만족하는 \(x\)는 \(x_1 = 2x_2\)을 만족하는 \(x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)라면, 예를 들면 \(\begin{bmatrix} 2 \\ 1 \end{bmatrix}\)같은 벡터가 모두 해가 된다.
+
+  \(\lambda = 2\)에 대해서도 똑같이 풀면, \(x_1 = -x_2\)을 만족하는 \(x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)라면, 예를 들면 \(\begin{bmatrix} 1 \\ -1 \end{bmatrix}\)같은 벡터가 모두 해가 된다.
+
   
-    <entry>
-      <title>Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?</title>
-      <url>/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/</url>
-      <content type="text">127p Example 4.14 (영화 평점과 유저)
 
 
-세 명의 유저 Ali, Beatrix, Chandra가 있고, 4개의 영화 Star Wars, Blade Runner, Amelie, Delicatessen이 있다고 해보자.
-평점은 0(worst)에서 5(best) 사이이고, 데이터는 \(\mathbf{A} \in \mathbb{R}^{4 \times 3}\)으로 나타내어진다.
-각 row는 영화를, column은 유저를 나타낸다.**
-column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}}\)로 나타낼 수 있다.
 
-\(\mathbf{A}\)를 SVD를 사용해 분해(Factoring)하면 유저와 영화의 관계를 알 수 있다! Left-singular 벡터를 \(u_i\), right-singular 벡터를 \(v_j\)라고 하자.
 
-가정 하나를 만든다. ‘유저의 선호도는 \(v_j\)의 선형 조합으로 표현될 수 있음.’ 또, ‘영화의 호감도는 \(u_i\)‘의 선형 조합으로 표현될 수 있다.’
-
-그러므로, SVD의 정의역에 존재하는 벡터는 유저로, 공역에 존재하는 벡터는 영화로 해석될 수 있다.
-
-left-singular vector \(u_1\)은 science fiction에 큰 절대값을 갖고, 큰 first singular value를 갖는다. 그림에서 빨간색으로 칠해진 곳이다.
-그러므로, 이는 특정 영화들(science fiction)에 대해 유저들을 한 타입으로 그룹화한다.
-
-유사하게, first right-singular \(v_1\)은 science fiction 영화들에게 높은 별점을 준 Ali와 Beatrix에게 큰 절댓값을 주게 된다. 이는 \(v1\)이 science fiction을 좋아하는 사람들을 나타내는 것이라 볼 수 있다!
-
-유사하게, \(u2\)는 프랑스 예술 영화 테마를 잘 포착하고 있는 것 같으며, \(v2\)는 Chandra가 그러한 영화를 이상적으로 사랑하는 사람임을 나타낸다.
-공상 과학 영화 애호가는 순수주의자이며, 오직 공상 과학 영화만을 좋아한다. 그래서 공상 과학 영화를 좋아하는 사람 \(v1\)은 공상 과학 테마가 아닌 모든 것에 대해 0점을 준다. 이 논리는 특이값 행렬 \(\Sigma\)의 대각 하부구조에 암시되어 있습니다
-
-이어서..
-
-참고 : Mathematics for Machine Learning
 </content>
       <categories>
         

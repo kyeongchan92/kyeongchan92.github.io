@@ -109,19 +109,19 @@
 
 
 
-<meta name="description" content="127p Example 4.14 (영화 평점과 유저)">
+<meta name="description" content="행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?">
-<meta property="og:url" content="http://localhost:4000/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/">
+<meta property="og:title" content="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors">
+<meta property="og:url" content="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
-<meta property="og:description" content="127p Example 4.14 (영화 평점과 유저)">
+<meta property="og:description" content="행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png">
+<meta property="og:image" content="/assets/images/matrix decomposition 2/compute_eigen.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?">
-<meta name="twitter:description" content="127p Example 4.14 (영화 평점과 유저)">
-<meta name="twitter:image" content="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png">
+<meta name="twitter:title" content="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors">
+<meta name="twitter:description" content="행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!">
+<meta name="twitter:image" content="/assets/images/matrix decomposition 2/compute_eigen.png">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -154,7 +154,7 @@
 
 
 
-  <title>Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까? | Leegang's AI Note</title>
+  <title>추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors | Leegang's AI Note</title>
   
 
 
@@ -326,7 +326,7 @@
   
 
   <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2024/06/24/How-Matrix-Decomposition-can-be-recommender-system/">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kyeongchan Lee">
@@ -346,7 +346,7 @@
           <h1 class="post-title" itemprop="name headline">
           
           
-            Matrix Decomposition은 어떻게 추천시스템이 될 수 있을까?
+            추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors
           
         </h1>
         
@@ -360,8 +360,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2024-06-24T00:00:00+09:00">
-                2024-06-24
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2024-07-01T00:00:00+09:00">
+                2024-07-01
               </time>
             
 
@@ -397,31 +397,97 @@
       
 
       
-        <p>127p Example 4.14 (영화 평점과 유저)
-<img src="/assets/images/how matrix decomposition can be recommender system/rating_matrix.png" alt="0" /></p>
+        <p>행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!</p>
 
-<p>세 명의 유저 Ali, Beatrix, Chandra가 있고, 4개의 영화 Star Wars, Blade Runner, Amelie, Delicatessen이 있다고 해보자.
-평점은 0(worst)에서 5(best) 사이이고, 데이터는 \(\mathbf{A} \in \mathbb{R}^{4 \times 3}\)으로 나타내어진다.
-각 row는 영화를, column은 유저를 나타낸다.<em>**</em>
-column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}}\)로 나타낼 수 있다.</p>
+<blockquote>
+  <p>선형 사상(linear mapping)이란?</p>
 
-<p>\(\mathbf{A}\)를 SVD를 사용해 분해(Factoring)하면 유저와 영화의 관계를 알 수 있다! Left-singular 벡터를 \(u_i\), right-singular 벡터를 \(v_j\)라고 하자.</p>
+  <p>간단히 말해서, 두 벡터를 더한 후 매핑한 결과랑, 각각 매핑하고 더한 결과가 같으면 이 매핑은 linear mapping이다.</p>
 
-<p>가정 하나를 만든다. ‘유저의 선호도는 \(v_j\)의 선형 조합으로 표현될 수 있음.’ 또, ‘영화의 호감도는 \(u_i\)‘의 선형 조합으로 표현될 수 있다.’</p>
+  <p>내가 이해하기론 ‘선형 사상 = 행렬 곱’ 이다.</p>
+</blockquote>
 
-<p>그러므로, SVD의 정의역에 존재하는 벡터는 유저로, 공역에 존재하는 벡터는 영화로 해석될 수 있다.</p>
+<p>모든 선형 사상은 ordered basis에 대해 고유한 변환 행렬(transformation matrix)를 갖는다.
+linear mapping과 이에 연관된 변환 행렬들은 “고유(eigen)” 분석을 하는 거라고 볼 수 있다.
+앞으로 살펴보겠지만, <strong>고유벡터</strong>(eigenvectors)라고 하는 특별한 벡터들이 선형 사상에 의해 어떻게 변형되는가를 <strong>고유값</strong>(eigenvalue)을 통해 알 수 있다.</p>
 
-<p>left-singular vector \(u_1\)은 science fiction에 큰 절대값을 갖고, 큰 first singular value를 갖는다. 그림에서 빨간색으로 칠해진 곳이다.
-그러므로, 이는 특정 영화들(science fiction)에 대해 유저들을 한 타입으로 그룹화한다.</p>
+<blockquote>
+  <p><strong>Definition 4.6.</strong> \(A \in \mathbb{R}^{n \times n}\)를 정방행렬이라고 하자.
+\(A\)가 \(Ax=\lambda x\)를 만족한다면, \(\lambda \in \mathbb{R}\)를 \(A\)의 고유값(eigenvalue)라고 부르고, \(x \in \mathbb{R}^n \backslash \left\{ 0 \right\}\)은 이에 상응하는 고유벡터(eigenvector)라고 부른다.</p>
+</blockquote>
 
-<p>유사하게, first right-singular \(v_1\)은 science fiction 영화들에게 높은 별점을 준 Ali와 Beatrix에게 큰 절댓값을 주게 된다. 이는 \(v1\)이 science fiction을 좋아하는 사람들을 나타내는 것이라 볼 수 있다!</p>
+<p>이를 고유값 방정식(eigenvalue equation)이라고 한다.</p>
 
-<p>유사하게, \(u2\)는 프랑스 예술 영화 테마를 잘 포착하고 있는 것 같으며, \(v2\)는 Chandra가 그러한 영화를 이상적으로 사랑하는 사람임을 나타낸다.<br />
-공상 과학 영화 애호가는 순수주의자이며, 오직 공상 과학 영화만을 좋아한다. 그래서 공상 과학 영화를 좋아하는 사람 \(v1\)은 공상 과학 테마가 아닌 모든 것에 대해 0점을 준다. 이 논리는 특이값 행렬 \(\Sigma\)의 대각 하부구조에 암시되어 있습니다</p>
+<hr />
 
-<p>이어서..</p>
+<blockquote>
+  <p><strong>Definition 4.7</strong> (Collinearity and Codirection). 같은 방향을 가리키는 두 벡터를 codirected라고 부른다. 같은 방향을 가리키거나 반대 방향을 가리키는 경우엔 collinear라고 한다.</p>
+</blockquote>
 
-<p>참고 : Mathematics for Machine Learning</p>
+<p>비고. 만약 \(x\)가 \(A\)의 고유벡터이고 \(\lambda\)가 고유값이라면, 어떠한 \(c \in \mathbb{R} \backslash \left\{ 0 \right\}\)에 대해서 \(cx\)는 A의 고유벡터이다.
+왜냐하면 \(A(cx) = cAx = c \lambda x = c \lambda x = \lambda (cx)\), 즉 \(A(cx) = \lambda (cx)\) (고유값 방정식 만족!)이기 때문이다.
+그러므로, x와 collinear 관계에 있는 모든 벡터들 또한 A의 고유벡터이다.</p>
+
+<p>기하학적으로 0이 아닌 고유값에 대한 고유벡터는 선형 사상에 의해 고유값만큼 늘어난다(stretched). 그리고 고유벡터는 선형 사상 \(\phi\)에 의해 방향이 변하지 않는 벡터이다.</p>
+
+<p>행렬 \(A\)와 \(A\)의 전치행렬 \(A^\top\)는 같은 고유값을 갖는다. 하지만 반드시 같은 고유벡터를 갖지는 않는다!</p>
+
+<p>고유값, 고유벡터 계산를 계산해보자. 들어가기에 앞서, kernel(=null space)에 대한 정의 리마인드 해보자.</p>
+
+<hr />
+<blockquote>
+  <p><strong>Example 4.5</strong> 고유값, 고유벡터, 고유공간(Eigenspace) 계산하기</p>
+
+  <p>아래의 2 X 2 행렬 \(A\)에 대해 고유값과 고유 벡터를 찾아보자.</p>
+
+\[A = \begin{bmatrix}
+4 &amp; 2 \\
+1 &amp; 3
+\end{bmatrix}\]
+
+  <p><strong>Step 1: 특성방정식(Characteristic Polynomial)</strong></p>
+
+  <p>고유값과 고유벡터의 정의에 따라 \(Ax=\lambda x\), 즉, \((A-\lambda I)x=0\)를 만족하는 벡터 \(x \ne 0\)가 존재할 것이다.</p>
+
+  <p>다시 \(Ax=\lambda x\)를 자세히 보면, \((A - \lambda I)x=0\)을 만족하는 \(0\)벡터가 아닌 \(x\)가 고유벡터이다.</p>
+
+  <p>고유벡터를 구하고 싶은데, 잠시 \((A-\lambda I)^{-1}\)이 존재하는지 아닌지 보자.
+\((A-\lambda x)^{-1}\)가 존재한다면,  \((A - \lambda I)x=0\)의 양변에 \((A-\lambda x)^{-1}\)를 곱하면 \(x = \mathbf{0}\)이 될 수밖에 없다.</p>
+
+  <p>고로 고유값, 고유벡터의 정의에 의해 \((A-\lambda x)^{-1}\)는 존재하지 말아야 한다.
+이 말은 \((A-\lambda x)\)는 not invertible하다는 것과 동일한 말이고, 
+\(\text{det}(A-\lambda I) = 0\)이라는 것이다.</p>
+
+  <p>즉, \(\text{det}(A-\lambda I) = 0\) 식의 \(\lambda\)를 구하면 그 값이 고유값이다! 와우.</p>
+
+  <p>행렬 \(A\)의 특성 다항식은 \(p_{A}(\lambda) := det(A - \lambda I)\)로 정의된다. \(\lambda\)는 스칼라 값이다.
+특성다항식의 근은 행렬 \(A\)의 고유값이라는 것이다.</p>
+
+  <p><strong>Step 2: 고유값</strong></p>
+
+\[\begin{align} p_A(A) &amp;= \text{det}(A - \lambda I) \\ &amp;= \text{det}(\begin{bmatrix} 4 &amp; 2 \\ 1 &amp; 3 \end{bmatrix} - \begin{bmatrix} \lambda &amp; 0 \\ 0 &amp; \lambda \end{bmatrix}) \\ &amp;= \begin{vmatrix} 4-\lambda &amp; 2 \\ 1 &amp; 3 - \lambda \end{vmatrix} \\ &amp;= (4 - \lambda)(3 - \lambda) - 2 \cdot 1 \\ &amp;= \lambda^2 - 7\lambda + 10 \\ &amp;= (2-\lambda)(5-\lambda) \end{align}\]
+
+  <p>근 \(\lambda_1 = 2\)와 \(\lambda_2 = 5\)를 얻었다.</p>
+
+  <p><strong>Step 3: 고유벡터와 고유값</strong></p>
+
+  <p>고유값에 상응하는 고유벡터를 다음 식으로 얻을 수 있다:</p>
+
+\[\begin{bmatrix} 4 - \lambda &amp; 2 \\ 1 &amp; 3 - \lambda \end{bmatrix}x = \mathbf{0}\]
+
+  <p>\(\lambda = 5\)에 대하여 아래 식이 된다.</p>
+
+\[\begin{bmatrix} 4 - 5 &amp; 2 \\ 1 &amp; 3 - 5 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} -1 &amp; 2 \\ 1 &amp; -2 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \mathbf{0}\]
+
+  <p>이를 만족하는 \(x\)는 \(x_1 = 2x_2\)을 만족하는 \(x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)라면, 예를 들면 \(\begin{bmatrix} 2 \\ 1 \end{bmatrix}\)같은 벡터가 모두 해가 된다.</p>
+
+  <p>\(\lambda = 2\)에 대해서도 똑같이 풀면, \(x_1 = -x_2\)을 만족하는 \(x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)라면, 예를 들면 \(\begin{bmatrix} 1 \\ -1 \end{bmatrix}\)같은 벡터가 모두 해가 된다.</p>
+
+  <p><img src="/assets/images/matrix decomposition 2/compute_eigen.png" alt="0" /></p>
+</blockquote>
+
+<hr />
+
 
       
     </div>
@@ -460,10 +526,6 @@ column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}
       
         <div class="post-nav" id="post-nav-id">
           <div class="post-nav-next post-nav-item">
-            
-              <a href="/2024/07/01/matrix-decomposision-02-eigenvalues-and-eigenvectors/" rel="next" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors">
-                <i class="fa fa-chevron-left"></i> 추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors
-              </a>
             
           </div>
 
@@ -543,7 +605,7 @@ column 벡터는 \(x_{\text{Ali}}\), \(x_{\text{Beatrix}}\), \(x_{\text{Chandra}
           
             <div class="site-state-item site-state-posts">
               <a href="">
-                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
