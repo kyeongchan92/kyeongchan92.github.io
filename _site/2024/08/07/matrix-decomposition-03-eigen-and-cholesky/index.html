@@ -109,19 +109,19 @@
 
 
 
-<meta name="description" content="Node2vec은 말그대로 노드를 벡터표현으로 나타내는 방법 중 하나입니다. 모델의 목적은 그래프 속에서 유사한(이웃한) 노드들이 임베딩 공간에서도 근처에 있도록 매핑하는 것입니다. 즉, 한 노드 입장에서 이웃 노드가 등장할 확률을 최대화하는 것입니다. 논문 : node2vec: Scalable Feature Learning for Networks">
+<meta name="description" content="Graphical Intuition in Two Dimensions">
 <meta name="keywords" content="lovit, hyunjoong kim, machine learning, 한국어 자연어처리">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Node2Vec">
-<meta property="og:url" content="http://localhost:4000/2023/01/13/Node2Vec/">
+<meta property="og:title" content="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition">
+<meta property="og:url" content="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">
 <meta property="og:site_name" content="Leegang&apos;s AI Note">
-<meta property="og:description" content="Node2vec은 말그대로 노드를 벡터표현으로 나타내는 방법 중 하나입니다. 모델의 목적은 그래프 속에서 유사한(이웃한) 노드들이 임베딩 공간에서도 근처에 있도록 매핑하는 것입니다. 즉, 한 노드 입장에서 이웃 노드가 등장할 확률을 최대화하는 것입니다. 논문 : node2vec: Scalable Feature Learning for Networks">
+<meta property="og:description" content="Graphical Intuition in Two Dimensions">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="/assets/images/node2vec0.png">
+<meta property="og:image" content="/assets/images/matrix decomposition 3/transform.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Node2Vec">
-<meta name="twitter:description" content="Node2vec은 말그대로 노드를 벡터표현으로 나타내는 방법 중 하나입니다. 모델의 목적은 그래프 속에서 유사한(이웃한) 노드들이 임베딩 공간에서도 근처에 있도록 매핑하는 것입니다. 즉, 한 노드 입장에서 이웃 노드가 등장할 확률을 최대화하는 것입니다. 논문 : node2vec: Scalable Feature Learning for Networks">
-<meta name="twitter:image" content="/assets/images/node2vec0.png">
+<meta name="twitter:title" content="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition">
+<meta name="twitter:description" content="Graphical Intuition in Two Dimensions">
+<meta name="twitter:image" content="/assets/images/matrix decomposition 3/transform.png">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -154,7 +154,7 @@
 
 
 
-  <title>Node2Vec | Leegang's AI Note</title>
+  <title>추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition | Leegang's AI Note</title>
   
 
 
@@ -326,7 +326,7 @@
   
 
   <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2023/01/13/Node2Vec/">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kyeongchan Lee">
@@ -346,7 +346,7 @@
           <h1 class="post-title" itemprop="name headline">
           
           
-            Node2Vec
+            추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition
           
         </h1>
         
@@ -360,8 +360,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2023-01-13T00:00:00+09:00">
-                2023-01-13
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2024-08-07T00:00:00+09:00">
+                2024-08-07
               </time>
             
 
@@ -397,11 +397,64 @@
       
 
       
-        <p>Node2vec은 말그대로 노드를 벡터표현으로 나타내는 방법 중 하나입니다. 모델의 목적은 그래프 속에서 유사한(이웃한) 노드들이 임베딩 공간에서도 근처에 있도록 매핑하는 것입니다. 즉, 한 노드 입장에서 이웃 노드가 등장할 확률을 최대화하는 것입니다.
-논문 : <a href="https://arxiv.org/abs/1607.00653">node2vec: Scalable Feature Learning for Networks</a></p>
+        <p><strong>Graphical Intuition in Two Dimensions</strong></p>
 
-<p><img src="/assets/images/node2vec0.png" alt="0" /></p>
+<p>determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해로 들어가보자. Figure 4.4는 행렬 \(\mathbf{A}_1\), …, \(\mathbf{A}_5\)와 이들에 의한 점들의 변형을 보여주고 있다.</p>
 
+<ul>
+  <li>\(\mathbf{A}_1 = \begin{bmatrix} \frac{1}{2} &amp; 1 \\
+0 &amp; 2
+\end{bmatrix}\). 두 고유벡터들의 방향이 2차원 canonical basis 벡터들과 나란한 상황이다. 수직축 방향으로 2만큼 늘어나고(고유값 \(\lambda_1=2\)), 수평축 방향으로 \(\frac{1}{2}\)만큼 압축된다. 넓이는 보존된다.</li>
+  <li>\(\mathbf{A}_2 = \begin{bmatrix} 1 &amp; \frac{1}{2} \\
+0 &amp; 1
+\end{bmatrix}\)은 전단 매핑(sheering mapping)인데, 즉, y축의 양의 방향에 있다면 오른쪽으로, 음의 방향에 있다면 왼쪽으로 전단한다. 이 매핑도 넓이를 보존한다. 고유값은 두 값이 동일한 \(\lambda_1=1=\lambda_2\)이며, 고유 벡터들은 collinear이다. 즉, 그림처럼 수평 축 방향으로만 늘어나거나 줄어든다.</li>
+  <li>\(\mathbf{A}_3 = \begin{bmatrix} \cos{\frac{\pi}{6}} &amp; -\sin{\frac{\pi}{6}} \\
+\sin{\frac{\pi}{6}} &amp; \cos{\frac{\pi}{6}}
+\end{bmatrix}=\frac{1}{2}\begin{bmatrix} \sqrt{3} &amp; --1 \\
+1 &amp; \sqrt{3}
+\end{bmatrix}\)은 점들을 \(\frac{\pi}{6}\), 즉 30도만큼 반시계 방향으로 회전시키다. 그리고 허수의 고유값을 갖는다.</li>
+  <li>\(\mathbf{A}_4 = \begin{bmatrix} 1 &amp; -1 \\
+-1 &amp; 1
+\end{bmatrix}\)은 표준 기저에서의 2차원 도메인을 1차원으로 줄이는 매핑이다. 한 고유값이 0이기 때문에, 이에 해당하는 파란색 고유벡터 방향의 점들은 넓이가 0이 된다. 반면 이와 수직인 빨간색 고유벡터 방향으로는 고유값인 \(\lambda_2=2\)만큼 늘어난다.</li>
+  <li>\(\mathbf{A}_5 = \begin{bmatrix} 1 &amp; \frac{1}{2} \\
+\frac{1}{2} &amp; 1
+\end{bmatrix}\)는 전단도 하고 늘리기도 하는 매핑이다. 이 행렬의 determinant는 \(|\det(\mathbf{A}_5)|=\frac{3}{4}\)이기 때문에, 넓이를 75%로 만든다. 빨간 고유벡터 방향의 넓이는 \(\lambda_2=1.5\)에 의해 늘어나고, 파란 고유벡터 방향의 넓이는 \(\lambda_1=0.5\)에 의해 줄어든다.</li>
+</ul>
+
+<p><img src="/assets/images/matrix decomposition 3/transform.png" alt="0" /></p>
+
+<hr />
+
+<blockquote>
+  <p>Theorem 4.12. 서로 다른 고유값 \(\lambda_1, ..., \lambda_n\)을 갖는 행렬 \(\mathbf{A}\in \mathbb{R}^{n\times n}\)의 고유벡터 \(x_1, ..., x_n\)는 선형 독립이다.</p>
+
+</blockquote>
+
+<p>위 정리는 n개의 서로 다른 고유값을 갖는 행렬의 고유 벡터들은  \(\mathbb{R}^n\)의 기저를 형성한다는 것이 된다.</p>
+
+<blockquote>
+  <p>Definition 4.14. 만약 정방행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 \(n\)보다 적은 선형 독립의 고유 벡터를 갖는다면 \(defective\)이다.</p>
+
+</blockquote>
+
+<p>\(non-defective\) 행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 필수적으로 \(n\)개의 서로 다른 고유값을 필요로 하는 것은 아니다. 하지만, 고유 벡터들이 \(\mathbb{R}^n\)의 기저를 형성해야한다.</p>
+
+<hr />
+
+<h1 id="43-cholesky-decomposition">4.3 Cholesky Decomposition</h1>
+
+<p>머신러닝에서 우리가 자주 마주하는 특별한 유형의 행렬을 분해하는데는 다양한 방법들이 있다. 양의 실수에서 \(9\)가 \(3\cdot 3\)으로 분해되는걸 생각해보자. 행렬에 대해서 비슷하게 하려면 좀 조심해야한다. symmetric, positive definite matrices에 대해서는, Cholesky 분해가 유용하다!</p>
+
+<blockquote>
+  <p>Theorem 4.18 (Cholesky Decomposition). Symmetric, positive definite 행렬 \(\mathbf{A}\)는 \(\mathbf{A}=\mathbf{L}\mathbf{L}^{\top}\)로 분해될 수 있다. \(\mathbf{L}\)은 양의 대각 요소를 가진 lower triangular 행렬이다.</p>
+
+\[\begin{bmatrix}a_{11} &amp; \cdots &amp; a_{1n} \\\vdots &amp; \ddots &amp; \vdots \\a_{n1} &amp; \cdots &amp; a_{nn}\end{bmatrix}=\begin{bmatrix}l_{11} &amp; \cdots &amp; 0 \\\vdots &amp; \ddots &amp; \vdots \\l_{n1} &amp; \cdots &amp; l_{nn}\end{bmatrix}\begin{bmatrix}l_{11} &amp; \cdots &amp; l_{1n} \\\vdots &amp; \ddots &amp; \vdots \\0 &amp; \cdots &amp; l_{nn}\end{bmatrix}\]
+
+  <p>이 때의 \(\mathbf{L}\)을 \(\mathbf{A}\)의 Cholesky factor라고 부르며, \(\mathbf{L}\)은 유일하다.</p>
+
+</blockquote>
+
+<p>Symmetric positive definite 행렬은 3단원에 나오는데, 잠시 살펴보자.</p>
 
       
     </div>
@@ -441,18 +494,14 @@
         <div class="post-nav" id="post-nav-id">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2023/01/15/Implicit-data-recommendation-nDCG/" rel="next" title="Implicit data 추천시스템에서의 nDCG">
-                <i class="fa fa-chevron-left"></i> Implicit data 추천시스템에서의 nDCG
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2022/12/27/Matrix-Factorization-in-RS/" rel="prev" title="추천시스템에서의 Matrix Factorization">
-                추천시스템에서의 Matrix Factorization <i class="fa fa-chevron-right"></i>
+              <a href="/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/" rel="prev" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors">
+                추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -507,8 +556,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/assets/images/profile.jpg"
@@ -578,6 +636,31 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-1"> <a class="nav-link" href="#43-cholesky-decomposition"> <span class="nav-text">4.3 Cholesky Decomposition</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
