@@ -59,3 +59,41 @@ $$non-defective$$ 행렬 $$\mathbf{A} \in \mathbb{R}^{n \times n}$$이 필수적
 > 
 
 Symmetric positive definite 행렬은 3단원에 나오는데, 잠시 살펴보자.
+
+> Definition 3.4 (Symmetric, Positive Definite Matrix)
+> 
+> $$
+> \forall x \in V \setminus \left\{ \mathbf{0}\right\} : x^{\top}\mathbf{A} x > 0
+> $$
+> 
+> 위 식을 만족하는 대칭 행렬 $$\mathbf{A} \in \mathbb{R}^{n \times n}$$을 symmetric, positive definite,  또는 그냥 positive definite이라고 부른다.
+> 
+> 예를 들어 $$\mathbf{A} = \begin{bmatrix} 9 & 6 \\ 6 & 5  \end{bmatrix}$$의 경우, $$\begin{bmatrix} x_1 & x_2 \end{bmatrix}
+> \begin{bmatrix} 9 & 6 \\ 6 & 5  \end{bmatrix}
+> \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = (3x_1 + 2x_2)^2 + x_2^2 > 0$$이기 때문에 symmetric, positive definite이다. 
+> 
+
+이제 symmetric positive definite 행렬에 대해 Cholesky 분해하는 예제를 보자.
+
+> Example 4.10 (Cholesky Factorization)
+Symmetric, positive definite 행렬 $$\mathbf{A} \in \mathbb{R}^{3 \times 3}$$이 있다고 하자. Cholesky 분해 $$\mathbf{A}=\mathbf{L}\mathbf{L}^\top$$을 해보자.
+> 
+> 
+> $$
+> \mathbf{A} = \begin{bmatrix}a_{11} & a_{21} & a_{31} \\ a_{21} & a_{22} & a_{32} \\a_{31} & a_{32} & a_{33}\end{bmatrix}=\mathbf{L}\mathbf{L}^{\top}=\begin{bmatrix}l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\l_{31} & l_{32} & l_{33}\end{bmatrix} \begin{bmatrix}l_{11} & l_{21} & l_{31} \\ 0 & l_{22} & l_{32} \\0 & 0 & l_{33}\end{bmatrix}
+> $$
+> 
+> 우변을 곱한 결과는
+> 
+> $$
+> \mathbf{A} = \begin{bmatrix}l_{11}^2 & l_{21}l_{11} & l_{31}l_{11} \\ l_{21}l_{11} & l_{21}^2 + l_{22}^2 & l_{31}l_{21} + l_{32}l_{22} \\l_{31}l_{11} & l_{31}l_{21} + l_{32}l_{22} & l_{31}^2 + l_{32}^2 + l_{33}^2\end{bmatrix}
+> $$
+> 
+> 그럼 다음과 같은 관계가 도출된다.
+> 
+> $$
+> l_{11} = \sqrt{a_{11}},\;\; l_{22}=\sqrt{a_{22}-l_{21}^2}, \;\; l_{33}=\sqrt{a_{33} - (l_{31}^2) + l_{32}^2)}
+> $$
+> 
+> 이런 방식으로 어떠한 symmetric, positive definite $$3 \times 3$$ 행렬에 대하여도 Cholesky 분해를 할 수 있다.
+

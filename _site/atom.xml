@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-08-07T22:53:06+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;&lt;strong&gt;Graphical Intuition in Two Dimensions&lt;/strong&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-08-14T16:45:13+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;&lt;strong&gt;Graphical Intuition in Two Dimensions&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해로 들어가보자. Figure 4.4는 행렬 \(\mathbf{A}_1\), …, \(\mathbf{A}_5\)와 이들에 의한 점들의 변형을 보여주고 있다.&lt;/p&gt;
 
@@ -55,7 +55,39 @@
 
 &lt;/blockquote&gt;
 
-&lt;p&gt;Symmetric positive definite 행렬은 3단원에 나오는데, 잠시 살펴보자.&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">Graphical Intuition in Two Dimensions</summary></entry><entry><title type="html">추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title><link href="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors" /><published>2024-07-01T00:00:00+09:00</published><updated>2024-07-01T00:00:00+09:00</updated><id>http://localhost:4000/2024/07/01/matrix%20decomposition%2002%20eigenvalues%20and%20eigenvectors</id><content type="html" xml:base="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">&lt;p&gt;행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!&lt;/p&gt;
+&lt;p&gt;Symmetric positive definite 행렬은 3단원에 나오는데, 잠시 살펴보자.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Definition 3.4 (Symmetric, Positive Definite Matrix)&lt;/p&gt;
+
+\[\forall x \in V \setminus \left\{ \mathbf{0}\right\} : x^{\top}\mathbf{A} x &amp;gt; 0\]
+
+  &lt;p&gt;위 식을 만족하는 대칭 행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)을 symmetric, positive definite,  또는 그냥 positive definite이라고 부른다.&lt;/p&gt;
+
+  &lt;p&gt;예를 들어 \(\mathbf{A} = \begin{bmatrix} 9 &amp;amp; 6 \\ 6 &amp;amp; 5  \end{bmatrix}\)의 경우, \(\begin{bmatrix} x_1 &amp;amp; x_2 \end{bmatrix}
+\begin{bmatrix} 9 &amp;amp; 6 \\ 6 &amp;amp; 5  \end{bmatrix}
+\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = (3x_1 + 2x_2)^2 + x_2^2 &amp;gt; 0\)이기 때문에 symmetric, positive definite이다.&lt;/p&gt;
+
+&lt;/blockquote&gt;
+
+&lt;p&gt;이제 symmetric positive definite 행렬에 대해 Cholesky 분해하는 예제를 보자.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Example 4.10 (Cholesky Factorization)
+Symmetric, positive definite 행렬 \(\mathbf{A} \in \mathbb{R}^{3 \times 3}\)이 있다고 하자. Cholesky 분해 \(\mathbf{A}=\mathbf{L}\mathbf{L}^\top\)을 해보자.&lt;/p&gt;
+
+\[\mathbf{A} = \begin{bmatrix}a_{11} &amp;amp; a_{21} &amp;amp; a_{31} \\ a_{21} &amp;amp; a_{22} &amp;amp; a_{32} \\a_{31} &amp;amp; a_{32} &amp;amp; a_{33}\end{bmatrix}=\mathbf{L}\mathbf{L}^{\top}=\begin{bmatrix}l_{11} &amp;amp; 0 &amp;amp; 0 \\ l_{21} &amp;amp; l_{22} &amp;amp; 0 \\l_{31} &amp;amp; l_{32} &amp;amp; l_{33}\end{bmatrix} \begin{bmatrix}l_{11} &amp;amp; l_{21} &amp;amp; l_{31} \\ 0 &amp;amp; l_{22} &amp;amp; l_{32} \\0 &amp;amp; 0 &amp;amp; l_{33}\end{bmatrix}\]
+
+  &lt;p&gt;우변을 곱한 결과는&lt;/p&gt;
+
+\[\mathbf{A} = \begin{bmatrix}l_{11}^2 &amp;amp; l_{21}l_{11} &amp;amp; l_{31}l_{11} \\ l_{21}l_{11} &amp;amp; l_{21}^2 + l_{22}^2 &amp;amp; l_{31}l_{21} + l_{32}l_{22} \\l_{31}l_{11} &amp;amp; l_{31}l_{21} + l_{32}l_{22} &amp;amp; l_{31}^2 + l_{32}^2 + l_{33}^2\end{bmatrix}\]
+
+  &lt;p&gt;그럼 다음과 같은 관계가 도출된다.&lt;/p&gt;
+
+\[l_{11} = \sqrt{a_{11}},\;\; l_{22}=\sqrt{a_{22}-l_{21}^2}, \;\; l_{33}=\sqrt{a_{33} - (l_{31}^2) + l_{32}^2)}\]
+
+  &lt;p&gt;이런 방식으로 어떠한 symmetric, positive definite \(3 \times 3\) 행렬에 대하여도 Cholesky 분해를 할 수 있다.&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">Graphical Intuition in Two Dimensions</summary></entry><entry><title type="html">추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title><link href="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors" /><published>2024-07-01T00:00:00+09:00</published><updated>2024-07-01T00:00:00+09:00</updated><id>http://localhost:4000/2024/07/01/matrix%20decomposition%2002%20eigenvalues%20and%20eigenvectors</id><content type="html" xml:base="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">&lt;p&gt;행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;선형 사상(linear mapping)이란?&lt;/p&gt;

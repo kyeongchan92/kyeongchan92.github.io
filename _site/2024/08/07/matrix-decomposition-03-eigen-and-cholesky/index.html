@@ -456,6 +456,39 @@
 
 <p>Symmetric positive definite 행렬은 3단원에 나오는데, 잠시 살펴보자.</p>
 
+<blockquote>
+  <p>Definition 3.4 (Symmetric, Positive Definite Matrix)</p>
+
+\[\forall x \in V \setminus \left\{ \mathbf{0}\right\} : x^{\top}\mathbf{A} x &gt; 0\]
+
+  <p>위 식을 만족하는 대칭 행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)을 symmetric, positive definite,  또는 그냥 positive definite이라고 부른다.</p>
+
+  <p>예를 들어 \(\mathbf{A} = \begin{bmatrix} 9 &amp; 6 \\ 6 &amp; 5  \end{bmatrix}\)의 경우, \(\begin{bmatrix} x_1 &amp; x_2 \end{bmatrix}
+\begin{bmatrix} 9 &amp; 6 \\ 6 &amp; 5  \end{bmatrix}
+\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = (3x_1 + 2x_2)^2 + x_2^2 &gt; 0\)이기 때문에 symmetric, positive definite이다.</p>
+
+</blockquote>
+
+<p>이제 symmetric positive definite 행렬에 대해 Cholesky 분해하는 예제를 보자.</p>
+
+<blockquote>
+  <p>Example 4.10 (Cholesky Factorization)
+Symmetric, positive definite 행렬 \(\mathbf{A} \in \mathbb{R}^{3 \times 3}\)이 있다고 하자. Cholesky 분해 \(\mathbf{A}=\mathbf{L}\mathbf{L}^\top\)을 해보자.</p>
+
+\[\mathbf{A} = \begin{bmatrix}a_{11} &amp; a_{21} &amp; a_{31} \\ a_{21} &amp; a_{22} &amp; a_{32} \\a_{31} &amp; a_{32} &amp; a_{33}\end{bmatrix}=\mathbf{L}\mathbf{L}^{\top}=\begin{bmatrix}l_{11} &amp; 0 &amp; 0 \\ l_{21} &amp; l_{22} &amp; 0 \\l_{31} &amp; l_{32} &amp; l_{33}\end{bmatrix} \begin{bmatrix}l_{11} &amp; l_{21} &amp; l_{31} \\ 0 &amp; l_{22} &amp; l_{32} \\0 &amp; 0 &amp; l_{33}\end{bmatrix}\]
+
+  <p>우변을 곱한 결과는</p>
+
+\[\mathbf{A} = \begin{bmatrix}l_{11}^2 &amp; l_{21}l_{11} &amp; l_{31}l_{11} \\ l_{21}l_{11} &amp; l_{21}^2 + l_{22}^2 &amp; l_{31}l_{21} + l_{32}l_{22} \\l_{31}l_{11} &amp; l_{31}l_{21} + l_{32}l_{22} &amp; l_{31}^2 + l_{32}^2 + l_{33}^2\end{bmatrix}\]
+
+  <p>그럼 다음과 같은 관계가 도출된다.</p>
+
+\[l_{11} = \sqrt{a_{11}},\;\; l_{22}=\sqrt{a_{22}-l_{21}^2}, \;\; l_{33}=\sqrt{a_{33} - (l_{31}^2) + l_{32}^2)}\]
+
+  <p>이런 방식으로 어떠한 symmetric, positive definite \(3 \times 3\) 행렬에 대하여도 Cholesky 분해를 할 수 있다.</p>
+</blockquote>
+
+
       
     </div>
 
