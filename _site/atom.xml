@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-08-15T22:40:25+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;이번엔 내용이 좀 많습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-08-18T21:04:51+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;이번엔 내용이 좀 많고 어려웠습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄&lt;/p&gt;
 
-&lt;p&gt;좌표를 잃지 않기 위해 4단원 ‘Matrix Decompositions의 목차를 다시 한 번 정리하고 들어가보자.&lt;/p&gt;
+&lt;p&gt;좌표를 잃지 않기 위해 4단원 ‘Matrix Decompositions의 목차를 다시 한 번 정리하고 오늘 다룰 부분을 알아보자.&lt;/p&gt;
 
 &lt;p&gt;4.1 Determinant and Trace&lt;/p&gt;
 
@@ -28,6 +28,8 @@
 
 &lt;p&gt;&lt;strong&gt;Graphical Intuition in Two Dimensions&lt;/strong&gt;&lt;/p&gt;
 
+&lt;p&gt;&lt;img src=&quot;/assets/images/matrix decomposition 3/transform.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
+
 &lt;p&gt;determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해로 들어가보자. Figure 4.4는 행렬 \(\mathbf{A}_1\), …, \(\mathbf{A}_5\)와 이들에 의한 점들의 변형을 보여주고 있다.&lt;/p&gt;
 
 &lt;ul&gt;
@@ -49,8 +51,6 @@
 \frac{1}{2} &amp;amp; 1
 \end{bmatrix}\)는 전단도 하고 늘리기도 하는 매핑이다. 이 행렬의 determinant는 \(|\det(\mathbf{A}_5)|=\frac{3}{4}\)이기 때문에, 넓이를 75%로 만든다. 빨간 고유벡터 방향의 넓이는 \(\lambda_2=1.5\)에 의해 늘어나고, 파란 고유벡터 방향의 넓이는 \(\lambda_1=0.5\)에 의해 줄어든다.&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/matrix decomposition 3/transform.png&quot; alt=&quot;0&quot; /&gt;&lt;/p&gt;
 
 &lt;hr /&gt;
 
@@ -296,7 +296,7 @@ p_2=\frac{1}{\sqrt{2}} \begin{bmatrix}
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;고유값 분해는 정방행렬에 대해서만 사용된다. 일반적인 형태의 행렬을 분해하면 매우 유용할 것이다! 다음 챕터에서 일반적인 형태의 행렬 분해 방법인 singular value decomposition에 대해 알아본다!&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">이번엔 내용이 좀 많습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄</summary></entry><entry><title type="html">추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title><link href="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors" /><published>2024-07-01T00:00:00+09:00</published><updated>2024-07-01T00:00:00+09:00</updated><id>http://localhost:4000/2024/07/01/matrix%20decomposition%2002%20eigenvalues%20and%20eigenvectors</id><content type="html" xml:base="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">&lt;p&gt;행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!&lt;/p&gt;
+&lt;p&gt;고유값 분해는 정방행렬에 대해서만 사용된다. 일반적인 형태의 행렬을 분해하면 매우 유용할 것이다! 다음 챕터에서 일반적인 형태의 행렬 분해 방법인 singular value decomposition에 대해 알아본다!&lt;/p&gt;</content><author><name>Kyeongchan Lee</name></author><summary type="html">이번엔 내용이 좀 많고 어려웠습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄</summary></entry><entry><title type="html">추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors</title><link href="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 2. Eigenvalues and Eigenvectors" /><published>2024-07-01T00:00:00+09:00</published><updated>2024-07-01T00:00:00+09:00</updated><id>http://localhost:4000/2024/07/01/matrix%20decomposition%2002%20eigenvalues%20and%20eigenvectors</id><content type="html" xml:base="http://localhost:4000/2024/07/01/matrix-decomposition-02-eigenvalues-and-eigenvectors/">&lt;p&gt;행렬의 특성과 선형 사상(linear mapping)을 새로운 관점으로 살펴보자!&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;선형 사상(linear mapping)이란?&lt;/p&gt;

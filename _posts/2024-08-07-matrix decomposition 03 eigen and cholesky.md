@@ -5,9 +5,9 @@ categories:
 tags:
 ---
 
-이번엔 내용이 좀 많습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄
+이번엔 내용이 좀 많고 어려웠습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄
 
-좌표를 잃지 않기 위해 4단원 ‘Matrix Decompositions의 목차를 다시 한 번 정리하고 들어가보자.
+좌표를 잃지 않기 위해 4단원 ‘Matrix Decompositions의 목차를 다시 한 번 정리하고 오늘 다룰 부분을 알아보자.
 
 4.1 Determinant and Trace
 
@@ -34,6 +34,8 @@ Eigenvector 이야기가 아직 끝나지 않았다!
 
 **Graphical Intuition in Two Dimensions**
 
+![0](/assets/images/matrix decomposition 3/transform.png)
+
 determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해로 들어가보자. Figure 4.4는 행렬 $$\mathbf{A}_1$$, …, $$\mathbf{A}_5$$와 이들에 의한 점들의 변형을 보여주고 있다.
 
 - $$\mathbf{A}_1 = \begin{bmatrix} \frac{1}{2} & 1 \\
@@ -54,17 +56,15 @@ determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해�
 \frac{1}{2} & 1
 \end{bmatrix}$$는 전단도 하고 늘리기도 하는 매핑이다. 이 행렬의 determinant는 $$|\det(\mathbf{A}_5)|=\frac{3}{4}$$이기 때문에, 넓이를 75%로 만든다. 빨간 고유벡터 방향의 넓이는 $$\lambda_2=1.5$$에 의해 늘어나고, 파란 고유벡터 방향의 넓이는 $$\lambda_1=0.5$$에 의해 줄어든다.
 
-![0](/assets/images/matrix decomposition 3/transform.png)
+
 
 ---
 
 > Theorem 4.12. 서로 다른 고유값 $$\lambda_1, ..., \lambda_n$$을 갖는 행렬 $$\mathbf{A}\in \mathbb{R}^{n\times n}$$의 고유벡터 $$x_1, ..., x_n$$는 선형 독립이다.
-> 
 
 위 정리는 n개의 서로 다른 고유값을 갖는 행렬의 고유 벡터들은  $$\mathbb{R}^n$$의 기저를 형성한다는 것이 된다.
 
 > Definition 4.14. 만약 정방행렬 $$\mathbf{A} \in \mathbb{R}^{n \times n}$$이 $$n$$보다 적은 선형 독립의 고유 벡터를 갖는다면 $$defective$$이다.
-> 
 
 $$non-defective$$ 행렬 $$\mathbf{A} \in \mathbb{R}^{n \times n}$$이 필수적으로 $$n$$개의 서로 다른 고유값을 필요로 하는 것은 아니다. 하지만, 고유 벡터들이 $$\mathbb{R}^n$$의 기저를 형성해야한다. 
 
@@ -78,7 +78,6 @@ $$non-defective$$ 행렬 $$\mathbf{A} \in \mathbb{R}^{n \times n}$$이 필수적
 > 
 > 
 > $$
-> 
 > \begin{bmatrix}a_{11} & \cdots & a_{1n} \\\vdots & \ddots & \vdots \\a_{n1} & \cdots & a_{nn}\end{bmatrix}=\begin{bmatrix}l_{11} & \cdots & 0 \\\vdots & \ddots & \vdots \\l_{n1} & \cdots & l_{nn}\end{bmatrix}\begin{bmatrix}l_{11} & \cdots & l_{1n} \\\vdots & \ddots & \vdots \\0 & \cdots & l_{nn}\end{bmatrix}
 > $$
 > 
