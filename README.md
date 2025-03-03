@@ -43,3 +43,6 @@ navigator > index.md
 # 수식 번호 붙이기
 $$수식수식 \tag(1.1)$$ 처럼 끝에 \tag{수식번호}만 붙이면 된다
 $$  \mathcal{L} = \sum_{s \in \mathcal{S}} \sum_{e_m \in s} \sum_{-n \lt j \lt n, j \ne 0} \sum_{k=1, \cdots , T_m} \log \mathbb{P}(e_{m+j} \mid p_{mk}) \tag{3.2}$$
+
+# css 수정방법
+홈화면 : _sie/assets/css/main.css를 수정하면 된다

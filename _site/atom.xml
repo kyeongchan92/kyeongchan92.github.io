@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-08-18T21:04:51+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;이번엔 내용이 좀 많고 어려웠습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/atom.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-03-03T16:05:26+09:00</updated><id>http://localhost:4000/atom.xml</id><title type="html">Leegang’s AI Note</title><author><name>Kyeongchan Lee</name></author><entry><title type="html">추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition</title><link href="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/" rel="alternate" type="text/html" title="추천시스템과 Matrix Decompositions — 3. 고유값과 고유벡터, Cholesky Decomposition" /><published>2024-08-07T00:00:00+09:00</published><updated>2024-08-07T00:00:00+09:00</updated><id>http://localhost:4000/2024/08/07/matrix%20decomposition%2003%20eigen%20and%20cholesky</id><content type="html" xml:base="http://localhost:4000/2024/08/07/matrix-decomposition-03-eigen-and-cholesky/">&lt;p&gt;이번엔 내용이 좀 많고 어려웠습니다..! Matrix decomposition의 원리를 다 이해해보려고 며칠동안 독기품고 정리했습니다..!! 말투를 반말로 바꾸겠습니다 😄&lt;/p&gt;
 
 &lt;p&gt;좌표를 잃지 않기 위해 4단원 ‘Matrix Decompositions의 목차를 다시 한 번 정리하고 오늘 다룰 부분을 알아보자.&lt;/p&gt;
 
@@ -56,14 +56,12 @@
 
 &lt;blockquote&gt;
   &lt;p&gt;Theorem 4.12. 서로 다른 고유값 \(\lambda_1, ..., \lambda_n\)을 갖는 행렬 \(\mathbf{A}\in \mathbb{R}^{n\times n}\)의 고유벡터 \(x_1, ..., x_n\)는 선형 독립이다.&lt;/p&gt;
-
 &lt;/blockquote&gt;
 
 &lt;p&gt;위 정리는 n개의 서로 다른 고유값을 갖는 행렬의 고유 벡터들은  \(\mathbb{R}^n\)의 기저를 형성한다는 것이 된다.&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;Definition 4.14. 만약 정방행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 \(n\)보다 적은 선형 독립의 고유 벡터를 갖는다면 \(defective\)이다.&lt;/p&gt;
-
 &lt;/blockquote&gt;
 
 &lt;p&gt;\(non-defective\) 행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 필수적으로 \(n\)개의 서로 다른 고유값을 필요로 하는 것은 아니다. 하지만, 고유 벡터들이 \(\mathbb{R}^n\)의 기저를 형성해야한다.&lt;/p&gt;

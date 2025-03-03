@@ -64,12 +64,10 @@ determinants, eigenvectors, 그리고 eigenvalues에 대해 직관적인 이해�
   Theorem 4.12. 서로 다른 고유값 \(\lambda_1, ..., \lambda_n\)을 갖는 행렬 \(\mathbf{A}\in \mathbb{R}^{n\times n}\)의 고유벡터 \(x_1, ..., x_n\)는 선형 독립이다.
 
 
-
 위 정리는 n개의 서로 다른 고유값을 갖는 행렬의 고유 벡터들은  \(\mathbb{R}^n\)의 기저를 형성한다는 것이 된다.
 
 
   Definition 4.14. 만약 정방행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 \(n\)보다 적은 선형 독립의 고유 벡터를 갖는다면 \(defective\)이다.
-
 
 
 \(non-defective\) 행렬 \(\mathbf{A} \in \mathbb{R}^{n \times n}\)이 필수적으로 \(n\)개의 서로 다른 고유값을 필요로 하는 것은 아니다. 하지만, 고유 벡터들이 \(\mathbb{R}^n\)의 기저를 형성해야한다.
@@ -3355,7 +3353,7 @@ urlpatterns = [
 
 \[NDCG@K = Z_K \sum_{i=1}^{K} \frac{2^{rel_i}-1}{\log_2(i+1)}\]
 
-\(Z_K\)는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. \(rel_i\)는 $i$번째 아이템의 graded relavance입니다. implicit data이기 때문에 \(rel_i\)는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
+\(Z_K\)는 제일 좋은 성능일 때를 1로 만들기 위한 normalizer입니다. 보통은 1로 놓습니다. \(rel_i\)는 \(i\)번째 아이템의 graded relavance입니다. implicit data이기 때문에 \(rel_i\)는 1 또는 0이며, 1일 때는 아이템이 test set에 존재할 때이고, 0일 때는 그렇지 않을 때입니다.
 
 예시
 예를 들어 K=5라고 해보겠습니다.
@@ -3371,7 +3369,7 @@ urlpatterns = [
 
 모델이 다음 클릭으로 예측한 결과가 6, 4, 8, 5, 10 순으로 높은 스코어가 나왔다고 해봅시다. 테스트 유저가 실제로 클릭한 test셋인 아이템은 4, 5입니다. 모델이 4, 5를 높은 순위로 예측했다면 좋은 모델이라고 할 수 있습니다. 이 true label set, 즉 test set인 4, 5 아이템 간의 시간 순서 등은 사용되지 않습니다.
 
-idcg를 구해봅시다. idcg는 모델 예측이 true label set으로 1위부터 쭉 나열된 경우, 말그대로 ideal한 상황에서 nDCG를 계산한 값입니다. 위 수식에 따르면 :
+idcg를 구해봅시다. idcg는 모델 예측이 true label set으로 1위부터 쭉 나열된 경우, 말그대로 ideal한 상황에서 DCG를 계산한 값입니다. 위 수식에 따르면 :
 
 \[\begin{align*}\text{idcg(ideal dcg)} &amp;amp;= \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)}\\
 &amp;amp;=\frac{1}{\log_2{(1+1)}}+\frac{1}{\log_2{(2+1)}}+\frac{0}{\log_2{(3+1)}}+\frac{0}{\log_2{(4+1)}}+\frac{0}{\log_2{(5+1)}}\\
@@ -3388,7 +3386,8 @@ idcg를 구해봅시다. idcg는 모델 예측이 true label set으로 1위부�
 \end{align*}\]
 
 \(ndcg=\frac{dcg}{idcg}\)로 계산합니다.
-\(\text{nDCG@5}=\frac{dcg}{idcg}=\frac{1.0616}{1.6309}=0.6509\)
+
+그러므로 \(\text{nDCG@5}=\frac{dcg}{idcg}=\frac{1.0616}{1.6309}=0.6509\)
 
 
 
