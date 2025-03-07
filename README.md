@@ -16,6 +16,11 @@ bundle exec jekyll serve
 <span style="color:red"> red </span>
 ```
 
+이탤릭체 추가
+```
+<span style="color:blue; font-style:italic">example</span>
+```
+
 ### 바로가기 문자
 ↗
 

@@ -32,8 +32,6 @@ ReAct 방법론 설명 전 예시 먼저 해석
 
 
 
-
-
 Hotspot QA라는 데이터셋 예시 안에서 Apple Remote라는 리모컨과 Front Row라는 화면이 나옵니다. 그리고 물어봅니다. “원래 Apple Remote와 통신할 수 있도록 만든 프로그램을 제어할 수 있는 Apple Remote 이외의 다른 장치가 뭐야?”
 
 
@@ -42,14 +40,7 @@ Hotspot QA라는 데이터셋 예시 안에서 Apple Remote라는 리모컨과 F
 
 2 REACT: SYNERGIZING REASONING + ACTING
 
-
-  
-    
-      시간 $t$에서 에이전트는 $o_t \in \mathcal{O}$라는 관측(observation)을 받고, 행동(action)인 $a_t \in \mathcal{A}$을 받는다. 이는 $\pi(a_t
-      c_t)$라는 정책을 따르는데, 이 때 문맥(context)는
-    
-  
-
+시간 $t$에서 에이전트는 $o_t \in \mathcal{O}$라는 관측(observation)을 받고, 행동(action)인 $a_t \in \mathcal{A}$을 받는다. 이는 $\pi(a_t \vert c_t)$라는 정책을 따르는데, 이 때 문맥(context)는
 
 \[c_t = (o_1, a_1, \cdots, o_{t-1}, a_{t-1}, o_t)\]
 
@@ -91,11 +82,48 @@ Apple Remote가 뭔지 검색하고, Front Row에 대해 검색하고, Front Row
 
 3 KNOWLEDGE-INTENSIVE REASONING TASKS
 
-‘Knowledge-intensive’는 ‘지식 집약적인’이라는 뜻으로 통용되는 것 같습니다. https://velog.io/@tobigs-nlp/Retrieval-Augmented-Generation-for-Knowledge-Intensive-NLP-Tasks에 따르면, Knowledge Intensive Tasks란 ‘사람조차도 외부 지식(ex. 위키피디아 검색) 없이 해결하기 어려운 문제’라고 하네요. 본 섹션에서는 복잡한 정보가 필요한(=지식 집약적인) 추론 작업, 즉 여러 단계를 거쳐야 하는 Question-Answering과 팩트 체크와 같은 작업을 다뤄본다고 합니다.
+‘Knowledge-intensive’는 ‘지식 집약적인’이라는 뜻으로 통용되는 것 같습니다. 
+Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks에 따르면, Knowledge Intensive Tasks란 ‘사람조차도 외부 지식(ex. 위키피디아 검색) 없이 해결하기 어려운 문제’라고 하네요. 본 섹션에서는 복잡한 정보가 필요한(=지식 집약적인) 추론 작업, 즉 여러 단계를 거쳐야 하는 Question-Answering과 팩트 체크와 같은 작업을 다뤄본다고 합니다.
 
 
 
 ReAct를 사용하면 위 그림과 같이 위키피디아 API를 사용하여 추론을 도와줄 수 있는 검색을 할 수 있고, 그 다음에 필요한 정보가 무엇인지 알아내기 위해 다시 추론을 사용한다고 합니다.
+
+데이터셋은 다음 두 가지를 사용했다고 합니다.
+
+
+  Hotpotqa: A dataset for diverse, explainable multi-hop question answering(2018)
+  FEVER: a large-scale dataset for fact extraction and VERification(2018)
+
+
+HotpotQA는 Question-Answering 데이터셋이며 113,000개의 위키피디아 기반 question-answer 쌍으로 되어있다고 합니다. FEVER에는 사실 검증을 위한 벤치마크 데이터셋으로 185,445개의 주장(claim)이 있으며, 각 주장은 주장은 SUPPORTS(지지됨, 주장을 뒷받침하는 위키백과 문서가 존재하는 경우), REFUTES(반박됨, 주장이 위키백과 문서에 의해 반박되는 경우), NOT ENOUGH INFO(정보 부족, 주장을 검증할 수 있는 충분한 정보가 위키백과 문서에 존재하지 않는 경우) 중 하나로 분류됩니다.
+
+HotpotQA부터 살펴봅시다.
+
+
+
+위 이미지는 HotpotQA 데이터셋의 샘플인데요, 단락 A와 B가 있습니다. 파란색 이탤릭체는 supporting facts라고 합니다. 내용은 대략 이렇습니다. (Hotpot이라는 이름은 저자들이 중국식 전골인 hot pot 식당에서 아이디어를 떠올려서 그렇다고 합니다)
+
+
+  단락 A, Return to Olympus:
+
+  [1] ‘Return to Olympus’는 록밴드 Malfunkshun의 유일한 앨범이다. [2] 이 앨범은 밴드가 해체된 후, 그리고 리드 싱어였던 Andrew Wood(나중에 Mother Love Bone의 멤버)가 1990년에 약물 과다복용으로 사망한 후 발매되었다. [3] Pearl Jam의 Stone Gossard가 곡들을 모아 자신의 레이블인 Loosegroove Records에서 앨범을 발매했다.
+
+  단락 B, Mother Love Bone:
+
+  [4] Mother Love Bone은 1987년에 미국 시애틀에서 결성된 록 밴드였다. [5] 이 밴드는 1987년부터 1990년까지 활동했다. [6] 프런트맨(밴드나 그룹에서 공연을 이끌어가며 그룹의 이미지를 좌우하는 사람) Andrew Wood의 개성과 작곡 실력은 1980년대 후반과 1990년대 초반 시애틀 음악 scene에서 이 밴드를 정상으로 끌어올리는 데 큰 역할을 했다. [7] Wood는 밴드의 데뷔 앨범인 Apple이 예정된 출시를 불과 며칠 앞두고 사망했으며, 이는 밴드의 성공 가능성을 끝내는 계기가 되었다. [8] 앨범은 결국 몇 달 후에 발매되었다.
+
+  Q: Apple이 출시되기 직전에 사망한 Mother Love Bone의 멤버가 이전에 속했던 밴드는 무엇인가?
+
+  A: Malfunkshun
+
+
+이 질문에 대답하기 위해선 꽤 여러 단계의 Reasoning을 거쳐야 합니다. Multi-hop 문제라고도 부릅니다. [7]을 보면 Apple이라는 앨범은 Mother Love Bone라는 밴드의 데뷔 앨범이었습니다. 근데 Wood라는 사람이 Apple 출시 앞두고 사망합니다. [4],[6]에서 Wood는 Mother Love Bone 밴드의 프런트맨이었습니다. [1]과 [2]를 보면 이 사람은 ‘Malfunkshun’이란 밴드의 리드 싱어였습니다. 그러므로 대답은 ‘Malfunkshun’가 됩니다.
+
+다시 ReAct로 돌아와봅니다.
+
+다음은 Action Space에 대한 설명입니다.
+
 </content>
       <categories>
         
