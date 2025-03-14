@@ -116,7 +116,14 @@ HotpotQA부터 살펴봅시다.
 
 이 질문에 대답하기 위해선 꽤 여러 단계의 Reasoning을 거쳐야 합니다. Multi-hop 문제라고도 부릅니다. [7]을 보면 Apple이라는 앨범은 Mother Love Bone라는 밴드의 데뷔 앨범이었습니다. 근데 Wood라는 사람이 Apple 출시 앞두고 사망합니다. [4],[6]에서 Wood는 Mother Love Bone 밴드의 프런트맨이었습니다. [1]과 [2]를 보면 이 사람은 'Malfunkshun'이란 밴드의 리드 싱어였습니다. 그러므로 대답은 'Malfunkshun'가 됩니다.
 
-다시 ReAct로 돌아와봅니다.
+다시 ReAct로 돌아와봅니다. 다음은 **Action Space**에 대한 설명입니다. 
 
-다음은 **Action Space**에 대한 설명입니다. 
+액션은 크게 세 가지입니다.
+
+1. search[entity] : entity로 검색한 문서가 존재하면 그 문서의 첫 5문장을 반환합니다. 없으면 Wikipedia 검색엔진에 의한 유사한 entity 상위 5개를 반환합니다.
+2. lookup[string] : 브라우저의 Ctrl+F 기능으로 해당 string을 찾아, 이 string을 포함하고 있는 페이지의 첫 번째 문장을 반환한다.
+3. finish[answer] : 끝낸다.
+
+
+
 
